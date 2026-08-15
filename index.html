@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Umbral">
+<meta name="theme-color" content="#EDEFF2">
+<meta name="description" content="Planificación de entrenamientos de running con planes importables en formato UTP/1.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.png">
+<title>Umbral — entrenamiento de running</title>
+<style>
+/* ============================================================
+   UMBRAL — sistema visual
+   El color no decora: codifica intensidad. La rampa E→M→T→I→R
+   es la paleta, y el perfil de esfuerzo es la firma de la app.
+   ============================================================ */
+:root{
+  --bg:#EDEFF2; --surface:#FFFFFF; --surface-2:#F6F8FA;
+  --ink:#0E141B; --ink-2:#46525F; --ink-3:#8794A1;
+  --line:#DCE1E7; --line-2:#C3CCD5;
+  --accent:#1E4F7C; --alerta:#B5502F; --ok:#2F7A5B;
+  --E:#4E7FA8; --M:#3E8E7E; --T:#D19A2E; --I:#C7502F; --R:#A32E4E;
+  --trote:#93A7B8; --caminar:#B3BCC5; --libre:#7E93A6; --carrera:#6B4E9B; --nulo:#AEB8C2;
+  --r-s:8px; --r-m:14px; --r-l:20px;
+  --disp:"Avenir Next Condensed","Avenir Next","Helvetica Neue",-apple-system,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  --sb:env(safe-area-inset-bottom,0px); --st:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.42;
+  overscroll-behavior-y:none;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer;text-align:left}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.app{display:flex;flex-direction:column;height:100dvh;padding-top:var(--st)}
+.vista{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px calc(78px + var(--sb))}
+.vista.off{display:none}
+
+/* ---------- tipografía ---------- */
+.disp{font-family:var(--disp);font-weight:600;letter-spacing:.01em}
+.eyebrow{font-family:var(--disp);font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005em}
+
+/* ---------- cabecera ---------- */
+.head{padding:12px 14px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.head .l{min-width:0}
+.head h1{font-size:26px;line-height:1.05;text-transform:uppercase}
+.head .sub{font-size:12.5px;color:var(--ink-2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cuenta{text-align:right;flex:0 0 auto}
+.cuenta b{font-family:var(--disp);font-size:30px;line-height:.9;display:block;font-weight:600}
+.cuenta span{font-family:var(--disp);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ---------- tarjetas ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:15px;margin-bottom:11px}
+.card.tight{padding:12px}
+.card h3{font-size:16px;text-transform:uppercase;letter-spacing:.05em}
+.card p{margin:6px 0 0;font-size:14px;color:var(--ink-2)}
+.row{display:flex;gap:10px;align-items:center}
+.row>*{min-width:0}
+.spread{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+
+/* ---------- PERFIL DE ESFUERZO (firma) ---------- */
+.perfil{display:flex;align-items:flex-end;gap:1.5px;width:100%;
+  border-bottom:1.5px solid var(--line-2);padding-bottom:0}
+.perfil i{display:block;min-width:1.5px;border-radius:2px 2px 0 0;opacity:.95}
+.perfil.xl{height:76px;gap:2px}
+.perfil.md{height:40px}
+.perfil.sm{height:20px;border-bottom-width:1px}
+.perfil.xs{height:13px;gap:1px;border-bottom-width:1px}
+
+/* ---------- sesión de hoy ---------- */
+.hoy-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:17px;margin-bottom:11px;position:relative;overflow:hidden}
+.hoy-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--z)}
+.tipo-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--disp);font-size:11px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--z);border:1px solid currentColor;border-radius:11px;padding:2px 9px}
+.hoy-card h2{font-size:27px;line-height:1.08;margin:11px 0 3px;letter-spacing:-.005em}
+.hoy-meta{font-size:13px;color:var(--ink-3);font-family:var(--mono)}
+.ritmo-grande{display:flex;align-items:flex-end;gap:9px;margin:16px 0 4px}
+.ritmo-grande b{font-family:var(--disp);font-size:46px;line-height:.86;font-weight:600;letter-spacing:-.01em}
+.ritmo-grande em{font-style:normal;font-family:var(--disp);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-bottom:5px}
+.ritmo-sub{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+.clima-flag{display:inline-block;font-family:var(--disp);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  background:#FBEFD8;color:#8A6314;border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+
+/* ---------- segmentos ---------- */
+.segs{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}
+.seg{display:flex;gap:11px;padding:9px 0;align-items:flex-start;border-bottom:1px solid var(--line)}
+.seg:last-child{border-bottom:0}
+.seg .marca{width:3px;border-radius:2px;align-self:stretch;min-height:20px;flex:0 0 3px;background:var(--z)}
+.seg .t{font-size:14.5px;flex:1}
+.seg .t b{font-weight:600}
+.seg .r{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.seg .rol{font-family:var(--disp);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:block}
+
+/* ---------- semana ---------- */
+.sem-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.dia-mini{background:var(--surface-2);border-radius:var(--r-s);padding:6px 3px 5px;text-align:center;border:1px solid transparent}
+.dia-mini.hoy{border-color:var(--ink);background:var(--surface)}
+.dia-mini .d{font-family:var(--disp);font-size:10px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+.dia-mini .k{font-family:var(--mono);font-size:10px;color:var(--ink-2);margin-top:3px}
+.dia-mini .perfil{margin-top:4px;border-bottom:0}
+
+/* ---------- lista de sesiones ---------- */
+.ses{display:flex;gap:11px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line);width:100%}
+.ses:last-child{border-bottom:0}
+.ses .fecha{flex:0 0 34px;text-align:center}
+.ses .fecha b{font-family:var(--disp);font-size:17px;font-weight:600;display:block;line-height:1}
+.ses .fecha span{font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ses .cuerpo{flex:1;min-width:0}
+.ses .tit{font-size:14.5px;font-weight:590;letter-spacing:-.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ses .bajo{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
+.ses .viz{flex:0 0 62px}
+.ses.hecha .tit{color:var(--ink-3);text-decoration:line-through}
+.ses.hoy{background:var(--surface-2);border-radius:var(--r-s)}
+.tick{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--line-2);flex:0 0 17px;display:grid;place-items:center}
+.tick.on{background:var(--ok);border-color:var(--ok)}
+.tick.on::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg) translate(-1px,-1px)}
+
+/* ---------- semanas del plan ---------- */
+.sem{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);margin-bottom:9px;overflow:hidden}
+.sem-head{display:flex;align-items:center;gap:11px;padding:12px 13px;width:100%}
+.sem-head .n{font-family:var(--disp);font-size:20px;font-weight:600;flex:0 0 auto;line-height:1}
+.sem-head .info{flex:1;min-width:0}
+.sem-head .foco{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sem-head .datos{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:1px}
+.sem-head .barra{flex:0 0 54px;height:26px;display:flex;align-items:flex-end}
+.sem-head .barra i{display:block;width:100%;background:var(--accent);border-radius:2px 2px 0 0;opacity:.75}
+.sem.abierta .sem-cuerpo{display:block}
+.sem-cuerpo{display:none;padding:0 13px 8px;border-top:1px solid var(--line)}
+.fase-tag{font-family:var(--disp);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;padding:2px 7px;border-radius:9px;color:#fff}
+.hoy-marca{position:absolute;left:0;right:0;height:2px;background:var(--alerta)}
+
+/* ---------- pestañas ---------- */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding:7px 0 calc(7px + var(--sb))}
+.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--disp);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:2px 0}
+.tabs button.on{color:var(--accent)}
+.tabs svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- hojas ---------- */
+.scrim{position:fixed;inset:0;background:rgba(14,20,27,.36);z-index:50;opacity:0;pointer-events:none;transition:opacity .22s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--surface);border-radius:var(--r-l) var(--r-l) 0 0;
+  max-height:94dvh;display:flex;flex-direction:column;transform:translateY(101%);
+  transition:transform .28s cubic-bezier(.32,.72,0,1)}
+.sheet.on{transform:translateY(0)}
+.grab{width:34px;height:4px;background:var(--line-2);border-radius:2px;margin:8px auto 0;flex:none}
+.sheet-head{padding:9px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);flex:none}
+.sheet-head h3{font-size:15px;text-transform:uppercase;letter-spacing:.07em}
+.sheet-head button{font-size:15px;color:var(--accent);font-weight:600;font-family:var(--sans)}
+.sheet-head button.plain{color:var(--ink-3);font-weight:500}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(24px + var(--sb))}
+
+/* ---------- formularios ---------- */
+.f{margin-bottom:13px}
+.f label,.lbl{font-family:var(--disp);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
+.in{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:10px 11px;font-size:16px}
+.in.mono{font-family:var(--mono)}
+textarea.in{resize:vertical;min-height:70px;line-height:1.45}
+select.in{-webkit-appearance:none;appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.seg-btns{display:flex;flex-wrap:wrap;gap:6px}
+.seg-btns button{border:1px solid var(--line-2);border-radius:14px;padding:6px 11px;font-size:13px;font-weight:560;color:var(--ink-2);font-family:var(--sans)}
+.seg-btns button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn{display:block;width:100%;text-align:center;padding:14px;border-radius:var(--r-m);font-size:15.5px;font-weight:640;margin-top:10px;font-family:var(--sans)}
+.btn.pri{background:var(--accent);color:#fff}
+.btn.gh{border:1px solid var(--line-2)}
+.btn.dg{color:var(--alerta);border:1px solid rgba(181,80,47,.32)}
+.btn:active{opacity:.72}
+.btn-row{display:flex;gap:9px}
+.mini{padding:9px;font-size:13.5px;border-radius:var(--r-s);margin-top:0}
+
+/* ---------- ritmos ---------- */
+.zt{width:100%;border-collapse:collapse;margin-top:10px}
+.zt td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+.zt tr:last-child td{border-bottom:0}
+.zt .z{font-family:var(--disp);font-size:19px;font-weight:600;width:26px}
+.zt .nm{font-size:14px}
+.zt .nm small{display:block;color:var(--ink-3);font-size:11.5px}
+.zt .rt{font-family:var(--mono);font-size:14px;text-align:right;white-space:nowrap}
+.vdot-box{display:flex;align-items:baseline;gap:10px;margin:4px 0 2px}
+.vdot-box b{font-family:var(--disp);font-size:52px;line-height:.85;font-weight:600}
+.equiv{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.equiv div{background:var(--surface-2);border-radius:var(--r-s);padding:8px 4px;text-align:center}
+.equiv b{font-family:var(--mono);font-size:13px;display:block}
+.equiv span{font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;color:var(--ink-3)}
+
+/* ---------- importar ---------- */
+.pre{background:#0E141B;color:#D7DEE6;border-radius:var(--r-m);padding:13px;font-family:var(--mono);font-size:11px;
+  line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:230px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.acc{border-bottom:1px solid var(--line)}
+.acc:last-of-type{border-bottom:0}
+.acc>button{width:100%;padding:12px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font-size:14.5px;font-weight:600;font-family:var(--sans)}
+.acc>button span{color:var(--ink-3);font-size:19px;line-height:1;font-weight:400}
+.acc .cont{display:none;padding:0 0 13px}
+.acc.on .cont{display:block}
+.acc.on>button span{transform:rotate(45deg)}
+.tabla{width:100%;border-collapse:collapse;font-size:12.5px}
+.tabla td{padding:5px 8px 5px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.tabla td:first-child{font-family:var(--mono);color:var(--accent);white-space:nowrap}
+.aviso{border-radius:var(--r-s);padding:10px 12px;font-size:13px;margin-top:9px;line-height:1.45}
+.aviso.err{background:#FBEDE9;color:#8A3418}
+.aviso.warn{background:#FBF4E2;color:#7A5A13}
+.aviso.ok{background:#E9F4EE;color:#1F5C42}
+.aviso b{font-family:var(--mono);font-size:11px;margin-right:5px}
+
+/* ---------- varios ---------- */
+.vacio{text-align:center;padding:46px 20px;color:var(--ink-3)}
+.vacio h3{font-size:19px;color:var(--ink);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em}
+.vacio p{font-size:14px;margin:0 0 16px}
+.toast{position:fixed;left:50%;transform:translate(-50%,14px);bottom:calc(84px + var(--sb));z-index:90;
+  background:var(--ink);color:#fff;padding:11px 16px;border-radius:var(--r-m);font-size:13.5px;font-weight:560;
+  opacity:0;pointer-events:none;transition:all .24s;max-width:88vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.oculto{display:none!important}
+.barras-vol{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:9px;border-bottom:1px solid var(--line-2)}
+.barras-vol i{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.5;min-height:2px}
+.barras-vol i.act{opacity:1}
+.barras-vol i.desc{background:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="head" id="head">
+    <div class="l"><h1 id="hTitulo">Umbral</h1><div class="sub" id="hSub">Sin plan activo</div></div>
+    <div class="cuenta oculto" id="hCuenta"><b id="hDias">—</b><span id="hDiasLbl">días</span></div>
+  </div>
+
+  <div class="vista" id="v-hoy"></div>
+  <div class="vista off" id="v-plan"></div>
+  <div class="vista off" id="v-ritmos"></div>
+  <div class="vista off" id="v-importar"></div>
+  <div class="vista off" id="v-ajustes"></div>
+
+  <nav class="tabs">
+    <button class="on" data-v="hoy">
+      <svg viewBox="0 0 24 24"><path d="M12 3v3M5 8l2 2M19 8l-2 2M12 21a7 7 0 100-14 7 7 0 000 14zM12 13v-2"/></svg>Hoy</button>
+    <button data-v="plan">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Plan</button>
+    <button data-v="ritmos">
+      <svg viewBox="0 0 24 24"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-4"/></svg>Ritmos</button>
+    <button data-v="importar">
+      <svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>Importar</button>
+    <button data-v="ajustes">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1A1.6 1.6 0 008 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1A1.6 1.6 0 003.6 9a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H8a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>Ajustes</button>
+  </nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- detalle de sesión -->
+<div class="sheet" id="shDetalle">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <button class="plain" data-cerrar>Cerrar</button>
+    <h3>Sesión</h3>
+    <button id="btnEditar">Editar</button>
+  </div>
+  <div class="sheet-body" id="cuerpoDetalle"></div>
+</div>
+
+<!-- editor de sesión -->
+<div class="sheet" id="shEditor">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <button class="plain" data-cerrar>Cancelar</button>
+    <h3>Editar sesión</h3>
+    <button id="btnGuardarSes">Guardar</button>
+  </div>
+  <div class="sheet-body" id="cuerpoEditor"></div>
+</div>
+
+<!-- registro -->
+<div class="sheet" id="shRegistro">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <button class="plain" data-cerrar>Cancelar</button>
+    <h3>Registrar</h3>
+    <button id="btnGuardarReg">Guardar</button>
+  </div>
+  <div class="sheet-body" id="cuerpoRegistro"></div>
+</div>
+
+<!-- informe de importación -->
+<div class="sheet" id="shInforme">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <button class="plain" data-cerrar>Descartar</button>
+    <h3>Revisión del plan</h3>
+    <button id="btnConfirmar">Importar</button>
+  </div>
+  <div class="sheet-body" id="cuerpoInforme"></div>
+</div>
+
+<input type="file" id="fileJson" accept=".json,application/json,text/plain" class="oculto">
+<input type="file" id="fileCopia" accept=".json,application/json" class="oculto">
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   UMBRAL — núcleo lógico
+   Sin DOM: todo acá es probable de forma aislada.
+   ============================================================ */
+
+/* ---------- fechas ---------- */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseYMD = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d, 12); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const diffDays = (a, b) => Math.round((new Date(b.getFullYear(), b.getMonth(), b.getDate()) - new Date(a.getFullYear(), a.getMonth(), a.getDate())) / 864e5);
+const hoy = () => { const d = new Date(); d.setHours(12, 0, 0, 0); return d; };
+const sameYMD = (a, b) => ymd(a) === ymd(b);
+
+const DIAS_SEM = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+const DIAS_LBL = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+const DIAS_MIN = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const MESES_C = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+const sinAcentos = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+// los modelos escriben los días en inglés o abreviados con la misma frecuencia
+const SIN_DIA = {
+  monday: 'lunes', mon: 'lunes', lun: 'lunes', l: 'lunes',
+  tuesday: 'martes', tue: 'martes', tues: 'martes', mar: 'martes',
+  wednesday: 'miercoles', wed: 'miercoles', mie: 'miercoles', mier: 'miercoles',
+  thursday: 'jueves', thu: 'jueves', thur: 'jueves', thurs: 'jueves', jue: 'jueves',
+  friday: 'viernes', fri: 'viernes', vie: 'viernes',
+  saturday: 'sabado', sat: 'sabado', sab: 'sabado',
+  sunday: 'domingo', sun: 'domingo', dom: 'domingo'
+};
+function normDia(v) {
+  const s = sinAcentos(v);
+  if (DIAS_SEM.includes(s)) return s;
+  return SIN_DIA[s] || s;
+}
+// índice 0..6 desde el inicio de semana configurado
+function idxDia(nombre, inicioSemana) {
+  const base = DIAS_SEM.indexOf(sinAcentos(inicioSemana) || 'lunes');
+  const i = DIAS_SEM.indexOf(normDia(nombre));
+  if (i < 0) return -1;
+  return (i - (base < 0 ? 0 : base) + 7) % 7;
+}
+// lunes de la semana que contiene a d (según inicio de semana)
+function inicioDeSemana(d, inicioSemana) {
+  const base = Math.max(0, DIAS_SEM.indexOf(sinAcentos(inicioSemana) || 'lunes'));
+  const jsIdx = (d.getDay() + 6) % 7;           // 0 = lunes
+  return addDays(d, -((jsIdx - base + 7) % 7));
+}
+const fmtFecha = d => `${d.getDate()} de ${MESES[d.getMonth()]}`;
+const fmtCorta = d => `${pad(d.getDate())} ${MESES_C[d.getMonth()]}`;
+
+/* ---------- tiempos ---------- */
+function segundos(txt) {
+  if (txt == null) return null;
+  if (typeof txt === 'number') return txt;
+  const s = String(txt).trim().toLowerCase().replace(',', '.');
+  let m = s.match(/^(\d+)h ?(\d+)?m?(?: ?(\d+)s?)?$/);          // 1h45, 1h45m30s
+  if (m) return (+m[1]) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0));
+  m = s.match(/^(\d+):(\d{1,2}):(\d{1,2})$/);                    // h:mm:ss
+  if (m) return (+m[1]) * 3600 + (+m[2]) * 60 + (+m[3]);
+  m = s.match(/^(\d{1,3}):(\d{1,2})$/);                          // mm:ss
+  if (m) return (+m[1]) * 60 + (+m[2]);
+  m = s.match(/^(\d+(?:\.\d+)?)\s*min$/);
+  if (m) return Math.round(+m[1] * 60);
+  if (/^\d+(\.\d+)?$/.test(s)) return Math.round(+s * 60);       // número suelto = minutos
+  return null;
+}
+function hms(seg) {
+  seg = Math.round(seg);
+  const h = Math.floor(seg / 3600), m = Math.floor(seg % 3600 / 60), s = seg % 60;
+  return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+const ritmoTxt = sxkm => `${Math.floor(sxkm / 60)}:${pad(Math.round(sxkm % 60))}`;
+function duracionTxt(min) {
+  if (min == null) return '';
+  const h = Math.floor(min / 60), m = Math.round(min % 60);
+  return h ? `${h} h ${m ? m + ' min' : ''}`.trim() : `${m} min`;
+}
+
+/* ============================================================
+   VDOT — Jack Daniels
+   ============================================================ */
+const vo2De = v => -4.60 + 0.182258 * v + 0.000104 * v * v;
+const pctMax = t => 0.8 + 0.1894393 * Math.exp(-0.012778 * t) + 0.2989558 * Math.exp(-0.1932605 * t);
+
+function vdotDe(dist_m, seg) {
+  if (!dist_m || !seg) return null;
+  const t = seg / 60, v = dist_m / t;
+  return vo2De(v) / pctMax(t);
+}
+function velDe(vo) {
+  const a = 0.000104, b = 0.182258, c = -(4.60 + vo);
+  return (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);   // m/min
+}
+const ritmoDe = (vdot, frac) => 60000 / velDe(vdot * frac);  // segundos por km
+
+const ZONAS = {
+  E: { min: 0.59, max: 0.74, tip: 0.665, nom: 'Suave', desc: 'Base aeróbica y recuperación', sens: 'Conversación entera sin cortarte' },
+  M: { min: 0.75, max: 0.84, tip: 0.795, nom: 'Maratón', desc: 'Economía a ritmo de competencia larga', sens: 'Cómodo pero con la cabeza puesta' },
+  T: { min: 0.83, max: 0.88, tip: 0.855, nom: 'Umbral', desc: 'Sostener el umbral de lactato', sens: 'Cómodamente duro: frases cortas' },
+  I: { min: 0.95, max: 1.00, tip: 0.975, nom: 'Intervalos', desc: 'Consumo máximo de oxígeno', sens: 'Duro. Querés que la serie termine' },
+  R: { min: 1.05, max: 1.10, tip: 1.075, nom: 'Repeticiones', desc: 'Velocidad, economía y mecánica', sens: 'Rápido pero suelto, sin agonía' }
+};
+const ZONA_COLOR = {
+  E: '#4E7FA8', M: '#3E8E7E', T: '#D19A2E', I: '#C7502F', R: '#A32E4E',
+  trote: '#93A7B8', caminar: '#B3BCC5', libre: '#7E93A6', carrera: '#6B4E9B'
+};
+const ZONA_NIVEL = { caminar: 0.8, trote: 1.4, E: 2, libre: 2, M: 3.2, carrera: 3.6, T: 4.2, I: 5.2, R: 6 };
+
+function zonasDe(vdot) {
+  if (!vdot) return null;
+  const z = {};
+  for (const k in ZONAS) {
+    const Z = ZONAS[k];
+    z[k] = { lento: ritmoDe(vdot, Z.min), rapido: ritmoDe(vdot, Z.max), tip: ritmoDe(vdot, Z.tip) };
+  }
+  z.trote = { lento: z.E.lento * 1.18, rapido: z.E.lento, tip: z.E.lento * 1.1 };
+  z.libre = { ...z.E };
+  z.caminar = { lento: 600, rapido: 480, tip: 540 };
+  return z;
+}
+// Riegel
+const riegel = (t1, d1, d2) => t1 * Math.pow(d2 / d1, 1.06);
+
+/* ajuste ambiental: índice = temperatura + humedad/4 */
+function recargoClima(temp, hum) {
+  if (temp == null) return 0;
+  const i = temp + (hum || 0) / 4;
+  if (i < 18) return 0;
+  if (i < 22) return 0.01;
+  if (i < 26) return 0.02;
+  if (i < 30) return 0.04;
+  if (i < 34) return 0.06;
+  return 0.08;
+}
+const AJUSTABLES = ['M', 'T', 'I', 'R', 'carrera'];
+
+/* ============================================================
+   UTP/1 — parseo tolerante
+   ============================================================ */
+const SIN_TIPO = {
+  easy: 'suave', rodaje: 'suave', recuperacion: 'suave', regenerativo: 'suave',
+  long: 'largo', longrun: 'largo', 'tirada larga': 'largo', fondo: 'largo',
+  threshold: 'tempo', umbral: 'tempo', ritmo: 'tempo',
+  intervals: 'intervalos', interval: 'intervalos', vo2max: 'intervalos', series: 'intervalos',
+  reps: 'repeticiones', repetitions: 'repeticiones', velocidad: 'repeticiones',
+  rest: 'descanso', off: 'descanso', libre: 'descanso',
+  hills: 'cuestas', hill: 'cuestas', cuesta: 'cuestas',
+  race: 'carrera', competencia: 'carrera', progression: 'progresivo',
+  strength: 'fuerza', gym: 'fuerza', gimnasio: 'fuerza',
+  cross: 'cruzado', crosstraining: 'cruzado', bici: 'cruzado',
+  mobility: 'movilidad', estiramiento: 'movilidad', elongacion: 'movilidad'
+};
+const TIPOS = {
+  descanso:     { n: 'Descanso',      z: null,      corto: 'Descanso' },
+  suave:        { n: 'Suave',         z: 'E',       corto: 'Suave' },
+  largo:        { n: 'Tirada larga',  z: 'E',       corto: 'Largo' },
+  progresivo:   { n: 'Progresivo',    z: 'M',       corto: 'Progresivo' },
+  tempo:        { n: 'Umbral',        z: 'T',       corto: 'Umbral' },
+  intervalos:   { n: 'Intervalos',    z: 'I',       corto: 'Series' },
+  repeticiones: { n: 'Repeticiones',  z: 'R',       corto: 'Repes' },
+  fartlek:      { n: 'Fartlek',       z: 'T',       corto: 'Fartlek' },
+  cuestas:      { n: 'Cuestas',       z: 'I',       corto: 'Cuestas' },
+  test:         { n: 'Test',          z: 'T',       corto: 'Test' },
+  carrera:      { n: 'Carrera',       z: 'carrera', corto: 'Carrera' },
+  fuerza:       { n: 'Fuerza',        z: null,      corto: 'Fuerza' },
+  cruzado:      { n: 'Cruzado',       z: null,      corto: 'Cruzado' },
+  movilidad:    { n: 'Movilidad',     z: null,      corto: 'Movilidad' }
+};
+const ROLES = ['calentamiento', 'continuo', 'serie', 'bloque', 'recuperacion', 'vuelta_calma', 'tecnica'];
+const SIN_ROL = { warmup: 'calentamiento', calentar: 'calentamiento', wu: 'calentamiento',
+  cooldown: 'vuelta_calma', cd: 'vuelta_calma', enfriamiento: 'vuelta_calma', 'vuelta a la calma': 'vuelta_calma',
+  main: 'continuo', principal: 'continuo', run: 'continuo', set: 'serie', repeat: 'serie',
+  drills: 'tecnica', tecnica: 'tecnica', rest: 'recuperacion' };
+
+const TEXTOS = {
+  suave: { p: 'Volumen aeróbico sin costo de recuperación.',
+    f: 'El rodaje suave aumenta la densidad capilar y mitocondrial, y mejora la capacidad del corazón de mover sangre. Es el trabajo que sostiene todo lo demás: casi todo el volumen de un plan vive acá.',
+    s: 'Deberías poder hablar de corrido. Si terminás cansado, fuiste rápido.' },
+  largo: { p: 'La sesión que más construye la resistencia. Es la más importante de la semana.',
+    f: 'La tirada larga agota el glucógeno y obliga al cuerpo a mejorar el uso de grasas como combustible. También endurece tendones y ligamentos, que se adaptan más lento que el músculo.',
+    s: 'Conversación cómoda de punta a punta. Si al final estás peleando, empezaste rápido.' },
+  tempo: { p: 'Subir el ritmo que podés sostener sin acumular lactato.',
+    f: 'Correr en el umbral entrena al cuerpo a limpiar el lactato tan rápido como lo produce. Es el estímulo con mejor relación entre lo que rinde y lo que cuesta recuperarse.',
+    s: 'Cómodamente duro. Podés decir una frase corta, no charlar.' },
+  intervalos: { p: 'Elevar el consumo máximo de oxígeno.',
+    f: 'Las series de 3 a 5 minutos cerca del consumo máximo aumentan el volumen sistólico. La recuperación incompleta mantiene el consumo alto durante toda la sesión.',
+    s: 'Duro pero controlado. Si la última serie es la más lenta, saliste pasado.' },
+  repeticiones: { p: 'Velocidad, economía de carrera y mecánica.',
+    f: 'Tramos cortos y rápidos con recuperación completa. No busca fatiga: busca que el gesto sea más eficiente y que reclutes fibras que el rodaje no toca.',
+    s: 'Rápido y suelto. Cada repetición tiene que salir igual de bien que la primera.' },
+  progresivo: { p: 'Terminar más rápido de lo que empezaste.',
+    f: 'Acumular fatiga suave y después pedirle ritmo al cuerpo simula el final de una carrera y entrena la cabeza tanto como las piernas.',
+    s: 'El último tramo cuesta, pero llegás entero.' },
+  fartlek: { p: 'Cambios de ritmo por sensación, sin reloj.',
+    f: 'Alternar intensidades de forma libre desarrolla la capacidad de cambiar de ritmo y de recuperarse en movimiento, algo que las series medidas no entrenan.',
+    s: 'Jugado. Los tramos rápidos incomodan, los suaves te devuelven el aire.' },
+  cuestas: { p: 'Fuerza específica de carrera sin impacto de velocidad.',
+    f: 'La subida obliga a más fuerza por zancada con menos impacto al aterrizar. Mejora la potencia y la mecánica, y es más segura que la pista para empezar a trabajar intensidad.',
+    s: 'Esfuerzo alto en cada subida, pero bajás trotando y te recuperás.' },
+  test: { p: 'Medir el estado de forma para recalcular los ritmos.',
+    f: 'Un esfuerzo máximo controlado sobre una distancia fija actualiza el VDOT y con él todo el plan. Sin medir, los ritmos se van quedando viejos.',
+    s: 'Fuerte y parejo. Terminás sin nada guardado.' },
+  carrera: { p: 'El objetivo. Todo el plan apuntó acá.',
+    f: 'Día de competencia: salida controlada, ritmo objetivo en el medio, y lo que quede para el final.',
+    s: 'Los primeros kilómetros tienen que sentirse fáciles. Si no, vas rápido.' },
+  descanso: { p: 'El descanso es parte del entrenamiento.',
+    f: 'La adaptación ocurre en el reposo, no durante el esfuerzo. Saltear los días libres es la vía más corta a la lesión.',
+    s: 'Sin culpa.' },
+  fuerza: { p: 'Sostener la estructura que corre.',
+    f: 'El trabajo de fuerza corrige desequilibrios, protege articulaciones y mejora la economía de carrera.',
+    s: 'Exigente pero sin dejarte las piernas para el día siguiente.' },
+  cruzado: { p: 'Volumen aeróbico sin impacto.',
+    f: 'Bici, natación o elíptico suman trabajo cardiovascular sin castigar las piernas. Útil en semanas de mucha carga o al volver de una molestia.',
+    s: 'Sostenido y cómodo.' },
+  movilidad: { p: 'Rango de movimiento y calidad del gesto.',
+    f: 'Movilidad y técnica mantienen la zancada eficiente a medida que sube el volumen.',
+    s: 'Sin dolor, con control.' }
+};
+TEXTOS.default = { p: 'Sesión del plan.', f: '', s: '' };
+
+/* --- limpieza de texto pegado --- */
+function limpiarJSON(raw) {
+  let t = String(raw || '');
+  t = t.replace(/[\u201C\u201D\u201E]/g, '"').replace(/[\u2018\u2019]/g, "'");
+  t = t.replace(/```[a-z]*\n?/gi, '');
+  const i = t.indexOf('{');
+  if (i < 0) return '';
+  // recortar hasta la llave que cierra el primer objeto balanceado
+  let nivel = 0, fin = -1, enStr = false, esc = false;
+  for (let k = i; k < t.length; k++) {
+    const c = t[k];
+    if (esc) { esc = false; continue; }
+    if (c === '\\') { esc = true; continue; }
+    if (c === '"') { enStr = !enStr; continue; }
+    if (enStr) continue;
+    if (c === '{') nivel++;
+    else if (c === '}') { nivel--; if (nivel === 0) { fin = k; break; } }
+  }
+  t = t.slice(i, fin < 0 ? t.length : fin + 1);
+  t = t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:"'])\/\/[^\n]*/g, '$1');
+  t = t.replace(/,(\s*[}\]])/g, '$1');
+  return t;
+}
+
+/* --- normalización de un plan crudo --- */
+function normalizarSeg(s) {
+  const o = { rol: SIN_ROL[sinAcentos(s.rol)] || (ROLES.includes(sinAcentos(s.rol)) ? sinAcentos(s.rol) : 'continuo') };
+  const dist = v => {
+    if (v == null) return null;
+    if (typeof v === 'string' && /km/i.test(v)) return Math.round(parseFloat(v) * 1000);
+    if (typeof v === 'string' && /m\b/i.test(v)) return Math.round(parseFloat(v));
+    return Math.round(+v);
+  };
+  const parte = p => {
+    if (!p || typeof p !== 'object') return null;
+    const q = {};
+    if (p.distancia_m != null) q.distancia_m = dist(p.distancia_m);
+    else if (p.distancia_km != null) q.distancia_m = Math.round(+p.distancia_km * 1000);
+    else if (p.distancia != null) q.distancia_m = dist(p.distancia);
+    if (p.duracion_min != null) q.duracion_min = +p.duracion_min;
+    else if (p.duracion != null) { const sg = segundos(p.duracion); if (sg != null) q.duracion_min = sg / 60; }
+    const z = String(p.zona || '').trim();
+    q.zona = ZONAS[z.toUpperCase()] ? z.toUpperCase() : (ZONA_COLOR[sinAcentos(z)] ? sinAcentos(z) : null);
+    if (p.ritmo) q.ritmo = p.ritmo;
+    if (p.descripcion) q.descripcion = String(p.descripcion);
+    return q;
+  };
+  if (s.repeticiones != null) o.repeticiones = Math.max(1, Math.round(+s.repeticiones));
+  const propio = parte(s);
+  if (propio) { if (propio.distancia_m != null) o.distancia_m = propio.distancia_m;
+    if (propio.duracion_min != null) o.duracion_min = propio.duracion_min;
+    if (propio.zona) o.zona = propio.zona; if (propio.ritmo) o.ritmo = propio.ritmo; }
+  if (s.descripcion) o.descripcion = String(s.descripcion);
+  const tr = parte(s.trabajo), rc = parte(s.recuperacion);
+  if (tr) o.trabajo = tr;
+  if (rc) o.recuperacion = rc;
+  if (o.repeticiones && !o.trabajo) { o.trabajo = { distancia_m: o.distancia_m, duracion_min: o.duracion_min, zona: o.zona }; delete o.distancia_m; delete o.duracion_min; }
+  if (o.trabajo || o.repeticiones) o.rol = 'serie';
+  return o;
+}
+
+function normalizarPlan(crudo) {
+  const p = JSON.parse(JSON.stringify(crudo.plan || crudo));
+  const out = {
+    id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    nombre: p.nombre || p.titulo || 'Plan sin nombre',
+    autor: p.autor || '', creado: p.creado || ymd(hoy()), notas: p.notas || '',
+    objetivo: {}, anclaje: {}, referencia: null, supuestos: {}, fases: [], semanas: []
+  };
+  const ob = p.objetivo || {};
+  out.objetivo = {
+    nombre: ob.nombre || ob.carrera || 'Objetivo',
+    distancia_m: ob.distancia_m != null ? Math.round(+ob.distancia_m) : (ob.distancia_km != null ? Math.round(+ob.distancia_km * 1000) : null),
+    fecha: ob.fecha || null,
+    meta_tiempo: ob.meta_tiempo || ob.meta || null,
+    prioridad: (ob.prioridad || 'A').toUpperCase()
+  };
+  const an = p.anclaje || {};
+  out.anclaje = {
+    modo: sinAcentos(an.modo) === 'inicio' ? 'inicio' : 'carrera',
+    fecha_inicio: an.fecha_inicio || null,
+    inicio_semana: sinAcentos(an.inicio_semana) || 'lunes'
+  };
+  if (p.referencia && (p.referencia.distancia_m || p.referencia.distancia_km)) {
+    out.referencia = {
+      distancia_m: p.referencia.distancia_m ? +p.referencia.distancia_m : Math.round(+p.referencia.distancia_km * 1000),
+      tiempo: p.referencia.tiempo || null, fecha: p.referencia.fecha || null,
+      origen: p.referencia.origen || 'estimada'
+    };
+  }
+  const su = p.supuestos || {};
+  out.supuestos = {
+    dias_por_semana: su.dias_por_semana != null ? +su.dias_por_semana : null,
+    dia_largo: su.dia_largo ? normDia(su.dia_largo) : null,
+    volumen_inicial_km: su.volumen_inicial_km != null ? +su.volumen_inicial_km : null,
+    volumen_pico_km: su.volumen_pico_km != null ? +su.volumen_pico_km : null,
+    superficies: Array.isArray(su.superficies) ? su.superficies : []
+  };
+  out.fases = (p.fases || []).map(f => ({
+    nombre: sinAcentos(f.nombre) || 'base',
+    desde_semana: +f.desde_semana || 1, hasta_semana: +f.hasta_semana || 1, foco: f.foco || ''
+  }));
+  const semanas = Array.isArray(p.semanas) ? p.semanas : [];
+  out.semanas = semanas.map((w, wi) => {
+    const num = +w.numero || wi + 1;
+    const ses = (Array.isArray(w.sesiones) ? w.sesiones : []).map((s, si) => {
+      let tipo = sinAcentos(s.tipo);
+      tipo = TIPOS[tipo] ? tipo : (SIN_TIPO[tipo] || null);
+      const original = TIPOS[sinAcentos(s.tipo)] ? null : (s.tipo || null);
+      const segs = (Array.isArray(s.segmentos) ? s.segmentos : []).map(normalizarSeg);
+      const T = TEXTOS[tipo || 'suave'] || TEXTOS.default;
+      return {
+        uid: `w${num}d${si}`,
+        dia: /^\d{4}-\d{2}-\d{2}$/.test(String(s.dia || '')) ? s.dia : normDia(s.dia),
+        tipo: tipo || 'suave', tipo_original: tipo ? null : original,
+        titulo: s.titulo || s.nombre || '',
+        proposito: s.proposito || T.p, fundamento: s.fundamento || s.explicacion || T.f,
+        sensacion: s.sensacion || T.s,
+        clave: s.clave != null ? !!s.clave : ['largo', 'tempo', 'intervalos', 'carrera'].includes(tipo),
+        propio: !!(s.proposito || s.fundamento),
+        opcional: !!s.opcional,
+        segmentos: segs,
+        alternativas: (Array.isArray(s.alternativas) ? s.alternativas : []).map(a => ({
+          cuando: sinAcentos(a.cuando) || 'otro', descripcion: a.descripcion || '' }))
+      };
+    });
+    return {
+      numero: num, foco: w.foco || '',
+      volumen_objetivo_km: w.volumen_objetivo_km != null ? +w.volumen_objetivo_km : null,
+      descarga: !!w.descarga, sesiones: ses
+    };
+  }).sort((a, b) => a.numero - b.numero);
+  return out;
+}
+
+/* --- resolución de fechas --- */
+function resolverFechas(plan) {
+  const N = plan.semanas.length;
+  const iw = plan.anclaje.inicio_semana || 'lunes';
+  let base;   // inicio de la semana 1
+  if (plan.anclaje.modo === 'inicio' && plan.anclaje.fecha_inicio) {
+    base = inicioDeSemana(parseYMD(plan.anclaje.fecha_inicio), iw);
+  } else if (plan.objetivo.fecha) {
+    const semCarrera = inicioDeSemana(parseYMD(plan.objetivo.fecha), iw);
+    base = addDays(semCarrera, -(N - 1) * 7);
+  } else {
+    base = inicioDeSemana(hoy(), iw);
+  }
+  plan.inicio = ymd(base);
+  plan.semanas.forEach((w, i) => {
+    const ws = addDays(base, i * 7);
+    w.inicio = ymd(ws);
+    w.fin = ymd(addDays(ws, 6));
+    w.hasta_carrera = N - w.numero;
+    w.sesiones.forEach(s => {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s.dia)) { s.fecha = s.dia; return; }
+      const k = idxDia(s.dia, iw);
+      s.fecha = ymd(addDays(ws, k < 0 ? 0 : k));
+    });
+    w.sesiones.sort((a, b) => a.fecha.localeCompare(b.fecha));
+  });
+  plan.fin = plan.semanas.length ? plan.semanas[plan.semanas.length - 1].fin : plan.inicio;
+  return plan;
+}
+
+/* ============================================================
+   Métricas de una sesión
+   ============================================================ */
+function ritmoZona(z, zonas) {
+  if (!z || !zonas) return null;
+  const Z = zonas[z] || (z === 'carrera' ? zonas.M : null);
+  return Z ? Z.tip : null;
+}
+function metricaParte(p, zonas) {
+  if (!p) return { km: 0, min: 0 };
+  const r = ritmoZona(p.zona, zonas) || (zonas ? zonas.E.tip : 330);
+  if (p.distancia_m != null) { const km = p.distancia_m / 1000; return { km, min: km * r / 60 }; }
+  if (p.duracion_min != null) { const min = p.duracion_min; return { km: min * 60 / r, min }; }
+  return { km: 0, min: 0 };
+}
+const NO_CORRER = ['fuerza', 'cruzado', 'movilidad'];
+function metricaSesion(s, zonas) {
+  if (NO_CORRER.includes(s.tipo)) {
+    let min = 0;
+    for (const g of s.segmentos || []) min += g.duracion_min || 0;
+    return { km: 0, min: Math.round(min), porZona: {}, sinCorrer: true };
+  }
+  let km = 0, min = 0;
+  const porZona = {};
+  const sumar = (p, veces) => {
+    const m = metricaParte(p, zonas);
+    km += m.km * veces; min += m.min * veces;
+    const z = p && p.zona ? p.zona : 'E';
+    porZona[z] = (porZona[z] || 0) + m.min * veces;
+  };
+  for (const g of s.segmentos || []) {
+    if (g.rol === 'serie') {
+      const n = g.repeticiones || 1;
+      if (g.trabajo) sumar(g.trabajo, n);
+      if (g.recuperacion) sumar(g.recuperacion, n);
+    } else if (g.rol === 'tecnica') {
+      if (g.duracion_min) sumar({ duracion_min: g.duracion_min, zona: g.zona || 'E' }, 1);
+    } else {
+      sumar(g, 1);
+    }
+  }
+  return { km: Math.round(km * 10) / 10, min: Math.round(min), porZona };
+}
+function metricaSemana(w, zonas) {
+  let km = 0, min = 0; const porZona = {};
+  for (const s of w.sesiones) {
+    if (s.tipo === 'descanso') continue;
+    const m = metricaSesion(s, zonas);
+    km += m.km; min += m.min;
+    for (const z in m.porZona) porZona[z] = (porZona[z] || 0) + m.porZona[z];
+  }
+  return { km: Math.round(km * 10) / 10, min: Math.round(min), porZona, sesiones: w.sesiones.filter(s => s.tipo !== 'descanso').length };
+}
+function facilVsDuro(porZona) {
+  let facil = 0, duro = 0;
+  for (const z in porZona) {
+    if (['E', 'trote', 'caminar', 'libre'].includes(z)) facil += porZona[z];
+    else duro += porZona[z];
+  }
+  const tot = facil + duro;
+  return tot ? Math.round(facil / tot * 100) : 0;
+}
+
+/* ============================================================
+   Título automático y descripción textual
+   ============================================================ */
+function textoParte(p, zonas, recargo) {
+  if (!p) return '';
+  const bits = [];
+  if (p.distancia_m != null) bits.push(p.distancia_m >= 1000 ? `${+(p.distancia_m / 1000).toFixed(2)} km` : `${p.distancia_m} m`);
+  else if (p.duracion_min != null) bits.push(duracionTxt(p.duracion_min));
+  if (p.ritmo) bits.push(`a ${p.ritmo}`);
+  else if (p.zona && zonas) {
+    const r = ritmoRango(p.zona, zonas, recargo);
+    bits.push(r ? `a ${r}` : `en ${p.zona}`);
+  } else if (p.zona) bits.push(`en ${p.zona}`);
+  return bits.join(' ');
+}
+function ritmoRango(z, zonas, recargo) {
+  if (!zonas) return null;
+  const Z = zonas[z] || (z === 'carrera' ? zonas.M : null);
+  if (!Z) return null;
+  const f = 1 + (AJUSTABLES.includes(z) ? (recargo || 0) : 0);
+  if (z === 'caminar') return 'caminando';
+  if (z === 'trote') return 'trote suave';
+  const a = ritmoTxt(Z.rapido * f), b = ritmoTxt(Z.lento * f);
+  return a === b ? `${a}/km` : `${a}–${b}/km`;
+}
+function tituloAuto(s, zonas) {
+  if (s.titulo) return s.titulo;
+  if (s.tipo === 'descanso') return 'Descanso';
+  const serie = (s.segmentos || []).find(g => g.rol === 'serie');
+  if (serie && serie.trabajo) {
+    const t = serie.trabajo;
+    const q = t.distancia_m != null ? (t.distancia_m >= 1000 ? `${t.distancia_m / 1000} km` : `${t.distancia_m} m`) : duracionTxt(t.duracion_min);
+    return `${serie.repeticiones || 1} × ${q}${t.zona ? ' en ' + t.zona : ''}`;
+  }
+  const m = metricaSesion(s, zonas);
+  if (m.km) return `${+m.km.toFixed(1)} km ${TIPOS[s.tipo] ? TIPOS[s.tipo].corto.toLowerCase() : ''}`.trim();
+  return TIPOS[s.tipo] ? TIPOS[s.tipo].n : 'Sesión';
+}
+
+/* ============================================================
+   Perfil visual del entrenamiento (bloques)
+   ============================================================ */
+function bloquesDe(s) {
+  const out = [];
+  const push = (p, rol) => {
+    if (!p) return;
+    const z = p.zona || (rol === 'recuperacion' ? 'trote' : 'E');
+    let peso = p.duracion_min != null ? p.duracion_min : (p.distancia_m != null ? p.distancia_m / 200 : 5);
+    out.push({ z, nivel: ZONA_NIVEL[z] != null ? ZONA_NIVEL[z] : 2, peso: Math.max(0.6, peso) });
+  };
+  for (const g of s.segmentos || []) {
+    if (g.rol === 'serie') {
+      const n = Math.min(g.repeticiones || 1, 20);
+      for (let i = 0; i < n; i++) { push(g.trabajo, 'trabajo'); if (i < n - 1 || (g.repeticiones || 1) > 1) push(g.recuperacion, 'recuperacion'); }
+    } else if (g.rol === 'tecnica') {
+      out.push({ z: 'R', nivel: 4, peso: Math.max(0.8, g.duracion_min || 3), tec: true });
+    } else push(g, g.rol);
+  }
+  return out.length ? out : [{ z: 'E', nivel: 2, peso: 10 }];
+}
+
+/* ============================================================
+   Validación
+   ============================================================ */
+function validar(crudo, plan) {
+  const err = [], adv = [];
+  if (!crudo || typeof crudo !== 'object') { err.push(['E01', 'El texto no contiene un JSON que se pueda leer.']); return { err, adv }; }
+  const f = String(crudo.formato || crudo.plan?.formato || '').toLowerCase();
+  if (!f) adv.push(['A00', 'Falta el campo "formato". Se asume utp/1.']);
+  else if (!/^utp\/1/.test(f)) err.push(['E02', `Formato desconocido: "${crudo.formato}". Se esperaba "utp/1".`]);
+  if (!plan.nombre || plan.nombre === 'Plan sin nombre') adv.push(['A11', 'El plan no tiene nombre.']);
+  if (!plan.objetivo.distancia_m) err.push(['E03', 'Falta la distancia del objetivo (objetivo.distancia_m).']);
+  if (!plan.semanas.length) err.push(['E04', 'El plan no tiene semanas.']);
+  if (plan.anclaje.modo === 'carrera' && !plan.objetivo.fecha) err.push(['E06', 'El anclaje es por carrera pero falta objetivo.fecha.']);
+  if (plan.anclaje.modo === 'inicio' && !plan.anclaje.fecha_inicio) err.push(['E06', 'El anclaje es por inicio pero falta anclaje.fecha_inicio.']);
+  for (const w of plan.semanas) {
+    for (const s of w.sesiones) {
+      if (!s.dia) err.push(['E05', `Semana ${w.numero}: hay una sesión sin día.`]);
+      else if (!/^\d{4}-\d{2}-\d{2}$/.test(s.dia) && idxDia(s.dia, plan.anclaje.inicio_semana) < 0)
+        err.push(['E05', `Semana ${w.numero}: día no reconocido "${s.dia}".`]);
+      if (s.tipo_original) adv.push(['A01', `Semana ${w.numero}: tipo "${s.tipo_original}" no está en el vocabulario. Se importó como suave.`]);
+      if (s.tipo !== 'descanso' && !s.propio) adv.push(['A03', `Semana ${w.numero}, ${s.dia}: sin explicación propia, se usa la del tipo "${TIPOS[s.tipo].n}".`]);
+      if (s.tipo !== 'descanso' && !(s.segmentos || []).length) adv.push(['A02', `Semana ${w.numero}, ${s.dia}: sesión sin segmentos.`]);
+    }
+    if (!w.sesiones.filter(s => s.tipo !== 'descanso').length) adv.push(['A06', `La semana ${w.numero} no tiene ninguna sesión.`]);
+    if (plan.supuestos.dias_por_semana) {
+      const d = new Set(w.sesiones.filter(s => s.tipo !== 'descanso').map(s => s.dia)).size;
+      if (d > plan.supuestos.dias_por_semana) adv.push(['A07', `La semana ${w.numero} usa ${d} días y el plan declara ${plan.supuestos.dias_por_semana}.`]);
+    }
+  }
+  if (plan.objetivo.fecha && plan.inicio && parseYMD(plan.objetivo.fecha) < parseYMD(plan.inicio))
+    err.push(['E07', 'La fecha de la carrera es anterior al inicio del plan.']);
+  return { err, adv };
+}
+function advertenciasCarga(plan, zonas) {
+  const adv = [];
+  let prev = null, prevDescarga = false;
+  const vol = [];
+  for (const w of plan.semanas) {
+    const m = metricaSemana(w, zonas);
+    vol.push(m.km);
+    if (prev && prev > 5 && m.km > prev * 1.1 && !w.descarga && !prevDescarga)
+      adv.push(['A04', `Semana ${w.numero}: el volumen sube ${Math.round((m.km / prev - 1) * 100)} % respecto de la anterior.`]);
+    prev = m.km; prevDescarga = w.descarga;
+    const claves = w.sesiones.filter(s => s.clave && s.tipo !== 'descanso');
+    for (let i = 1; i < claves.length; i++)
+      if (diffDays(parseYMD(claves[i - 1].fecha), parseYMD(claves[i].fecha)) === 1)
+        adv.push(['A05', `Semana ${w.numero}: dos sesiones clave en días consecutivos.`]);
+  }
+  if (plan.semanas.length > 8 && !plan.semanas.some(w => w.descarga)) adv.push(['A10', 'El plan no tiene semanas de descarga.']);
+  if (plan.semanas.length >= 4) {
+    const sinCarrera = plan.semanas.map(w => {
+      const clon = { ...w, sesiones: w.sesiones.filter(s => s.tipo !== 'carrera') };
+      return metricaSemana(clon, zonas).km;
+    });
+    const pico = Math.max(...sinCarrera);
+    const ult = sinCarrera[sinCarrera.length - 1];
+    if (pico > 10 && ult > pico * 0.75) adv.push(['A08', 'La última semana no baja el volumen: falta afinamiento.']);
+  }
+  return adv;
+}
+
+/* ============================================================
+   ICS
+   ============================================================ */
+const esc4 = s => String(s ?? '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+const stampICS = () => new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+function foldICS(line) {
+  const bytes = s => new TextEncoder().encode(s).length;
+  if (bytes(line) <= 74) return line;
+  const parts = []; let cur = '';
+  for (const ch of line) {
+    if (bytes(cur + ch) > (parts.length ? 72 : 74)) { parts.push(cur); cur = ch; }
+    else cur += ch;
+  }
+  if (cur) parts.push(cur);
+  return parts.join('\r\n ');
+}
+function sesionICS(s, plan, zonas, recargo) {
+  const L = ['BEGIN:VEVENT', 'UID:' + plan.id + '-' + s.uid + '@umbral.local', 'DTSTAMP:' + stampICS()];
+  const d = parseYMD(s.fecha);
+  L.push('DTSTART;VALUE=DATE:' + ymd(d).replace(/-/g, ''));
+  L.push('DTEND;VALUE=DATE:' + ymd(addDays(d, 1)).replace(/-/g, ''));
+  L.push('SUMMARY:' + esc4(`${TIPOS[s.tipo].corto} · ${tituloAuto(s, zonas)}`));
+  const cuerpo = [];
+  if (s.proposito) cuerpo.push(s.proposito);
+  cuerpo.push('');
+  for (const g of s.segmentos || []) cuerpo.push('· ' + textoSegmento(g, zonas, recargo));
+  const m = metricaSesion(s, zonas);
+  if (m.km) cuerpo.push('', `${m.km} km aprox · ${duracionTxt(m.min)}`);
+  if (s.sensacion) cuerpo.push('', 'Sensación: ' + s.sensacion);
+  L.push('DESCRIPTION:' + esc4(cuerpo.join('\n')));
+  L.push('END:VEVENT');
+  return L.map(foldICS).join('\r\n');
+}
+function armarICS(sesiones, plan, zonas, recargo) {
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Umbral//Plan//ES', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH']
+    .concat(sesiones.map(s => sesionICS(s, plan, zonas, recargo)))
+    .concat(['END:VCALENDAR']).join('\r\n');
+}
+function textoSegmento(g, zonas, recargo) {
+  if (g.rol === 'serie') {
+    const t = textoParte(g.trabajo, zonas, recargo);
+    const r = g.recuperacion ? ` · recuperación ${textoParte(g.recuperacion, zonas, recargo)}` : '';
+    return `${g.repeticiones || 1} × ${t}${r}`;
+  }
+  const nom = { calentamiento: 'Calentamiento', vuelta_calma: 'Vuelta a la calma', tecnica: 'Técnica', recuperacion: 'Recuperación', bloque: 'Bloque', continuo: '' }[g.rol] || '';
+  const cuerpo = g.descripcion || textoParte(g, zonas, recargo);
+  return nom ? `${nom}: ${cuerpo}` : cuerpo;
+}
+
+/* ============================================================
+   Plan de ejemplo (referencia viva del estándar)
+   ============================================================ */
+function planEjemplo(fechaCarrera) {
+  // por defecto la carrera cae el domingo de la semana 12 contando desde esta semana,
+  // así el plan de ejemplo arranca hoy mismo y no en el futuro
+  const carrera = fechaCarrera || ymd(addDays(inicioDeSemana(hoy(), 'lunes'), 83));
+  const S = [];
+  const largo = [12, 14, 16, 12, 17, 19, 21, 15, 22, 24, 14, 21];
+  for (let i = 1; i <= 12; i++) {
+    const descarga = i === 4 || i === 8;
+    const taper = i >= 11;
+    const ses = [];
+    // martes: calidad
+    if (i <= 4) ses.push({ dia: 'martes', tipo: 'tempo', segmentos: [
+      { rol: 'calentamiento', duracion_min: 15, zona: 'E' },
+      { rol: 'continuo', duracion_min: 20 + i * 2, zona: 'T' },
+      { rol: 'vuelta_calma', duracion_min: 10, zona: 'E' }] });
+    else ses.push({ dia: 'martes', tipo: 'intervalos', segmentos: [
+      { rol: 'calentamiento', duracion_min: 15, zona: 'E' },
+      { rol: 'tecnica', descripcion: '4 × 20 s progresivos con 40 s de trote' },
+      { rol: 'serie', repeticiones: taper ? 4 : Math.min(6, 3 + Math.floor(i / 3)),
+        trabajo: { distancia_m: 1000, zona: 'I' }, recuperacion: { duracion_min: 3, zona: 'trote' } },
+      { rol: 'vuelta_calma', duracion_min: 10, zona: 'E' }] });
+    ses.push({ dia: 'jueves', tipo: 'suave', segmentos: [{ rol: 'continuo', distancia_m: (taper ? 6 : descarga ? 6 : 8) * 1000, zona: 'E' }] });
+    ses.push({ dia: 'viernes', tipo: 'fuerza', segmentos: [{ rol: 'continuo', duracion_min: 40 }], titulo: 'Fuerza para corredores' });
+    if (i !== 12) ses.push({ dia: 'sabado', tipo: 'suave', segmentos: [
+      { rol: 'continuo', distancia_m: (taper ? 5 : 7) * 1000, zona: 'E' },
+      { rol: 'tecnica', descripcion: '6 × 100 m progresivos' }] });
+    ses.push({ dia: 'domingo', tipo: i === 12 ? 'carrera' : 'largo',
+      segmentos: i === 12
+        ? [{ rol: 'continuo', distancia_m: 21097, zona: 'carrera' }]
+        : (i >= 9 && i <= 10
+          ? [{ rol: 'continuo', distancia_m: (largo[i - 1] - 6) * 1000, zona: 'E' },
+             { rol: 'bloque', distancia_m: 6000, zona: 'M' }]
+          : [{ rol: 'continuo', distancia_m: largo[i - 1] * 1000, zona: 'E' }]) });
+    S.push({
+      numero: i, descarga,
+      foco: i === 12 ? 'Semana de carrera' : taper ? 'Afinamiento: menos volumen, misma intensidad'
+        : descarga ? 'Descarga para absorber la carga' : i <= 4 ? 'Base aeróbica y umbral'
+        : i <= 8 ? 'Construcción: VO2max y tirada larga' : 'Ritmo específico de media maratón',
+      sesiones: ses
+    });
+  }
+  return {
+    formato: 'utp/1',
+    plan: {
+      nombre: 'Media maratón — 12 semanas',
+      autor: 'Ejemplo incluido en Umbral',
+      notas: 'Plan de referencia de 5 días semanales. Sirve como muestra del formato UTP/1.',
+      objetivo: { nombre: 'Media maratón', distancia_m: 21097, fecha: carrera, meta_tiempo: '1:38:00', prioridad: 'A' },
+      anclaje: { modo: 'carrera', inicio_semana: 'lunes' },
+      referencia: { distancia_m: 21097, tiempo: '1:45:30', fecha: ymd(addDays(hoy(), -14)), origen: 'carrera' },
+      supuestos: { dias_por_semana: 5, dia_largo: 'domingo', volumen_inicial_km: 34, volumen_pico_km: 52, superficies: ['asfalto', 'rambla'] },
+      fases: [
+        { nombre: 'base', desde_semana: 1, hasta_semana: 4, foco: 'Reconstruir volumen aeróbico' },
+        { nombre: 'construccion', desde_semana: 5, hasta_semana: 8, foco: 'VO2max y resistencia' },
+        { nombre: 'especifico', desde_semana: 9, hasta_semana: 10, foco: 'Ritmo de carrera' },
+        { nombre: 'afinamiento', desde_semana: 11, hasta_semana: 11, foco: 'Bajar volumen' },
+        { nombre: 'carrera', desde_semana: 12, hasta_semana: 12, foco: 'Competir' }
+      ],
+      semanas: S
+    }
+  };
+}
+
+
+
+/* ============================================================
+   UMBRAL — interfaz
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CLAVE = 'umbral:datos';
+
+/* ---------- persistencia ---------- */
+const memoria = {};
+const Store = {
+  async get(k) {
+    if (window.storage) { try { const r = await window.storage.get(k); return r ? JSON.parse(r.value) : null; } catch (e) { return null; } }
+    try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return memoria[k] ?? null; }
+  },
+  async set(k, v) {
+    const s = JSON.stringify(v);
+    if (window.storage) { try { await window.storage.set(k, s); return; } catch (e) { } }
+    try { localStorage.setItem(k, s); } catch (e) { memoria[k] = v; }
+  }
+};
+
+let D = { esquema: 1, ref: null, planes: [], activo: null, reg: {}, cfg: { clima: false, temp: 22, hum: 70 } };
+let vista = 'hoy';
+let pendiente = null;      // plan esperando confirmación de importación
+let editandoUid = null;
+let registrandoUid = null;
+
+const guardar = () => Store.set(CLAVE, D);
+const plan = () => D.planes.find(p => p.id === D.activo) || null;
+
+/* ---------- ritmos activos ---------- */
+function refActiva() {
+  if (D.ref && D.ref.distancia_m && D.ref.tiempo) return D.ref;
+  const p = plan();
+  if (p && p.referencia && p.referencia.distancia_m && p.referencia.tiempo) return p.referencia;
+  return null;
+}
+function vdotActual() {
+  const r = refActiva();
+  if (!r) return null;
+  const s = segundos(r.tiempo);
+  return s ? vdotDe(r.distancia_m, s) : null;
+}
+function zonasActuales() { const v = vdotActual(); return v ? zonasDe(v) : null; }
+function recargoActual() { return D.cfg.clima ? recargoClima(D.cfg.temp, D.cfg.hum) : 0; }
+
+/* ---------- registros ---------- */
+const claveReg = (p, s) => `${p.id}:${s.uid}`;
+const regDe = s => { const p = plan(); return p ? (D.reg[claveReg(p, s)] || null) : null; };
+
+/* ---------- utilidades de vista ---------- */
+let toastT;
+function toast(m) {
+  const t = $('toast'); t.textContent = m; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200);
+}
+const scrim = () => $('scrim');
+function abrirHoja(id) { $(id).classList.add('on'); scrim().classList.add('on'); }
+function cerrarHojas() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('on')); scrim().classList.remove('on'); }
+
+function todasSesiones(p) {
+  const out = [];
+  (p ? p.semanas : []).forEach(w => w.sesiones.forEach(s => out.push({ s, w })));
+  return out.sort((a, b) => a.s.fecha.localeCompare(b.s.fecha));
+}
+function buscarSesion(uid) {
+  const p = plan(); if (!p) return null;
+  for (const w of p.semanas) for (const s of w.sesiones) if (s.uid === uid) return { s, w, p };
+  return null;
+}
+const colorZona = z => ZONA_COLOR[z] || '#AEB8C2';
+function colorTipo(t) { const z = TIPOS[t] ? TIPOS[t].z : null; return z ? colorZona(z) : '#8794A1'; }
+
+/* ---------- PERFIL DE ESFUERZO ---------- */
+function perfilHTML(s, clase) {
+  const b = bloquesDe(s);
+  const maxN = Math.max(...b.map(x => x.nivel), 6);
+  return `<div class="perfil ${clase}">` + b.map(x =>
+    `<i style="flex-grow:${x.peso.toFixed(2)};height:${Math.max(14, x.nivel / maxN * 100).toFixed(0)}%;background:${colorZona(x.z)}"></i>`
+  ).join('') + '</div>';
+}
+
+/* ---------- fila de sesión ---------- */
+function filaSesion(s, w, opts = {}) {
+  const z = zonasActuales();
+  const d = parseYMD(s.fecha);
+  const r = regDe(s);
+  const m = metricaSesion(s, z);
+  const esHoy = sameYMD(d, hoy());
+  const bajo = s.tipo === 'descanso' ? 'Sin entrenamiento'
+    : [m.km ? `${m.km} km` : null, m.min ? duracionTxt(m.min) : null, TIPOS[s.tipo].n].filter(Boolean).join(' · ');
+  return `<button class="ses${r && r.hecho ? ' hecha' : ''}${esHoy && opts.marcarHoy ? ' hoy' : ''}" data-ses="${s.uid}">
+    <span class="fecha"><b>${d.getDate()}</b><span>${DIAS_MIN[(d.getDay() + 6) % 7]}</span></span>
+    <span class="cuerpo"><span class="tit">${esc(tituloAuto(s, z))}</span><span class="bajo">${esc(bajo)}</span></span>
+    ${s.tipo === 'descanso' ? '' : `<span class="viz">${perfilHTML(s, 'xs')}</span>`}
+    <span class="tick${r && r.hecho ? ' on' : ''}" data-tick="${s.uid}"></span>
+  </button>`;
+}
+
+/* ============================================================
+   CABECERA
+   ============================================================ */
+function pintarCabecera() {
+  const p = plan();
+  if (!p) {
+    $('hTitulo').textContent = 'Umbral';
+    $('hSub').textContent = 'Sin plan activo';
+    $('hCuenta').classList.add('oculto');
+    return;
+  }
+  $('hTitulo').textContent = p.objetivo.nombre || p.nombre;
+  const km = p.objetivo.distancia_m ? (p.objetivo.distancia_m / 1000).toFixed(p.objetivo.distancia_m % 1000 ? 1 : 0) + ' km' : '';
+  $('hSub').textContent = [km, p.objetivo.meta_tiempo ? 'meta ' + p.objetivo.meta_tiempo : null,
+    p.objetivo.fecha ? fmtFecha(parseYMD(p.objetivo.fecha)) : null].filter(Boolean).join(' · ');
+  if (p.objetivo.fecha) {
+    const n = diffDays(hoy(), parseYMD(p.objetivo.fecha));
+    $('hCuenta').classList.remove('oculto');
+    $('hDias').textContent = n >= 0 ? n : '—';
+    $('hDiasLbl').textContent = n === 1 ? 'día' : n >= 0 ? 'días' : 'pasó';
+  } else $('hCuenta').classList.add('oculto');
+}
+
+/* ============================================================
+   VISTA HOY
+   ============================================================ */
+function vistaHoy() {
+  const p = plan(); const c = $('v-hoy');
+  if (!p) {
+    c.innerHTML = `<div class="vacio"><h3>Todavía no hay plan</h3>
+      <p>Importá uno con el formato UTP/1 o cargá el plan de ejemplo para ver cómo funciona.</p>
+      <button class="btn pri" data-ir="importar">Ir a Importar</button></div>`;
+    return;
+  }
+  const z = zonasActuales(), rec = recargoActual();
+  const hoyStr = ymd(hoy());
+  const delDia = todasSesiones(p).filter(x => x.s.fecha === hoyStr);
+  const dentro = hoyStr >= p.inicio && hoyStr <= p.fin;
+
+  let html = '';
+  if (delDia.length) {
+    delDia.forEach(({ s }) => { html += tarjetaHoy(s, z, rec); });
+  } else if (dentro) {
+    html += `<div class="hoy-card" style="--z:var(--nulo)">
+      <span class="tipo-chip">Descanso</span>
+      <h2>Hoy no se corre</h2>
+      <p style="color:var(--ink-2);font-size:14px;margin-top:8px">La adaptación pasa en el reposo, no en el esfuerzo. Saltear los días libres es el camino corto a la lesión.</p>
+    </div>`;
+  } else {
+    const arranca = hoyStr < p.inicio;
+    html += `<div class="hoy-card" style="--z:var(--nulo)"><h2>${arranca ? 'El plan todavía no arrancó' : 'El plan terminó'}</h2>
+      <p style="color:var(--ink-2);font-size:14px;margin-top:8px">${arranca
+        ? `Empieza el ${fmtFecha(parseYMD(p.inicio))}.` : `Terminó el ${fmtFecha(parseYMD(p.fin))}. Importá el próximo ciclo cuando lo tengas.`}</p></div>`;
+  }
+
+  // semana en curso
+  const sem = p.semanas.find(w => hoyStr >= w.inicio && hoyStr <= w.fin) || p.semanas[0];
+  if (sem) {
+    const m = metricaSemana(sem, z);
+    const porDia = {};
+    sem.sesiones.forEach(s => { (porDia[s.fecha] ||= []).push(s); });
+    let strip = '';
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(parseYMD(sem.inicio), i), k = ymd(d);
+      const ss = porDia[k] || [];
+      const mm = ss.reduce((a, s) => a + metricaSesion(s, z).km, 0);
+      strip += `<div class="dia-mini${sameYMD(d, hoy()) ? ' hoy' : ''}">
+        <div class="d">${DIAS_MIN[i]}</div>
+        ${ss.length && ss[0].tipo !== 'descanso' ? perfilHTML(ss[0], 'xs') : '<div class="perfil xs"></div>'}
+        <div class="k">${mm ? mm.toFixed(0) : '–'}</div></div>`;
+    }
+    html += `<div class="card tight">
+      <div class="spread"><span class="eyebrow">Semana ${sem.numero} de ${p.semanas.length}</span>
+        <span class="num" style="font-size:12px;color:var(--ink-2)">${m.km} km · ${m.sesiones} ses.</span></div>
+      ${sem.foco ? `<p style="margin-top:5px;font-size:13.5px">${esc(sem.foco)}</p>` : ''}
+      <div class="sem-strip">${strip}</div></div>`;
+  }
+
+  // próximas
+  const prox = todasSesiones(p).filter(x => x.s.fecha > hoyStr && x.s.tipo !== 'descanso').slice(0, 4);
+  if (prox.length) {
+    html += `<div class="card tight"><span class="eyebrow">Lo que viene</span>
+      <div style="margin-top:4px">${prox.map(x => filaSesion(x.s, x.w)).join('')}</div></div>`;
+  }
+  c.innerHTML = html;
+}
+
+function tarjetaHoy(s, z, rec) {
+  if (s.tipo === 'descanso') {
+    return `<div class="hoy-card" style="--z:var(--nulo)"><span class="tipo-chip">Descanso</span>
+      <h2>${esc(tituloAuto(s, z))}</h2><p style="color:var(--ink-2);font-size:14px;margin-top:8px">${esc(s.fundamento || '')}</p></div>`;
+  }
+  const col = colorTipo(s.tipo);
+  const m = metricaSesion(s, z);
+  const r = regDe(s);
+  // zona dominante para el número grande
+  const b = bloquesDe(s);
+  let dom = null, mejor = -1;
+  // la técnica (progresivos, drills) no define el ritmo objetivo de la sesión
+  b.forEach(x => { if (!x.tec && x.nivel > mejor && x.z !== 'trote' && x.z !== 'caminar') { mejor = x.nivel; dom = x.z; } });
+  const rango = ritmoRango(dom, z, rec);
+  const rangoBase = ritmoRango(dom, z, 0);
+  const ajustado = rec > 0 && rango !== rangoBase;
+  return `<div class="hoy-card" style="--z:${col}">
+    <div class="spread"><span class="tipo-chip">${TIPOS[s.tipo].n}${s.clave ? ' · clave' : ''}</span>
+      ${r && r.hecho ? '<span class="eyebrow" style="color:var(--ok)">Hecha</span>' : ''}</div>
+    <h2>${esc(tituloAuto(s, z))}</h2>
+    <div class="hoy-meta">${[m.km ? m.km + ' km' : null, m.min ? duracionTxt(m.min) : null].filter(Boolean).join(' · ')}</div>
+    ${rango ? `<div class="ritmo-grande"><b>${rango.replace('/km', '')}</b><em>${dom && ZONAS[dom] ? ZONAS[dom].nom : 'ritmo'} /km</em></div>
+      ${ajustado ? `<div class="ritmo-sub">Sin ajuste: ${rangoBase}<span class="clima-flag">clima +${Math.round(recargoActual() * 100)}%</span></div>` : ''}` : ''}
+    <div style="margin:15px 0 3px">${perfilHTML(s, 'xl')}</div>
+    ${s.proposito ? `<p style="font-size:14px;color:var(--ink-2);margin-top:13px">${esc(s.proposito)}</p>` : ''}
+    <div class="btn-row"><button class="btn gh mini" data-ses="${s.uid}">Ver la sesión</button>
+      <button class="btn pri mini" data-registrar="${s.uid}">${r && r.hecho ? 'Editar registro' : 'Registrar'}</button></div>
+  </div>`;
+}
+
+/* ============================================================
+   VISTA PLAN
+   ============================================================ */
+const COLOR_FASE = { base: '#4E7FA8', construccion: '#3E8E7E', especifico: '#D19A2E', pico: '#C7502F', afinamiento: '#6B4E9B', carrera: '#A32E4E', recuperacion: '#93A7B8' };
+function faseDe(p, n) { return (p.fases || []).find(f => n >= f.desde_semana && n <= f.hasta_semana) || null; }
+
+function vistaPlan() {
+  const p = plan(); const c = $('v-plan');
+  if (!p) { c.innerHTML = `<div class="vacio"><h3>Sin plan</h3><p>Importá un plan para verlo acá.</p><button class="btn pri" data-ir="importar">Ir a Importar</button></div>`; return; }
+  const z = zonasActuales();
+  const vols = p.semanas.map(w => metricaSemana(w, z).km);
+  const max = Math.max(...vols, 1);
+  const hoyStr = ymd(hoy());
+  const actual = p.semanas.find(w => hoyStr >= w.inicio && hoyStr <= w.fin);
+  const hechas = todasSesiones(p).filter(x => x.s.tipo !== 'descanso');
+  const done = hechas.filter(x => { const r = regDe(x.s); return r && r.hecho; }).length;
+
+  let html = `<div class="card">
+    <div class="spread"><span class="eyebrow">${p.semanas.length} semanas · ${fmtCorta(parseYMD(p.inicio))} a ${fmtCorta(parseYMD(p.fin))}</span>
+      <span class="num" style="font-size:12px">${done}/${hechas.length}</span></div>
+    <div class="barras-vol">${p.semanas.map((w, i) =>
+      `<i class="${actual && w.numero === actual.numero ? 'act' : ''}${w.descarga ? ' desc' : ''}" style="height:${(vols[i] / max * 100).toFixed(0)}%" title="S${w.numero}"></i>`).join('')}</div>
+    <div class="spread" style="margin-top:6px"><span class="num" style="font-size:11px;color:var(--ink-3)">volumen semanal</span>
+      <span class="num" style="font-size:11px;color:var(--ink-3)">pico ${max.toFixed(0)} km</span></div>
+    ${p.notas ? `<p>${esc(p.notas)}</p>` : ''}
+  </div>`;
+
+  p.semanas.forEach((w, i) => {
+    const m = metricaSemana(w, z);
+    const f = faseDe(p, w.numero);
+    const esActual = actual && w.numero === actual.numero;
+    html += `<div class="sem${esActual ? ' abierta' : ''}" data-sem="${w.numero}">
+      <button class="sem-head" data-toggle="${w.numero}">
+        <span class="n">${w.numero}</span>
+        <span class="info">
+          <span class="foco">${esc(w.foco || (f ? f.foco : '') || 'Semana ' + w.numero)}</span>
+          <span class="datos">${m.km} km · ${m.sesiones} sesiones${w.descarga ? ' · descarga' : ''}${w.hasta_carrera === 0 ? ' · carrera' : ''}</span>
+        </span>
+        ${f ? `<span class="fase-tag" style="background:${COLOR_FASE[f.nombre] || '#8794A1'}">${esc(f.nombre.slice(0, 4))}</span>` : ''}
+        <span class="barra"><i style="height:${(vols[i] / max * 100).toFixed(0)}%"></i></span>
+      </button>
+      <div class="sem-cuerpo">${w.sesiones.map(s => filaSesion(s, w, { marcarHoy: true })).join('') || '<p style="padding:12px 0;color:var(--ink-3);font-size:13px">Semana sin sesiones.</p>'}</div>
+    </div>`;
+  });
+  c.innerHTML = html;
+}
+
+/* ============================================================
+   VISTA RITMOS
+   ============================================================ */
+function vistaRitmos() {
+  const c = $('v-ritmos');
+  const r = refActiva(), v = vdotActual(), z = zonasActuales();
+  const propia = D.ref && D.ref.distancia_m;
+  let html = `<div class="card">
+    <span class="eyebrow">Marca de referencia</span>
+    <div class="g2" style="margin-top:8px">
+      <div class="f"><label>Distancia</label>
+        <select class="in" id="refDist">
+          <option value="1500">1500 m</option><option value="3000">3 km</option><option value="5000">5 km</option>
+          <option value="10000">10 km</option><option value="15000">15 km</option><option value="21097">21,1 km</option>
+          <option value="42195">42,2 km</option>
+        </select></div>
+      <div class="f"><label>Tiempo</label><input class="in mono" id="refTiempo" placeholder="1:45:30" inputmode="numeric"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Fecha</label><input class="in mono" type="date" id="refFecha"></div>
+      <div class="f"><label>Origen</label><select class="in" id="refOrigen">
+        <option value="carrera">Carrera</option><option value="test">Test</option><option value="estimada">Estimada</option></select></div>
+    </div>
+    <button class="btn pri mini" id="btnRef">Recalcular ritmos</button>
+    ${!propia && r ? `<p style="margin-top:9px">Estos ritmos vienen de la referencia declarada en el plan importado. Cargá la tuya para ajustarlos.</p>` : ''}
+  </div>`;
+
+  if (v && z) {
+    const dias = r.fecha ? diffDays(parseYMD(r.fecha), hoy()) : null;
+    html += `<div class="card">
+      <span class="eyebrow">Estado de forma</span>
+      <div class="vdot-box"><b>${v.toFixed(1)}</b><span style="color:var(--ink-3);font-size:13px">VDOT</span></div>
+      ${dias != null ? `<p class="num" style="font-size:11.5px;color:${dias > 56 ? 'var(--alerta)' : 'var(--ink-3)'}">
+        medido hace ${dias} días${dias > 56 ? ' · conviene volver a testear' : ''}</p>` : ''}
+      <table class="zt">${Object.keys(ZONAS).map(k => `<tr>
+        <td class="z" style="color:${colorZona(k)}">${k}</td>
+        <td class="nm">${ZONAS[k].nom}<small>${ZONAS[k].desc}</small></td>
+        <td class="rt">${ritmoRango(k, z, recargoActual())}</td></tr>`).join('')}</table>
+      <span class="eyebrow" style="display:block;margin-top:16px">Marcas equivalentes</span>
+      <div class="equiv">${[[5000, '5K'], [10000, '10K'], [21097, '21K'], [42195, '42K']].map(([d, n]) => {
+        const t = riegel(segundos(r.tiempo), r.distancia_m, d);
+        return `<div><b>${hms(t)}</b><span>${n}</span></div>`;
+      }).join('')}</div>
+      <p style="font-size:12px;margin-top:10px">Proyección por la fórmula de Riegel. Asume que entrenás la distancia, no solo que podés correrla.</p>
+    </div>`;
+  } else {
+    html += `<div class="card"><p>Cargá una marca reciente y la app calcula el VDOT y las cinco zonas de entrenamiento. Todos los ritmos del plan salen de ahí.</p></div>`;
+  }
+
+  html += `<div class="card">
+    <span class="eyebrow">Ajuste por clima</span>
+    <div class="seg-btns" style="margin-top:8px">
+      <button data-clima="0" class="${D.cfg.clima ? '' : 'on'}">Sin ajuste</button>
+      <button data-clima="1" class="${D.cfg.clima ? 'on' : ''}">Ajustar</button>
+    </div>
+    ${D.cfg.clima ? `<div class="g2" style="margin-top:11px">
+      <div class="f"><label>Temperatura °C</label><input class="in mono" type="number" id="climaT" value="${D.cfg.temp}"></div>
+      <div class="f"><label>Humedad %</label><input class="in mono" type="number" id="climaH" value="${D.cfg.hum}"></div>
+    </div>
+    <p class="num" style="font-size:12.5px">Recargo actual: +${(recargoClima(D.cfg.temp, D.cfg.hum) * 100).toFixed(0)} % sobre M, T, I, R y ritmo de carrera.</p>` : ''}
+    <p style="font-size:12.5px;margin-top:9px">El calor y la humedad frenan la disipación de temperatura: el mismo esfuerzo rinde menos ritmo. El ajuste es solo visual, no toca el plan guardado. La zona suave no se ajusta porque ya va por sensación.</p>
+  </div>`;
+  c.innerHTML = html;
+  if (r) {
+    $('refDist').value = String([1500, 3000, 5000, 10000, 15000, 21097, 42195].reduce((a, b) => Math.abs(b - r.distancia_m) < Math.abs(a - r.distancia_m) ? b : a, 5000));
+    $('refTiempo').value = r.tiempo || '';
+    $('refFecha').value = r.fecha || '';
+    $('refOrigen').value = r.origen || 'carrera';
+  }
+}
+
+/* ============================================================
+   VISTA IMPORTAR
+   ============================================================ */
+function armarPrompt() {
+  const z = zonasActuales(), r = refActiva(), v = vdotActual();
+  const bloqueRitmos = z ? `- Marca de referencia: ${(r.distancia_m / 1000).toFixed(1).replace('.0', '')} km en ${r.tiempo}${r.fecha ? ' (' + r.fecha + ')' : ''}
+- VDOT calculado: ${v.toFixed(1)}
+- Zonas de ritmo ya resueltas (min/km):
+  E suave ${ritmoRango('E', z, 0)} · M maratón ${ritmoRango('M', z, 0)} · T umbral ${ritmoRango('T', z, 0)}
+  I intervalos ${ritmoRango('I', z, 0)} · R repeticiones ${ritmoRango('R', z, 0)}`
+    : `- Marca de referencia: COMPLETAR (distancia y tiempo de una carrera o test reciente)`;
+
+  return `Sos un entrenador de running con experiencia en planificación por zonas de ritmo.
+Necesito que armes un plan de entrenamiento y me lo devuelvas EXCLUSIVAMENTE como un objeto
+JSON en formato UTP/1. Sin cercas de código, sin texto antes ni después. Solo el JSON.
+
+DATOS DEL CORREDOR
+${bloqueRitmos}
+- Objetivo: COMPLETAR (carrera, distancia y fecha exacta)
+- Meta de tiempo: COMPLETAR (o "sin meta")
+- Días por semana que puedo entrenar: COMPLETAR
+- Día que prefiero para la tirada larga: COMPLETAR
+- Volumen semanal actual: COMPLETAR km
+- Antecedentes, molestias o limitaciones: COMPLETAR
+
+ESTRUCTURA EXACTA DEL JSON
+
+{
+  "formato": "utp/1",
+  "plan": {
+    "nombre": "...",
+    "autor": "...",
+    "notas": "...",
+    "objetivo": { "nombre": "...", "distancia_m": 21097, "fecha": "AAAA-MM-DD",
+                  "meta_tiempo": "H:MM:SS", "prioridad": "A" },
+    "anclaje": { "modo": "carrera", "inicio_semana": "lunes" },
+    "referencia": { "distancia_m": 21097, "tiempo": "1:45:30",
+                    "fecha": "AAAA-MM-DD", "origen": "carrera" },
+    "supuestos": { "dias_por_semana": 4, "dia_largo": "domingo",
+                   "volumen_inicial_km": 32, "volumen_pico_km": 55,
+                   "superficies": ["asfalto"] },
+    "fases": [ { "nombre": "base", "desde_semana": 1, "hasta_semana": 4, "foco": "..." } ],
+    "semanas": [
+      { "numero": 1, "foco": "...", "volumen_objetivo_km": 34, "descarga": false,
+        "sesiones": [
+          { "dia": "martes",
+            "tipo": "intervalos",
+            "titulo": "6 × 800 m a ritmo I",
+            "proposito": "una frase: para qué está esta sesión en el plan",
+            "fundamento": "dos o tres frases: qué adaptación fisiológica busca",
+            "sensacion": "cómo debería sentirse y cuál es la señal de estar pasado",
+            "clave": true,
+            "segmentos": [
+              { "rol": "calentamiento", "duracion_min": 15, "zona": "E" },
+              { "rol": "tecnica", "descripcion": "4 × 20 s progresivos" },
+              { "rol": "serie", "repeticiones": 6,
+                "trabajo": { "distancia_m": 800, "zona": "I" },
+                "recuperacion": { "duracion_min": 2.5, "zona": "trote" } },
+              { "rol": "vuelta_calma", "duracion_min": 10, "zona": "E" }
+            ],
+            "alternativas": [
+              { "cuando": "lluvia", "descripcion": "..." },
+              { "cuando": "poco_tiempo", "descripcion": "..." }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+
+VOCABULARIOS CERRADOS — no inventes valores fuera de estas listas
+- tipo: descanso, suave, largo, progresivo, tempo, intervalos, repeticiones,
+        fartlek, cuestas, test, carrera, fuerza, cruzado, movilidad
+- zona: E, M, T, I, R, trote, caminar, libre, carrera
+- rol:  calentamiento, continuo, serie, bloque, recuperacion, vuelta_calma, tecnica
+- dia:  lunes, martes, miercoles, jueves, viernes, sabado, domingo
+- fase: base, construccion, especifico, pico, afinamiento, carrera, recuperacion
+- cuando: lluvia, calor, poco_tiempo, cinta, lesion_leve, viaje
+
+REGLAS
+1. Numerá las semanas de 1 en adelante. Con anclaje "carrera", la última semana es
+   la de la competencia y la app calcula sola todas las fechas.
+2. No escribas ritmos en min/km dentro de las sesiones: usá la zona. La app resuelve
+   los números según mi estado de forma. Solo poné "ritmo" explícito si es necesario.
+3. Las distancias van en metros ("distancia_m") y las duraciones en minutos
+   ("duracion_min"). Un número decimal en duracion_min es válido.
+4. El volumen no sube más de 10 % por semana. Incluí una semana de descarga cada 3 o 4,
+   con 20 a 30 % menos de volumen, marcada con "descarga": true.
+5. Las últimas dos semanas son de afinamiento: baja el volumen, se mantiene la intensidad.
+6. Nunca dos sesiones clave en días consecutivos.
+7. Respetá los días por semana y el día elegido para la tirada larga.
+8. Incluí una sesión de tipo "carrera" el día del objetivo.
+9. Completá proposito, fundamento y sensacion en todas las sesiones que no sean descanso.
+   Escribí en español rioplatense, directo, sin motivación vacía.
+10. Los días sin entrenamiento se pueden omitir o cargar como tipo "descanso".
+
+Devolvé únicamente el JSON.`;
+}
+
+function vistaImportar() {
+  const c = $('v-importar');
+  const z = zonasActuales();
+  c.innerHTML = `
+  <div class="card">
+    <h3>El prompt</h3>
+    <p>Copiá este texto, pegalo en el modelo que uses y completá los campos marcados. Te devuelve un JSON que se pega abajo y queda importado.</p>
+    ${z ? '<p style="color:var(--ok)">Tus ritmos actuales ya vienen incrustados en el prompt.</p>'
+       : '<p style="color:var(--alerta)">Cargá tu marca de referencia en Ritmos y el prompt va a salir con tus zonas ya calculadas.</p>'}
+    <button class="btn pri" id="btnCopiarPrompt">Copiar el prompt</button>
+    <div class="pre" style="margin-top:11px" id="vistaPrompt">${esc(armarPrompt())}</div>
+  </div>
+
+  <div class="card">
+    <h3>Reglas del formato</h3>
+    <p style="margin-bottom:6px">UTP/1 es el estándar que entiende la app. Esto es lo que valida al importar.</p>
+    ${acc('Campos obligatorios', `<table class="tabla">
+      <tr><td>formato</td><td>Literal <code>utp/1</code></td></tr>
+      <tr><td>plan.nombre</td><td>Texto libre</td></tr>
+      <tr><td>objetivo.distancia_m</td><td>Metros. 21097 para una media</td></tr>
+      <tr><td>objetivo.fecha</td><td>AAAA-MM-DD, si el anclaje es por carrera</td></tr>
+      <tr><td>semanas[].numero</td><td>Correlativo desde 1</td></tr>
+      <tr><td>sesiones[].dia</td><td>Nombre del día o fecha AAAA-MM-DD</td></tr>
+      <tr><td>sesiones[].tipo</td><td>Del vocabulario cerrado</td></tr></table>
+      <p style="font-size:12.5px;margin-top:8px">Todo lo demás tiene valor por defecto. Si falta el título, se arma desde los segmentos; si faltan las explicaciones, se usan las del tipo de sesión.</p>`)}
+    ${acc('Tipos de sesión', `<table class="tabla">${Object.keys(TIPOS).map(k => `<tr><td>${k}</td><td>${TIPOS[k].n}</td></tr>`).join('')}</table>`)}
+    ${acc('Zonas de ritmo', `<table class="tabla">${Object.keys(ZONAS).map(k => `<tr><td>${k}</td><td>${ZONAS[k].nom} — ${ZONAS[k].desc}</td></tr>`).join('')}
+      <tr><td>trote</td><td>Recuperación entre series</td></tr>
+      <tr><td>caminar</td><td>Caminata</td></tr>
+      <tr><td>libre</td><td>Sin ritmo objetivo</td></tr>
+      <tr><td>carrera</td><td>Ritmo meta del objetivo del plan</td></tr></table>`)}
+    ${acc('Roles de segmento', `<table class="tabla">
+      <tr><td>calentamiento</td><td>Entrada en calor</td></tr>
+      <tr><td>continuo</td><td>Bloque corrido, el cuerpo de la sesión</td></tr>
+      <tr><td>serie</td><td>Repeticiones: usa <code>repeticiones</code>, <code>trabajo</code> y <code>recuperacion</code></td></tr>
+      <tr><td>bloque</td><td>Tramo con otra zona dentro de la sesión</td></tr>
+      <tr><td>recuperacion</td><td>Trote de recuperación suelto</td></tr>
+      <tr><td>vuelta_calma</td><td>Enfriamiento</td></tr>
+      <tr><td>tecnica</td><td>Progresivos, drills. Solo descripción</td></tr></table>`)}
+    ${acc('Qué corrige la app sola', `<table class="tabla">
+      <tr><td>cercas \`\`\`</td><td>Se sacan</td></tr>
+      <tr><td>prosa alrededor</td><td>Se recorta hasta el primer JSON completo</td></tr>
+      <tr><td>comas finales</td><td>Se eliminan</td></tr>
+      <tr><td>comillas curvas</td><td>Se enderezan</td></tr>
+      <tr><td>comentarios //</td><td>Se descartan</td></tr>
+      <tr><td>distancia_km</td><td>Se convierte a metros</td></tr>
+      <tr><td>easy, long, rest…</td><td>Se traducen a los tipos en español</td></tr>
+      <tr><td>1h45 · 4:35 · 90min</td><td>Todos los formatos de tiempo se entienden</td></tr></table>`)}
+  </div>
+
+  <div class="card">
+    <h3>Pegar el plan</h3>
+    <textarea class="in mono" id="pegado" placeholder='{ "formato": "utp/1", "plan": { … } }' style="min-height:130px;font-size:13px;margin-top:8px"></textarea>
+    <button class="btn pri" id="btnRevisar">Revisar e importar</button>
+    <div class="btn-row">
+      <button class="btn gh" id="btnArchivo">Desde archivo</button>
+      <button class="btn gh" id="btnEjemplo">Plan de ejemplo</button>
+    </div>
+  </div>`;
+}
+function acc(t, cont) {
+  return `<div class="acc"><button data-acc><span style="flex:1">${t}</span><span>+</span></button><div class="cont">${cont}</div></div>`;
+}
+
+/* ============================================================
+   VISTA AJUSTES
+   ============================================================ */
+const instalada = window.navigator.standalone === true ||
+  (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+
+function vistaAjustes() {
+  const c = $('v-ajustes'), p = plan();
+  c.innerHTML = `
+  <div class="card">
+    <h3>Planes</h3>
+    ${D.planes.length ? D.planes.map(x => `<div class="ses" style="cursor:default">
+        <span class="cuerpo"><span class="tit">${esc(x.nombre)}</span>
+        <span class="bajo">${x.semanas.length} semanas · ${x.objetivo.fecha ? fmtCorta(parseYMD(x.objetivo.fecha)) : 'sin fecha'}${x.id === D.activo ? ' · activo' : ''}</span></span>
+        ${x.id === D.activo ? '' : `<button class="btn gh mini" style="width:auto;padding:7px 11px;margin:0" data-activar="${x.id}">Activar</button>`}
+        <button class="btn dg mini" style="width:auto;padding:7px 11px;margin:0;border:0" data-borrar-plan="${x.id}">Borrar</button>
+      </div>`).join('') : '<p>Todavía no importaste ningún plan.</p>'}
+  </div>
+
+  <div class="card">
+    <h3>Exportar</h3>
+    <p>El plan activo, en el mismo formato UTP/1 que importás. Sirve para archivarlo o para pedirle a un modelo que lo revise y lo ajuste.</p>
+    <button class="btn gh" id="btnExpPlan" ${p ? '' : 'disabled'}>Exportar el plan (UTP/1)</button>
+    <button class="btn gh" id="btnExpIcs" ${p ? '' : 'disabled'}>Mandar al Calendario del iPhone</button>
+    <p style="font-size:12.5px">Las sesiones van como eventos de día completo, con la estructura y los ritmos en la descripción.</p>
+  </div>
+
+  <div class="card">
+    <h3>Copia de seguridad</h3>
+    <p>Todo vive en este iPhone. Guardá una copia cada tanto: incluye planes, ritmos y registros.</p>
+    <div class="btn-row">
+      <button class="btn gh" id="btnCopia">Guardar copia</button>
+      <button class="btn gh" id="btnRestaurar">Restaurar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Umbral</h3>
+    <p>${instalada ? 'Instalada en la pantalla de inicio. Funciona sin conexión.' : 'Estás en Safari. Tocá Compartir y después Añadir a pantalla de inicio para instalarla.'}</p>
+    <p class="num" style="font-size:11.5px;margin-top:8px">Umbral 1.0 · formato UTP/1 · ${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'} · ${Object.keys(D.reg).length} registros</p>
+  </div>`;
+}
+
+/* ============================================================
+   DETALLE DE SESIÓN
+   ============================================================ */
+const CUANDO = { lluvia: 'Si llueve', calor: 'Si hace calor', poco_tiempo: 'Si tenés poco tiempo', cinta: 'En cinta', lesion_leve: 'Con una molestia', viaje: 'De viaje', otro: 'Alternativa' };
+
+function abrirDetalle(uid) {
+  const f = buscarSesion(uid); if (!f) return;
+  const { s, w } = f;
+  const z = zonasActuales(), rec = recargoActual();
+  const m = metricaSesion(s, z), r = regDe(s);
+  const d = parseYMD(s.fecha);
+  editandoUid = uid;
+
+  let h = `<div class="spread"><span class="tipo-chip" style="--z:${colorTipo(s.tipo)}">${TIPOS[s.tipo].n}</span>
+    <span class="eyebrow">Semana ${w.numero}${s.clave ? ' · clave' : ''}</span></div>
+    <h2 class="disp" style="font-size:25px;margin:11px 0 3px;line-height:1.1">${esc(tituloAuto(s, z))}</h2>
+    <div class="num" style="font-size:13px;color:var(--ink-3)">${DIAS_LBL[(d.getDay() + 6) % 7]} ${fmtFecha(d)}${m.km ? ' · ' + m.km + ' km' : ''}${m.min ? ' · ' + duracionTxt(m.min) : ''}</div>`;
+
+  if (s.tipo !== 'descanso') {
+    h += `<div style="margin:16px 0 3px">${perfilHTML(s, 'xl')}</div>`;
+    h += `<div class="segs">` + (s.segmentos || []).map(g => {
+      const z1 = g.rol === 'serie' ? (g.trabajo && g.trabajo.zona) : g.zona;
+      const rol = { calentamiento: 'Calentamiento', vuelta_calma: 'Vuelta a la calma', tecnica: 'Técnica', recuperacion: 'Recuperación', bloque: 'Bloque', serie: 'Serie', continuo: 'Bloque principal' }[g.rol] || '';
+      let cuerpo, ritmo = '';
+      if (g.rol === 'serie') {
+        cuerpo = `<b>${g.repeticiones || 1} × ${g.trabajo ? (g.trabajo.distancia_m != null ? (g.trabajo.distancia_m >= 1000 ? g.trabajo.distancia_m / 1000 + ' km' : g.trabajo.distancia_m + ' m') : duracionTxt(g.trabajo.duracion_min)) : ''}</b>`;
+        if (g.recuperacion) cuerpo += `<br><span style="color:var(--ink-3);font-size:13px">recuperá ${g.recuperacion.duracion_min != null ? duracionTxt(g.recuperacion.duracion_min) : (g.recuperacion.distancia_m + ' m')} ${ritmoRango(g.recuperacion.zona || 'trote', z, rec) || ''}</span>`;
+        ritmo = g.trabajo && g.trabajo.ritmo ? g.trabajo.ritmo : (ritmoRango(z1, z, rec) || '');
+      } else if (g.rol === 'tecnica') {
+        cuerpo = `<b>${esc(g.descripcion || 'Técnica')}</b>`;
+      } else {
+        cuerpo = `<b>${g.distancia_m != null ? (g.distancia_m >= 1000 ? +(g.distancia_m / 1000).toFixed(2) + ' km' : g.distancia_m + ' m') : duracionTxt(g.duracion_min)}</b>`;
+        if (g.descripcion) cuerpo += `<br><span style="color:var(--ink-3);font-size:13px">${esc(g.descripcion)}</span>`;
+        ritmo = g.ritmo || (ritmoRango(z1, z, rec) || '');
+      }
+      return `<div class="seg" style="--z:${colorZona(z1 || 'nulo')}"><span class="marca"></span>
+        <span class="t"><span class="rol">${rol}</span>${cuerpo}</span><span class="r">${esc(ritmo)}</span></div>`;
+    }).join('') + `</div>`;
+    if (rec > 0) h += `<p style="font-size:12.5px;color:var(--ink-2);margin-top:9px">Ritmos ajustados +${Math.round(rec * 100)} % por calor y humedad.</p>`;
+  }
+
+  if (s.proposito) h += `<div class="card" style="margin-top:16px;background:var(--surface-2)"><span class="eyebrow">Para qué</span><p style="color:var(--ink)">${esc(s.proposito)}</p></div>`;
+  if (s.fundamento) h += `<div class="card" style="background:var(--surface-2)"><span class="eyebrow">Por qué funciona</span><p style="color:var(--ink)">${esc(s.fundamento)}</p></div>`;
+  if (s.sensacion) h += `<div class="card" style="background:var(--surface-2)"><span class="eyebrow">Cómo se tiene que sentir</span><p style="color:var(--ink)">${esc(s.sensacion)}</p></div>`;
+  if ((s.alternativas || []).length) h += `<div class="card" style="background:var(--surface-2)"><span class="eyebrow">Alternativas</span>
+    ${s.alternativas.map(a => `<p style="color:var(--ink)"><b>${CUANDO[a.cuando] || a.cuando}:</b> ${esc(a.descripcion)}</p>`).join('')}</div>`;
+
+  if (r && r.hecho) {
+    h += `<div class="card" style="background:#E9F4EE;border-color:#BFDCCB"><span class="eyebrow" style="color:#1F5C42">Lo que hiciste</span>
+      <p style="color:#1F5C42" class="num">${[r.km ? r.km + ' km' : null, r.tiempo || null, r.km && r.tiempo && segundos(r.tiempo) ? ritmoTxt(segundos(r.tiempo) / r.km) + '/km' : null, r.rpe ? 'RPE ' + r.rpe : null].filter(Boolean).join(' · ')}</p>
+      ${r.nota ? `<p style="color:#1F5C42">${esc(r.nota)}</p>` : ''}</div>`;
+  }
+
+  h += `<button class="btn pri" data-registrar="${s.uid}">${r && r.hecho ? 'Editar el registro' : 'Registrar lo que hiciste'}</button>
+    <div class="btn-row">
+      <button class="btn gh" data-icsses="${s.uid}">Al calendario</button>
+      <button class="btn gh" data-duplicar="${s.uid}">Duplicar</button>
+    </div>
+    <button class="btn dg" data-borrar-ses="${s.uid}">Eliminar la sesión</button>`;
+  $('cuerpoDetalle').innerHTML = h;
+  abrirHoja('shDetalle');
+}
+
+/* ============================================================
+   EDITOR DE SESIÓN
+   ============================================================ */
+const ZONAS_OPT = ['E', 'M', 'T', 'I', 'R', 'trote', 'caminar', 'libre', 'carrera'];
+function optSel(lista, val, etiqueta) {
+  return lista.map(v => `<option value="${v}"${String(v) === String(val) ? ' selected' : ''}>${etiqueta ? etiqueta(v) : v}</option>`).join('');
+}
+function abrirEditor(uid) {
+  const f = buscarSesion(uid); if (!f) return;
+  const s = JSON.parse(JSON.stringify(f.s));
+  editandoUid = uid;
+  const campoSeg = (g, i) => {
+    const esSerie = g.rol === 'serie';
+    const t = esSerie ? (g.trabajo || {}) : g;
+    const medida = t.distancia_m != null ? 'd' : 'm';
+    return `<div class="card tight" data-seg="${i}" style="background:var(--surface-2)">
+      <div class="row" style="gap:8px">
+        <select class="in" data-c="rol" style="flex:1">${optSel(['calentamiento', 'continuo', 'serie', 'bloque', 'recuperacion', 'vuelta_calma', 'tecnica'], g.rol)}</select>
+        <button class="btn dg mini" style="width:auto;padding:8px 11px;margin:0;border:0" data-quitar-seg="${i}">Quitar</button>
+      </div>
+      ${g.rol === 'tecnica' ? `<div class="f" style="margin-top:9px"><label>Descripción</label>
+          <input class="in" data-c="descripcion" value="${esc(g.descripcion || '')}"></div>`
+      : `${esSerie ? `<div class="f" style="margin-top:9px"><label>Repeticiones</label>
+            <input class="in mono" type="number" min="1" data-c="repeticiones" value="${g.repeticiones || 1}"></div>` : ''}
+        <div class="g3" style="margin-top:9px">
+          <div><label class="lbl">Medida</label><select class="in" data-c="medida">
+            <option value="d"${medida === 'd' ? ' selected' : ''}>Distancia</option>
+            <option value="m"${medida === 'm' ? ' selected' : ''}>Tiempo</option></select></div>
+          <div><label class="lbl">${medida === 'd' ? 'Metros' : 'Minutos'}</label>
+            <input class="in mono" type="number" step="0.5" data-c="valor" value="${medida === 'd' ? (t.distancia_m ?? '') : (t.duracion_min ?? '')}"></div>
+          <div><label class="lbl">Zona</label><select class="in" data-c="zona">${optSel(ZONAS_OPT, t.zona || 'E')}</select></div>
+        </div>
+        ${esSerie ? `<div class="g3" style="margin-top:9px">
+          <div><label class="lbl">Recupera</label><select class="in" data-c="rmedida">
+            <option value="m"${(g.recuperacion && g.recuperacion.distancia_m == null) ? ' selected' : ''}>Tiempo</option>
+            <option value="d"${(g.recuperacion && g.recuperacion.distancia_m != null) ? ' selected' : ''}>Distancia</option></select></div>
+          <div><label class="lbl">Valor</label><input class="in mono" type="number" step="0.5" data-c="rvalor"
+            value="${g.recuperacion ? (g.recuperacion.distancia_m != null ? g.recuperacion.distancia_m : (g.recuperacion.duracion_min ?? '')) : ''}"></div>
+          <div><label class="lbl">Zona</label><select class="in" data-c="rzona">${optSel(ZONAS_OPT, (g.recuperacion && g.recuperacion.zona) || 'trote')}</select></div>
+        </div>` : ''}
+        <div class="f" style="margin-top:9px"><label>Ritmo fijo (opcional)</label>
+          <input class="in mono" data-c="ritmo" placeholder="dejar vacío para usar la zona" value="${esc(t.ritmo || '')}"></div>`}
+    </div>`;
+  };
+
+  $('cuerpoEditor').innerHTML = `
+    <div class="f"><label>Título</label><input class="in" id="eTitulo" value="${esc(s.titulo || tituloAuto(s, zonasActuales()))}"></div>
+    <div class="g2">
+      <div class="f"><label>Día</label><input class="in mono" type="date" id="eFecha" value="${s.fecha}"></div>
+      <div class="f"><label>Tipo</label><select class="in" id="eTipo">${optSel(Object.keys(TIPOS), s.tipo, k => TIPOS[k].n)}</select></div>
+    </div>
+    <div class="f"><label>Marcar como</label><div class="seg-btns">
+      <button data-flag="clave" class="${s.clave ? 'on' : ''}">Clave</button>
+      <button data-flag="opcional" class="${s.opcional ? 'on' : ''}">Opcional</button></div></div>
+    <div class="f"><label>Para qué</label><textarea class="in" id="eProp" style="min-height:56px">${esc(s.proposito || '')}</textarea></div>
+    <div class="f"><label>Por qué funciona</label><textarea class="in" id="eFund">${esc(s.fundamento || '')}</textarea></div>
+    <div class="f"><label>Cómo se tiene que sentir</label><textarea class="in" id="eSens" style="min-height:56px">${esc(s.sensacion || '')}</textarea></div>
+    <span class="eyebrow" style="display:block;margin:16px 0 8px">Estructura</span>
+    <div id="segsEditor">${(s.segmentos || []).map(campoSeg).join('')}</div>
+    <button class="btn gh" id="btnAddSeg">Agregar segmento</button>`;
+  $('cuerpoEditor').dataset.uid = uid;
+  $('cuerpoEditor').dataset.clave = s.clave ? '1' : '';
+  $('cuerpoEditor').dataset.opcional = s.opcional ? '1' : '';
+  abrirHoja('shEditor');
+}
+
+function leerEditor() {
+  const uid = $('cuerpoEditor').dataset.uid;
+  const f = buscarSesion(uid); if (!f) return null;
+  const s = f.s;
+  s.titulo = $('eTitulo').value.trim();
+  s.tipo = $('eTipo').value;
+  s.proposito = $('eProp').value.trim();
+  s.fundamento = $('eFund').value.trim();
+  s.sensacion = $('eSens').value.trim();
+  s.clave = $('cuerpoEditor').dataset.clave === '1';
+  s.opcional = $('cuerpoEditor').dataset.opcional === '1';
+  const nueva = $('eFecha').value;
+  if (nueva && nueva !== s.fecha) s.dia = nueva;
+  const segs = [];
+  document.querySelectorAll('#segsEditor [data-seg]').forEach(box => {
+    const v = c => { const el = box.querySelector(`[data-c="${c}"]`); return el ? el.value : null; };
+    const rol = v('rol');
+    const g = { rol };
+    if (rol === 'tecnica') { g.descripcion = v('descripcion') || ''; segs.push(g); return; }
+    const medida = v('medida'), valor = parseFloat(v('valor'));
+    const cuerpo = {};
+    if (!isNaN(valor)) { if (medida === 'd') cuerpo.distancia_m = Math.round(valor); else cuerpo.duracion_min = valor; }
+    cuerpo.zona = v('zona');
+    const ritmo = (v('ritmo') || '').trim();
+    if (ritmo) cuerpo.ritmo = ritmo;
+    if (rol === 'serie') {
+      g.repeticiones = Math.max(1, parseInt(v('repeticiones')) || 1);
+      g.trabajo = cuerpo;
+      const rv = parseFloat(v('rvalor'));
+      if (!isNaN(rv)) {
+        g.recuperacion = v('rmedida') === 'd' ? { distancia_m: Math.round(rv) } : { duracion_min: rv };
+        g.recuperacion.zona = v('rzona');
+      }
+    } else Object.assign(g, cuerpo);
+    segs.push(g);
+  });
+  s.segmentos = segs;
+  resolverFechas(f.p);
+  return f.p;
+}
+
+/* ============================================================
+   REGISTRO
+   ============================================================ */
+function abrirRegistro(uid) {
+  const f = buscarSesion(uid); if (!f) return;
+  registrandoUid = uid;
+  const r = regDe(f.s) || {};
+  const m = metricaSesion(f.s, zonasActuales());
+  $('cuerpoRegistro').innerHTML = `
+    <h2 class="disp" style="font-size:20px;margin-bottom:12px">${esc(tituloAuto(f.s, zonasActuales()))}</h2>
+    <div class="g2">
+      <div class="f"><label>Distancia (km)</label><input class="in mono" type="number" step="0.1" id="rKm" value="${r.km ?? (m.km || '')}"></div>
+      <div class="f"><label>Tiempo</label><input class="in mono" id="rTiempo" placeholder="48:20" value="${esc(r.tiempo || '')}"></div>
+    </div>
+    <div class="f"><label>Esfuerzo percibido (1 a 10)</label>
+      <div class="seg-btns">${[1,2,3,4,5,6,7,8,9,10].map(n => `<button data-rpe="${n}" class="${r.rpe === n ? 'on' : ''}">${n}</button>`).join('')}</div></div>
+    <div class="f"><label>Cómo te sentiste</label>
+      <div class="seg-btns">${['muy bien','bien','normal','pesado','muy mal'].map(v => `<button data-sens="${v}" class="${r.sensacion === v ? 'on' : ''}">${v}</button>`).join('')}</div></div>
+    <div class="f"><label>Notas</label><textarea class="in" id="rNota" placeholder="Viento en la rambla, molestia en el gemelo…">${esc(r.nota || '')}</textarea></div>
+    ${r.hecho ? '<button class="btn dg" id="btnBorrarReg">Borrar el registro</button>' : ''}`;
+  $('cuerpoRegistro').dataset.rpe = r.rpe || '';
+  $('cuerpoRegistro').dataset.sens = r.sensacion || '';
+  abrirHoja('shRegistro');
+}
+
+/* ============================================================
+   IMPORTACIÓN
+   ============================================================ */
+function revisar(texto) {
+  const limpio = limpiarJSON(texto);
+  let crudo;
+  try { crudo = JSON.parse(limpio); }
+  catch (e) { informe(null, null, [['E01', 'El texto no es un JSON válido. ' + e.message]], []); return; }
+  const p = resolverFechas(normalizarPlan(crudo));
+  const v = validar(crudo, p);
+  const z = zonasActuales() || (p.referencia && p.referencia.tiempo ? zonasDe(vdotDe(p.referencia.distancia_m, segundos(p.referencia.tiempo))) : null);
+  const adv = v.adv.concat(advertenciasCarga(p, z));
+  informe(crudo, p, v.err, adv);
+}
+
+function informe(crudo, p, err, adv) {
+  pendiente = err.length ? null : p;
+  let h = '';
+  if (err.length) {
+    h += `<div class="aviso err"><b>No se puede importar</b><br>${err.length} error${err.length > 1 ? 'es' : ''} que hay que corregir antes.</div>`;
+    err.forEach(e => { h += `<div class="aviso err"><b>${e[0]}</b>${esc(e[1])}</div>`; });
+    h += `<p style="margin-top:14px;font-size:13.5px;color:var(--ink-2)">Copiá el error y pedile al modelo que corrija el JSON. Los campos obligatorios están en Reglas del formato.</p>`;
+    $('btnConfirmar').style.visibility = 'hidden';
+  } else {
+    const z = zonasActuales() || (p.referencia && p.referencia.tiempo ? zonasDe(vdotDe(p.referencia.distancia_m, segundos(p.referencia.tiempo))) : null);
+    const vols = p.semanas.map(w => metricaSemana(w, z).km);
+    const max = Math.max(...vols, 1);
+    const tot = vols.reduce((a, b) => a + b, 0);
+    const ses = p.semanas.reduce((a, w) => a + w.sesiones.filter(s => s.tipo !== 'descanso').length, 0);
+    const dias = new Set();
+    p.semanas.forEach(w => w.sesiones.forEach(s => { if (s.tipo !== 'descanso') dias.add(s.fecha); }));
+    h += `<div class="aviso ok"><b>Listo</b>Se entendió el plan completo.</div>
+      <h2 class="disp" style="font-size:22px;margin:14px 0 2px">${esc(p.nombre)}</h2>
+      <div class="num" style="font-size:12.5px;color:var(--ink-3)">${esc(p.objetivo.nombre)} · ${(p.objetivo.distancia_m / 1000).toFixed(1).replace('.0', '')} km${p.objetivo.fecha ? ' · ' + fmtFecha(parseYMD(p.objetivo.fecha)) : ''}${p.objetivo.meta_tiempo ? ' · meta ' + p.objetivo.meta_tiempo : ''}</div>
+      <div class="card tight" style="margin-top:13px;background:var(--surface-2)">
+        <div class="g3">
+          <div><span class="eyebrow">Semanas</span><div class="disp" style="font-size:24px">${p.semanas.length}</div></div>
+          <div><span class="eyebrow">Sesiones</span><div class="disp" style="font-size:24px">${ses}</div></div>
+          <div><span class="eyebrow">Total km</span><div class="disp" style="font-size:24px">${tot.toFixed(0)}</div></div>
+        </div>
+        <div class="barras-vol">${vols.map((v2, i) => `<i class="${p.semanas[i].descarga ? 'desc' : ''}" style="height:${(v2 / max * 100).toFixed(0)}%"></i>`).join('')}</div>
+        <div class="num" style="font-size:11px;color:var(--ink-3);margin-top:6px">
+          arranca el ${fmtFecha(parseYMD(p.inicio))} · pico ${max.toFixed(0)} km · ${p.supuestos.dias_por_semana ? p.supuestos.dias_por_semana + ' días por semana' : Math.round(dias.size / p.semanas.length * 10) / 10 + ' días por semana en promedio'}</div>
+      </div>`;
+    if (parseYMD(p.inicio) < hoy()) {
+      const perdidas = p.semanas.filter(w => parseYMD(w.fin) < hoy()).length;
+      h += `<div class="aviso warn"><b>Fechas</b>El plan arranca el ${fmtFecha(parseYMD(p.inicio))}, que ya pasó. ${perdidas ? `Quedan ${perdidas} semana${perdidas > 1 ? 's' : ''} atrás.` : ''} Se importa igual: podés mover las sesiones o pedir un plan más corto.</div>`;
+    }
+    const grupos = {};
+    adv.forEach(a => { (grupos[a[0]] ||= []).push(a[1]); });
+    const claves = Object.keys(grupos);
+    if (claves.length) {
+      h += `<span class="eyebrow" style="display:block;margin:16px 0 6px">${adv.length} advertencia${adv.length > 1 ? 's' : ''}</span>`;
+      claves.forEach(k => {
+        const l = grupos[k];
+        h += `<div class="aviso warn"><b>${k}</b>${esc(l[0])}${l.length > 1 ? `<br><span style="opacity:.75">y ${l.length - 1} caso${l.length > 2 ? 's' : ''} más</span>` : ''}</div>`;
+      });
+      h += `<p style="font-size:12.5px;color:var(--ink-2);margin-top:9px">Las advertencias no impiden importar. Revisalas y decidí vos.</p>`;
+    }
+    h += `<div style="margin-top:16px"><span class="eyebrow">Primera semana</span>
+      ${p.semanas[0].sesiones.map(s => filaSesion(s, p.semanas[0])).join('')}</div>`;
+    $('btnConfirmar').style.visibility = 'visible';
+  }
+  $('cuerpoInforme').innerHTML = h;
+  abrirHoja('shInforme');
+}
+
+/* ============================================================
+   ARCHIVOS
+   ============================================================ */
+async function compartir(txt, nombre, mime, titulo, aviso) {
+  const file = new File([txt], nombre, { type: mime });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: titulo }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const url = URL.createObjectURL(new Blob([txt], { type: mime }));
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast(aviso);
+}
+function planAUTP(p) {
+  // se quitan solo los campos que la app deriva; los del estándar se conservan
+  const c = JSON.parse(JSON.stringify(p));
+  delete c.id; delete c.inicio; delete c.fin;
+  (c.semanas || []).forEach(w => {
+    delete w.inicio; delete w.fin; delete w.hasta_carrera;
+    (w.sesiones || []).forEach(s => {
+      delete s.uid; delete s.fecha; delete s.tipo_original;
+      // las explicaciones por defecto no se exportan: solo las que traía el plan
+      if (!s.propio) { delete s.proposito; delete s.fundamento; delete s.sensacion; }
+      delete s.propio;
+      if (!s.alternativas || !s.alternativas.length) delete s.alternativas;
+      if (!s.titulo) delete s.titulo;
+    });
+  });
+  return JSON.stringify({ formato: 'utp/1', plan: c }, null, 2);
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-ses],[data-tick],[data-registrar],[data-ir],[data-toggle],[data-acc],[data-clima],[data-flag],[data-rpe],[data-sens],[data-quitar-seg],[data-activar],[data-borrar-plan],[data-borrar-ses],[data-duplicar],[data-icsses]');
+  if (!t) return;
+  const p = plan();
+
+  if (t.dataset.tick != null) {
+    ev.stopPropagation();
+    const f = buscarSesion(t.dataset.tick); if (!f) return;
+    const k = claveReg(p, f.s);
+    const r = D.reg[k] || {};
+    r.hecho = !r.hecho;
+    if (r.hecho && r.km == null) r.km = metricaSesion(f.s, zonasActuales()).km || null;
+    D.reg[k] = r; await guardar(); pintar();
+    return;
+  }
+  if (t.dataset.ses) { abrirDetalle(t.dataset.ses); return; }
+  if (t.dataset.registrar) { cerrarHojas(); setTimeout(() => abrirRegistro(t.dataset.registrar), 240); return; }
+  if (t.dataset.ir) { irA(t.dataset.ir); return; }
+  if (t.dataset.toggle) { t.closest('.sem').classList.toggle('abierta'); return; }
+  if (t.hasAttribute('data-acc')) { t.parentElement.classList.toggle('on'); return; }
+  if (t.dataset.clima != null) { D.cfg.clima = t.dataset.clima === '1'; await guardar(); vistaRitmos(); return; }
+  if (t.dataset.flag) {
+    const d = $('cuerpoEditor').dataset;
+    d[t.dataset.flag] = d[t.dataset.flag] === '1' ? '' : '1';
+    t.classList.toggle('on'); return;
+  }
+  if (t.dataset.rpe) {
+    $('cuerpoRegistro').dataset.rpe = t.dataset.rpe;
+    t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); return;
+  }
+  if (t.dataset.sens) {
+    $('cuerpoRegistro').dataset.sens = t.dataset.sens;
+    t.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === t)); return;
+  }
+  if (t.dataset.quitarSeg != null) { t.closest('[data-seg]').remove(); return; }
+  if (t.dataset.activar) { D.activo = t.dataset.activar; await guardar(); pintar(); toast('Plan activado'); return; }
+  if (t.dataset.borrarPlan) {
+    if (!confirm('¿Borrar el plan y sus registros?')) return;
+    D.planes = D.planes.filter(x => x.id !== t.dataset.borrarPlan);
+    Object.keys(D.reg).forEach(k => { if (k.startsWith(t.dataset.borrarPlan + ':')) delete D.reg[k]; });
+    if (D.activo === t.dataset.borrarPlan) D.activo = D.planes.length ? D.planes[0].id : null;
+    await guardar(); pintar(); toast('Plan borrado'); return;
+  }
+  if (t.dataset.borrarSes) {
+    if (!confirm('¿Eliminar esta sesión del plan?')) return;
+    const f = buscarSesion(t.dataset.borrarSes);
+    f.w.sesiones = f.w.sesiones.filter(x => x.uid !== f.s.uid);
+    await guardar(); cerrarHojas(); pintar(); toast('Sesión eliminada'); return;
+  }
+  if (t.dataset.duplicar) {
+    const f = buscarSesion(t.dataset.duplicar);
+    const copia = JSON.parse(JSON.stringify(f.s));
+    copia.uid = f.s.uid + 'x' + Math.random().toString(36).slice(2, 5);
+    copia.dia = ymd(addDays(parseYMD(f.s.fecha), 1));
+    f.w.sesiones.push(copia); resolverFechas(p);
+    await guardar(); cerrarHojas(); pintar(); toast('Duplicada al día siguiente'); return;
+  }
+  if (t.dataset.icsses) {
+    const f = buscarSesion(t.dataset.icsses);
+    compartir(armarICS([f.s], p, zonasActuales(), recargoActual()),
+      'sesion.ics', 'text/calendar', 'Sesión', 'Abrilo desde Archivos para agregarlo al calendario.');
+    return;
+  }
+});
+
+document.querySelectorAll('[data-cerrar]').forEach(b => b.onclick = cerrarHojas);
+$('scrim').onclick = cerrarHojas;
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => irA(b.dataset.v));
+
+function irA(v) {
+  vista = v;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  ['hoy', 'plan', 'ritmos', 'importar', 'ajustes'].forEach(k => $('v-' + k).classList.toggle('off', k !== v));
+  pintar();
+  document.querySelector('.vista:not(.off)').scrollTop = 0;
+}
+
+$('btnEditar').onclick = () => { cerrarHojas(); setTimeout(() => abrirEditor(editandoUid), 240); };
+$('btnGuardarSes').onclick = async () => { leerEditor(); await guardar(); cerrarHojas(); pintar(); toast('Sesión actualizada'); };
+$('btnGuardarReg').onclick = async () => {
+  const f = buscarSesion(registrandoUid); if (!f) return;
+  const d = $('cuerpoRegistro').dataset;
+  const km = parseFloat($('rKm').value);
+  D.reg[claveReg(plan(), f.s)] = {
+    hecho: true, km: isNaN(km) ? null : km, tiempo: $('rTiempo').value.trim() || null,
+    rpe: d.rpe ? +d.rpe : null, sensacion: d.sens || null, nota: $('rNota').value.trim() || null, fecha: ymd(hoy())
+  };
+  await guardar(); cerrarHojas(); pintar(); toast('Registrado');
+};
+$('btnConfirmar').onclick = async () => {
+  if (!pendiente) return;
+  D.planes.push(pendiente); D.activo = pendiente.id;
+  if (!D.ref && pendiente.referencia) D.ref = pendiente.referencia;
+  pendiente = null;
+  await guardar(); cerrarHojas(); irA('plan'); toast('Plan importado');
+};
+
+/* eventos delegados de vistas dinámicas */
+document.addEventListener('click', async ev => {
+  const id = ev.target.id;
+  if (id === 'btnRef') {
+    const t = $('refTiempo').value.trim();
+    if (!segundos(t)) { toast('Poné el tiempo como 48:20 o 1:45:30'); return; }
+    D.ref = { distancia_m: +$('refDist').value, tiempo: t, fecha: $('refFecha').value || ymd(hoy()), origen: $('refOrigen').value };
+    await guardar(); vistaRitmos(); toast('Ritmos actualizados');
+  }
+  if (id === 'btnCopiarPrompt') {
+    const txt = armarPrompt();
+    try { await navigator.clipboard.writeText(txt); toast('Prompt copiado'); }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); toast('Prompt copiado'); } catch (x) { toast('Copialo desde el recuadro de abajo'); }
+      ta.remove();
+    }
+  }
+  if (id === 'btnRevisar') {
+    const txt = $('pegado').value.trim();
+    if (!txt) { toast('Pegá primero el JSON del plan'); return; }
+    revisar(txt);
+  }
+  if (id === 'btnArchivo') $('fileJson').click();
+  if (id === 'btnEjemplo') revisar(JSON.stringify(planEjemplo()));
+  if (id === 'btnAddSeg') {
+    const cont = $('segsEditor');
+    const i = cont.querySelectorAll('[data-seg]').length;
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="card tight" data-seg="${i}" style="background:var(--surface-2)">
+      <div class="row" style="gap:8px">
+        <select class="in" data-c="rol" style="flex:1">${optSel(['calentamiento', 'continuo', 'serie', 'bloque', 'recuperacion', 'vuelta_calma', 'tecnica'], 'continuo')}</select>
+        <button class="btn dg mini" style="width:auto;padding:8px 11px;margin:0;border:0" data-quitar-seg="${i}">Quitar</button>
+      </div>
+      <div class="g3" style="margin-top:9px">
+        <div><label class="lbl">Medida</label><select class="in" data-c="medida"><option value="d">Distancia</option><option value="m" selected>Tiempo</option></select></div>
+        <div><label class="lbl">Valor</label><input class="in mono" type="number" step="0.5" data-c="valor" value="20"></div>
+        <div><label class="lbl">Zona</label><select class="in" data-c="zona">${optSel(ZONAS_OPT, 'E')}</select></div>
+      </div>
+      <div class="f" style="margin-top:9px"><label>Ritmo fijo (opcional)</label><input class="in mono" data-c="ritmo" placeholder="dejar vacío para usar la zona"></div>
+    </div>`;
+    cont.appendChild(div.firstElementChild);
+  }
+  if (id === 'btnBorrarReg') {
+    const f = buscarSesion(registrandoUid);
+    delete D.reg[claveReg(plan(), f.s)];
+    await guardar(); cerrarHojas(); pintar(); toast('Registro borrado');
+  }
+  if (id === 'btnExpPlan') { const p = plan(); if (p) compartir(planAUTP(p), 'plan-utp1.json', 'application/json', p.nombre, 'Plan exportado a Archivos.'); }
+  if (id === 'btnExpIcs') {
+    const p = plan(); if (!p) return;
+    const ses = todasSesiones(p).map(x => x.s).filter(s => s.tipo !== 'descanso');
+    compartir(armarICS(ses, p, zonasActuales(), recargoActual()), 'plan.ics', 'text/calendar', p.nombre,
+      'Abrilo desde Archivos y elegí añadir al calendario.');
+  }
+  if (id === 'btnCopia') compartir(JSON.stringify(D), `umbral-copia-${ymd(hoy())}.json`, 'application/json', 'Copia de Umbral', 'Copia guardada en Archivos.');
+  if (id === 'btnRestaurar') $('fileCopia').click();
+});
+
+/* cambio de medida en el editor: actualiza la etiqueta */
+document.addEventListener('change', ev => {
+  if (ev.target.dataset && ev.target.dataset.c === 'medida') {
+    const box = ev.target.closest('[data-seg]');
+    const lbl = box.querySelectorAll('.lbl')[1];
+    if (lbl) lbl.textContent = ev.target.value === 'd' ? 'Metros' : 'Minutos';
+  }
+  if (ev.target.id === 'climaT') { D.cfg.temp = +ev.target.value; guardar(); vistaRitmos(); }
+  if (ev.target.id === 'climaH') { D.cfg.hum = +ev.target.value; guardar(); vistaRitmos(); }
+});
+
+$('fileJson').onchange = e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => revisar(r.result);
+  r.onerror = () => toast('No se pudo leer el archivo');
+  r.readAsText(f);
+};
+$('fileCopia').onchange = e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const r = new FileReader();
+  r.onload = async () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!Array.isArray(d.planes)) throw new Error('formato');
+      if (!confirm(`La copia tiene ${d.planes.length} plan(es). Reemplaza todo lo que hay ahora. ¿Seguir?`)) return;
+      D = Object.assign({ esquema: 1, ref: null, planes: [], activo: null, reg: {}, cfg: { clima: false, temp: 22, hum: 70 } }, d);
+      D.planes.forEach(resolverFechas);
+      await guardar(); pintar(); toast('Copia restaurada');
+    } catch (x) { toast('El archivo no es una copia de Umbral'); }
+  };
+  r.readAsText(f);
+};
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+function pintar() {
+  pintarCabecera();
+  if (vista === 'hoy') vistaHoy();
+  if (vista === 'plan') vistaPlan();
+  if (vista === 'ritmos') vistaRitmos();
+  if (vista === 'importar') vistaImportar();
+  if (vista === 'ajustes') vistaAjustes();
+}
+async function arrancar() {
+  const g = await Store.get(CLAVE);
+  if (g) D = Object.assign(D, g);
+  (D.planes || []).forEach(p => { try { resolverFechas(p); } catch (e) { } });
+  pintar();
+}
+arrancar();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { }));
+}
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => { });
+
+</script>
+</body>
+</html>

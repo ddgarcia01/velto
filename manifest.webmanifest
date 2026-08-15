@@ -1,0 +1,17 @@
+{
+  "name": "Umbral — entrenamiento de running",
+  "short_name": "Umbral",
+  "description": "Planes de running con ritmos por zona y planes importables en formato UTP/1.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EDEFF2",
+  "theme_color": "#EDEFF2",
+  "lang": "es-UY",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon.png", "sizes": "1024x1024", "type": "image/png" },
+    { "src": "icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" }
+  ]
+}
