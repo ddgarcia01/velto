@@ -437,10 +437,19 @@ function zonasDe(vdot) {
 // Riegel
 const riegel = (t1, d1, d2) => t1 * Math.pow(d2 / d1, 1.06);
 
-/* ajuste ambiental: índice = temperatura + humedad/4 */
+/* Ajuste ambiental.
+   La humedad estorba porque frena la evaporación del sudor, y eso solo pesa
+   cuando ya hace calor: a 12 grados con 90 % de humedad no hay castigo alguno.
+   Por eso la humedad entra ponderada por cuánto supera la temperatura los 15 grados. */
+function indiceCalor(temp, hum) {
+  if (temp == null) return 0;
+  const exceso = Math.max(0, temp - 15);
+  const humExtra = Math.max(0, (hum == null ? 50 : hum) - 50);
+  return temp + humExtra * exceso / 100;
+}
 function recargoClima(temp, hum) {
   if (temp == null) return 0;
-  const i = temp + (hum || 0) / 4;
+  const i = indiceCalor(temp, hum);
   if (i < 18) return 0;
   if (i < 22) return 0.01;
   if (i < 26) return 0.02;
@@ -558,6 +567,41 @@ function limpiarJSON(raw) {
   return t;
 }
 
+/* Cierra llaves y corchetes que quedaron abiertos.
+   Pasa seguido: al modelo se le termina el presupuesto de tokens a mitad del plan. */
+function cerrarAbiertos(t) {
+  const pila = []; let enStr = false, esc = false;
+  for (const c of t) {
+    if (esc) { esc = false; continue; }
+    if (c === '\\') { esc = true; continue; }
+    if (c === '"') { enStr = !enStr; continue; }
+    if (enStr) continue;
+    if (c === '{' || c === '[') pila.push(c);
+    else if (c === '}' || c === ']') pila.pop();
+  }
+  if (enStr) t += '"';
+  let out = t.replace(/,\s*$/, '');
+  while (pila.length) out += (pila.pop() === '{' ? '}' : ']');
+  return out.replace(/,(\s*[}\]])/g, '$1');
+}
+
+/* Punto de entrada del importador: limpia, y si aun así no parsea, repara. */
+function parseTolerante(raw) {
+  const base = limpiarJSON(raw);
+  if (!base) return null;
+  const intentos = [
+    base,
+    base.slice(0, base.lastIndexOf('}') + 1),
+    cerrarAbiertos(base),
+    cerrarAbiertos(base.slice(0, base.lastIndexOf('}') + 1))
+  ];
+  for (const t of intentos) {
+    if (!t) continue;
+    try { const o = JSON.parse(t); if (o && typeof o === 'object') return o; } catch (e) { }
+  }
+  return null;
+}
+
 /* --- normalización de un plan crudo --- */
 function normalizarSeg(s) {
   const o = { rol: SIN_ROL[sinAcentos(s.rol)] || (ROLES.includes(sinAcentos(s.rol)) ? sinAcentos(s.rol) : 'continuo') };
@@ -646,7 +690,7 @@ function normalizarPlan(crudo) {
       const segs = (Array.isArray(s.segmentos) ? s.segmentos : []).map(normalizarSeg);
       const T = TEXTOS[tipo || 'suave'] || TEXTOS.default;
       return {
-        uid: `w${num}d${si}`,
+        uid: `w${wi}d${si}`,
         dia: /^\d{4}-\d{2}-\d{2}$/.test(String(s.dia || '')) ? s.dia : normDia(s.dia),
         tipo: tipo || 'suave', tipo_original: tipo ? null : original,
         titulo: s.titulo || s.nombre || '',
@@ -696,6 +740,22 @@ function resolverFechas(plan) {
     w.sesiones.sort((a, b) => a.fecha.localeCompare(b.fecha));
   });
   plan.fin = plan.semanas.length ? plan.semanas[plan.semanas.length - 1].fin : plan.inicio;
+  return reubicar(plan);
+}
+
+/* Una sesión a la que le cambiaron la fecha tiene que mudarse a la semana
+   que le corresponde, no quedarse colgada de la anterior. */
+function reubicar(plan) {
+  const dentro = (f, w) => f >= w.inicio && f <= w.fin;
+  for (const w of plan.semanas) {
+    for (let i = w.sesiones.length - 1; i >= 0; i--) {
+      const s = w.sesiones[i];
+      if (dentro(s.fecha, w)) continue;
+      const destino = plan.semanas.find(x => dentro(s.fecha, x));
+      if (destino && destino !== w) { w.sesiones.splice(i, 1); destino.sesiones.push(s); }
+    }
+  }
+  plan.semanas.forEach(w => w.sesiones.sort((a, b) => a.fecha.localeCompare(b.fecha)));
   return plan;
 }
 
@@ -1044,7 +1104,19 @@ function vdotActual() {
   const s = segundos(r.tiempo);
   return s ? vdotDe(r.distancia_m, s) : null;
 }
-function zonasActuales() { const v = vdotActual(); return v ? zonasDe(v) : null; }
+function zonasActuales() {
+  const v = vdotActual();
+  if (!v) return null;
+  const z = zonasDe(v);
+  // la zona "carrera" es el ritmo meta del objetivo, no una zona fisiológica:
+  // un 10K y un maratón se corren a ritmos muy distintos
+  const p = plan();
+  if (p && p.objetivo && p.objetivo.meta_tiempo && p.objetivo.distancia_m) {
+    const s = segundos(p.objetivo.meta_tiempo);
+    if (s) { const r = s / (p.objetivo.distancia_m / 1000); z.carrera = { lento: r * 1.012, rapido: r * 0.988, tip: r }; }
+  }
+  return z;
+}
 function recargoActual() { return D.cfg.clima ? recargoClima(D.cfg.temp, D.cfg.hum) : 0; }
 
 /* ---------- registros ---------- */
@@ -1087,7 +1159,9 @@ function perfilHTML(s, clase) {
 function filaSesion(s, w, opts = {}) {
   const z = zonasActuales();
   const d = parseYMD(s.fecha);
-  const r = regDe(s);
+  // en la vista previa de una importación no hay registros que mostrar:
+  // los identificadores de sesión se repiten entre planes distintos
+  const r = opts.sinRegistro ? null : regDe(s);
   const m = metricaSesion(s, z);
   const esHoy = sameYMD(d, hoy());
   const bajo = s.tipo === 'descanso' ? 'Sin entrenamiento'
@@ -1096,7 +1170,7 @@ function filaSesion(s, w, opts = {}) {
     <span class="fecha"><b>${d.getDate()}</b><span>${DIAS_MIN[(d.getDay() + 6) % 7]}</span></span>
     <span class="cuerpo"><span class="tit">${esc(tituloAuto(s, z))}</span><span class="bajo">${esc(bajo)}</span></span>
     ${s.tipo === 'descanso' ? '' : `<span class="viz">${perfilHTML(s, 'xs')}</span>`}
-    <span class="tick${r && r.hecho ? ' on' : ''}" data-tick="${s.uid}"></span>
+    ${opts.sinRegistro ? '' : `<span class="tick${r && r.hecho ? ' on' : ''}" data-tick="${s.uid}"></span>`}
   </button>`;
 }
 
@@ -1612,11 +1686,7 @@ const ZONAS_OPT = ['E', 'M', 'T', 'I', 'R', 'trote', 'caminar', 'libre', 'carrer
 function optSel(lista, val, etiqueta) {
   return lista.map(v => `<option value="${v}"${String(v) === String(val) ? ' selected' : ''}>${etiqueta ? etiqueta(v) : v}</option>`).join('');
 }
-function abrirEditor(uid) {
-  const f = buscarSesion(uid); if (!f) return;
-  const s = JSON.parse(JSON.stringify(f.s));
-  editandoUid = uid;
-  const campoSeg = (g, i) => {
+function campoSeg(g, i) {
     const esSerie = g.rol === 'serie';
     const t = esSerie ? (g.trabajo || {}) : g;
     const medida = t.distancia_m != null ? 'd' : 'm';
@@ -1648,8 +1718,39 @@ function abrirEditor(uid) {
         <div class="f" style="margin-top:9px"><label>Ritmo fijo (opcional)</label>
           <input class="in mono" data-c="ritmo" placeholder="dejar vacío para usar la zona" value="${esc(t.ritmo || '')}"></div>`}
     </div>`;
-  };
+  }
 
+/* lee un segmento desde el formulario; se usa al guardar y al cambiar el rol */
+function leerSegDOM(box) {
+  const v = c => { const el = box.querySelector(`[data-c="${c}"]`); return el ? el.value : null; };
+  const rol = v('rol');
+  const g = { rol };
+  if (rol === 'tecnica') { g.descripcion = v('descripcion') || ''; return g; }
+  const medida = v('medida'), valor = parseFloat(v('valor'));
+  const cuerpo = {};
+  if (!isNaN(valor)) { if (medida === 'd') cuerpo.distancia_m = Math.round(valor); else cuerpo.duracion_min = valor; }
+  cuerpo.zona = v('zona') || 'E';
+  const ritmo = (v('ritmo') || '').trim();
+  if (ritmo) cuerpo.ritmo = ritmo;
+  if (rol === 'serie') {
+    g.repeticiones = Math.max(1, parseInt(v('repeticiones')) || 1);
+    g.trabajo = cuerpo;
+    const rv = parseFloat(v('rvalor'));
+    if (!isNaN(rv)) {
+      g.recuperacion = v('rmedida') === 'd' ? { distancia_m: Math.round(rv) } : { duracion_min: rv };
+      g.recuperacion.zona = v('rzona') || 'trote';
+    } else {
+      // al convertir un bloque en serie hace falta una recuperación por defecto
+      g.recuperacion = { duracion_min: 2, zona: 'trote' };
+    }
+  } else Object.assign(g, cuerpo);
+  return g;
+}
+
+function abrirEditor(uid) {
+  const f = buscarSesion(uid); if (!f) return;
+  const s = JSON.parse(JSON.stringify(f.s));
+  editandoUid = uid;
   $('cuerpoEditor').innerHTML = `
     <div class="f"><label>Título</label><input class="in" id="eTitulo" value="${esc(s.titulo || tituloAuto(s, zonasActuales()))}"></div>
     <div class="g2">
@@ -1685,28 +1786,7 @@ function leerEditor() {
   const nueva = $('eFecha').value;
   if (nueva && nueva !== s.fecha) s.dia = nueva;
   const segs = [];
-  document.querySelectorAll('#segsEditor [data-seg]').forEach(box => {
-    const v = c => { const el = box.querySelector(`[data-c="${c}"]`); return el ? el.value : null; };
-    const rol = v('rol');
-    const g = { rol };
-    if (rol === 'tecnica') { g.descripcion = v('descripcion') || ''; segs.push(g); return; }
-    const medida = v('medida'), valor = parseFloat(v('valor'));
-    const cuerpo = {};
-    if (!isNaN(valor)) { if (medida === 'd') cuerpo.distancia_m = Math.round(valor); else cuerpo.duracion_min = valor; }
-    cuerpo.zona = v('zona');
-    const ritmo = (v('ritmo') || '').trim();
-    if (ritmo) cuerpo.ritmo = ritmo;
-    if (rol === 'serie') {
-      g.repeticiones = Math.max(1, parseInt(v('repeticiones')) || 1);
-      g.trabajo = cuerpo;
-      const rv = parseFloat(v('rvalor'));
-      if (!isNaN(rv)) {
-        g.recuperacion = v('rmedida') === 'd' ? { distancia_m: Math.round(rv) } : { duracion_min: rv };
-        g.recuperacion.zona = v('rzona');
-      }
-    } else Object.assign(g, cuerpo);
-    segs.push(g);
-  });
+  document.querySelectorAll('#segsEditor [data-seg]').forEach(box => segs.push(leerSegDOM(box)));
   s.segmentos = segs;
   resolverFechas(f.p);
   return f.p;
@@ -1741,10 +1821,8 @@ function abrirRegistro(uid) {
    IMPORTACIÓN
    ============================================================ */
 function revisar(texto) {
-  const limpio = limpiarJSON(texto);
-  let crudo;
-  try { crudo = JSON.parse(limpio); }
-  catch (e) { informe(null, null, [['E01', 'El texto no es un JSON válido. ' + e.message]], []); return; }
+  const crudo = parseTolerante(texto);
+  if (!crudo) { informe(null, null, [['E01', 'No se encontró un JSON que se pueda leer en el texto pegado.']], []); return; }
   const p = resolverFechas(normalizarPlan(crudo));
   const v = validar(crudo, p);
   const z = zonasActuales() || (p.referencia && p.referencia.tiempo ? zonasDe(vdotDe(p.referencia.distancia_m, segundos(p.referencia.tiempo))) : null);
@@ -1797,7 +1875,7 @@ function informe(crudo, p, err, adv) {
       h += `<p style="font-size:12.5px;color:var(--ink-2);margin-top:9px">Las advertencias no impiden importar. Revisalas y decidí vos.</p>`;
     }
     h += `<div style="margin-top:16px"><span class="eyebrow">Primera semana</span>
-      ${p.semanas[0].sesiones.map(s => filaSesion(s, p.semanas[0])).join('')}</div>`;
+      ${p.semanas[0].sesiones.map(s => filaSesion(s, p.semanas[0], { sinRegistro: true })).join('')}</div>`;
     $('btnConfirmar').style.visibility = 'visible';
   }
   $('cuerpoInforme').innerHTML = h;
@@ -1967,18 +2045,7 @@ document.addEventListener('click', async ev => {
     const cont = $('segsEditor');
     const i = cont.querySelectorAll('[data-seg]').length;
     const div = document.createElement('div');
-    div.innerHTML = `<div class="card tight" data-seg="${i}" style="background:var(--surface-2)">
-      <div class="row" style="gap:8px">
-        <select class="in" data-c="rol" style="flex:1">${optSel(['calentamiento', 'continuo', 'serie', 'bloque', 'recuperacion', 'vuelta_calma', 'tecnica'], 'continuo')}</select>
-        <button class="btn dg mini" style="width:auto;padding:8px 11px;margin:0;border:0" data-quitar-seg="${i}">Quitar</button>
-      </div>
-      <div class="g3" style="margin-top:9px">
-        <div><label class="lbl">Medida</label><select class="in" data-c="medida"><option value="d">Distancia</option><option value="m" selected>Tiempo</option></select></div>
-        <div><label class="lbl">Valor</label><input class="in mono" type="number" step="0.5" data-c="valor" value="20"></div>
-        <div><label class="lbl">Zona</label><select class="in" data-c="zona">${optSel(ZONAS_OPT, 'E')}</select></div>
-      </div>
-      <div class="f" style="margin-top:9px"><label>Ritmo fijo (opcional)</label><input class="in mono" data-c="ritmo" placeholder="dejar vacío para usar la zona"></div>
-    </div>`;
+    div.innerHTML = campoSeg({ rol: 'continuo', duracion_min: 20, zona: 'E' }, i);
     cont.appendChild(div.firstElementChild);
   }
   if (id === 'btnBorrarReg') {
@@ -1999,6 +2066,13 @@ document.addEventListener('click', async ev => {
 
 /* cambio de medida en el editor: actualiza la etiqueta */
 document.addEventListener('change', ev => {
+  // al cambiar el rol el formulario tiene que cambiar de forma: una serie
+  // necesita repeticiones y recuperación, un bloque continuo no
+  if (ev.target.dataset && ev.target.dataset.c === 'rol') {
+    const box = ev.target.closest('[data-seg]');
+    if (box) { const i = box.dataset.seg; box.outerHTML = campoSeg(leerSegDOM(box), i); }
+    return;
+  }
   if (ev.target.dataset && ev.target.dataset.c === 'medida') {
     const box = ev.target.closest('[data-seg]');
     const lbl = box.querySelectorAll('.lbl')[1];
