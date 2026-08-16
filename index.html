@@ -96,7 +96,7 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .seg .marca{width:3px;border-radius:2px;align-self:stretch;min-height:20px;flex:0 0 3px;background:var(--z)}
 .seg .t{font-size:14.5px;flex:1}
 .seg .t b{font-weight:600}
-.seg .r{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.seg .r{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);white-space:nowrap;text-align:right;line-height:1.5}
 .seg .rol{font-family:var(--disp);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:block}
 
 /* ---------- semana ---------- */
@@ -760,6 +760,40 @@ function reubicar(plan) {
 }
 
 /* ============================================================
+   Segmentos de técnica
+   El estándar los deja como texto libre, así que hay que leerlos:
+   "6 × 20 s con metrónomo a 168 ppm, sin acelerar" no es lo mismo
+   que "6 × 100 m progresivos", aunque los dos sean "tecnica".
+   ============================================================ */
+const TEC_SUAVE = /(sin acelerar|cadencia|metronomo|ppm|paso corto|movilidad|elongac|activacion|educativ|drills|skipping|tecnica de carrera)/;
+const TEC_RAPIDA = /(progresiv|aceleracion|acelerando|sprint|recta|zancada|rapido|maxim|explosiv)/;
+
+function zonaTecnica(g) {
+  if (g && g.zona) return g.zona;                 // si el plan la declara, manda
+  const d = sinAcentos(g && g.descripcion);
+  if (TEC_SUAVE.test(d)) return 'E';
+  if (TEC_RAPIDA.test(d)) return 'R';
+  return 'libre';
+}
+function duracionTecnica(g) {
+  if (g && g.duracion_min != null) return g.duracion_min;
+  const d = String((g && g.descripcion) || '');
+  const m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*(s|seg|segundos|m|mts|metros)\b/i);
+  if (!m) {
+    // "drills 10 min", "8'": una duración suelta en el texto
+    const solo = d.match(/(\d+(?:[.,]\d+)?)\s*(?:min\b|minutos|')/i);
+    return solo ? +solo[1].replace(',', '.') : 3;
+  }
+  const n = Math.min(60, +m[1]);
+  const unidad = m[3].toLowerCase();
+  // un tramo en metros se estima a unos 3:30 el kilómetro
+  const trabajo = unidad[0] === 's' ? +m[2] : +m[2] * 0.21;
+  const rec = d.match(/(\d+)\s*(?:s|seg|segundos)\s*(?:de\s*)?(?:trote|recuperaci|caminando|pausa|descanso)/i);
+  const pausa = rec ? +rec[1] : (unidad[0] === 's' ? 40 : 45);
+  return Math.round((n * trabajo + Math.max(0, n - 1) * pausa) / 60 * 10) / 10;
+}
+
+/* ============================================================
    Métricas de una sesión
    ============================================================ */
 function ritmoZona(z, zonas) {
@@ -778,7 +812,7 @@ const NO_CORRER = ['fuerza', 'cruzado', 'movilidad'];
 function metricaSesion(s, zonas) {
   if (NO_CORRER.includes(s.tipo)) {
     let min = 0;
-    for (const g of s.segmentos || []) min += g.duracion_min || 0;
+    for (const g of s.segmentos || []) min += (g.rol === 'tecnica' ? duracionTecnica(g) : (g.duracion_min || 0));
     return { km: 0, min: Math.round(min), porZona: {}, sinCorrer: true };
   }
   let km = 0, min = 0;
@@ -795,7 +829,7 @@ function metricaSesion(s, zonas) {
       if (g.trabajo) sumar(g.trabajo, n);
       if (g.recuperacion) sumar(g.recuperacion, n);
     } else if (g.rol === 'tecnica') {
-      if (g.duracion_min) sumar({ duracion_min: g.duracion_min, zona: g.zona || 'E' }, 1);
+      sumar({ duracion_min: duracionTecnica(g), zona: zonaTecnica(g) }, 1);
     } else {
       sumar(g, 1);
     }
@@ -877,7 +911,8 @@ function bloquesDe(s) {
       const n = Math.min(g.repeticiones || 1, 20);
       for (let i = 0; i < n; i++) { push(g.trabajo, 'trabajo'); if (i < n - 1 || (g.repeticiones || 1) > 1) push(g.recuperacion, 'recuperacion'); }
     } else if (g.rol === 'tecnica') {
-      out.push({ z: 'R', nivel: 4, peso: Math.max(0.8, g.duracion_min || 3), tec: true });
+      const z = zonaTecnica(g);
+      out.push({ z, nivel: ZONA_NIVEL[z] != null ? ZONA_NIVEL[z] : 2.6, peso: Math.max(0.8, duracionTecnica(g)), tec: true });
     } else push(g, g.rol);
   }
   return out.length ? out : [{ z: 'E', nivel: 2, peso: 10 }];
@@ -1150,9 +1185,15 @@ function colorTipo(t) { const z = TIPOS[t] ? TIPOS[t].z : null; return z ? color
 function perfilHTML(s, clase) {
   const b = bloquesDe(s);
   const maxN = Math.max(...b.map(x => x.nivel), 6);
-  return `<div class="perfil ${clase}">` + b.map(x =>
-    `<i style="flex-grow:${x.peso.toFixed(2)};height:${Math.max(14, x.nivel / maxN * 100).toFixed(0)}%;background:${colorZona(x.z)}"></i>`
-  ).join('') + '</div>';
+  return `<div class="perfil ${clase}">` + b.map(x => {
+    const c = colorZona(x.z);
+    const alto = Math.max(14, x.nivel / maxN * 100).toFixed(0);
+    // la técnica va rayada: ocupa tiempo y tiene su ritmo, pero no es un esfuerzo duro
+    const fondo = x.tec
+      ? `repeating-linear-gradient(135deg,${c},${c} 2px,${c}80 2px,${c}80 5px)`
+      : c;
+    return `<i style="flex-grow:${x.peso.toFixed(2)};height:${alto}%;background:${fondo}"></i>`;
+  }).join('') + '</div>';
 }
 
 /* ---------- fila de sesión ---------- */
@@ -1637,7 +1678,7 @@ function abrirDetalle(uid) {
   if (s.tipo !== 'descanso') {
     h += `<div style="margin:16px 0 3px">${perfilHTML(s, 'xl')}</div>`;
     h += `<div class="segs">` + (s.segmentos || []).map(g => {
-      const z1 = g.rol === 'serie' ? (g.trabajo && g.trabajo.zona) : g.zona;
+      const z1 = g.rol === 'serie' ? (g.trabajo && g.trabajo.zona) : (g.rol === 'tecnica' ? zonaTecnica(g) : g.zona);
       const rol = { calentamiento: 'Calentamiento', vuelta_calma: 'Vuelta a la calma', tecnica: 'Técnica', recuperacion: 'Recuperación', bloque: 'Bloque', serie: 'Serie', continuo: 'Bloque principal' }[g.rol] || '';
       let cuerpo, ritmo = '';
       if (g.rol === 'serie') {
@@ -1646,13 +1687,17 @@ function abrirDetalle(uid) {
         ritmo = g.trabajo && g.trabajo.ritmo ? g.trabajo.ritmo : (ritmoRango(z1, z, rec) || '');
       } else if (g.rol === 'tecnica') {
         cuerpo = `<b>${esc(g.descripcion || 'Técnica')}</b>`;
+        const zt = zonaTecnica(g);
+        ritmo = g.zona || TEC_SUAVE.test(sinAcentos(g.descripcion)) || TEC_RAPIDA.test(sinAcentos(g.descripcion))
+          ? (ritmoRango(zt, z, rec) || '') : '';
+        ritmo = [duracionTecnica(g) ? `≈ ${duracionTxt(duracionTecnica(g))}` : '', ritmo].filter(Boolean).join('<br>');
       } else {
         cuerpo = `<b>${g.distancia_m != null ? (g.distancia_m >= 1000 ? +(g.distancia_m / 1000).toFixed(2) + ' km' : g.distancia_m + ' m') : duracionTxt(g.duracion_min)}</b>`;
         if (g.descripcion) cuerpo += `<br><span style="color:var(--ink-3);font-size:13px">${esc(g.descripcion)}</span>`;
         ritmo = g.ritmo || (ritmoRango(z1, z, rec) || '');
       }
       return `<div class="seg" style="--z:${colorZona(z1 || 'nulo')}"><span class="marca"></span>
-        <span class="t"><span class="rol">${rol}</span>${cuerpo}</span><span class="r">${esc(ritmo)}</span></div>`;
+        <span class="t"><span class="rol">${rol}</span>${cuerpo}</span><span class="r">${g.rol === 'tecnica' ? ritmo : esc(ritmo)}</span></div>`;
     }).join('') + `</div>`;
     if (rec > 0) h += `<p style="font-size:12.5px;color:var(--ink-2);margin-top:9px">Ritmos ajustados +${Math.round(rec * 100)} % por calor y humedad.</p>`;
   }
