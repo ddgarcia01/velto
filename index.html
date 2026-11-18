@@ -2305,17 +2305,6 @@ function registroPlanificado(s, p) {
    SEGMENTO: una fila de la estructura de la sesión (detalle y Hoy)
    ============================================================ */
 const NOMBRE_ROL = { calentamiento: 'Calentamiento', vuelta_calma: 'Vuelta a la calma', tecnica: 'Técnica', recuperacion: 'Recuperación', bloque: 'Bloque', serie: 'Serie', continuo: 'Bloque principal' };
-function filaEjercicio(e, claveRegActual) {
-  const u = ultimaVez(e, claveRegActual);
-  const meta = [e.rir ? `RIR ${e.rir}` : null, e.carga, e.pausa ? `pausa ${e.pausa}` : null].filter(Boolean).join(' · ');
-  return `<div class="ejrow">
-    <div class="ejn">${e.k ? `<button class="ej" data-ej="${e.k}">${esc(e.nombre)}</button>` : `<b>${esc(e.nombre)}</b>`}</div>
-    <div class="ejsr num">${e.series} × ${esc(e.reps)}</div>
-    ${meta ? `<div class="ejm">${esc(meta)}</div>` : ''}
-    ${e.nota ? `<div class="ejm">${enlazar(e.nota)}</div>` : ''}
-    ${u ? `<div class="ejult">Última vez: ${esc(txtUltima(u))}</div>` : ''}
-  </div>`;
-}
 function segmentoHTML(g, z, rec, claveRegActual) {
   const z1 = g.rol === 'serie' ? (g.trabajo && g.trabajo.zona) : (g.rol === 'tecnica' ? zonaTecnica(g) : g.zona);
   let rol = NOMBRE_ROL[g.rol] || '';
@@ -2486,7 +2475,6 @@ function vistaMas() {
     <button class="menu" data-ir="importar"><b>Importar un plan</b><span>Pegar o abrir un plan UTP/1, copiar el prompt para generarlo, reglas del formato</span></button>
     <button class="menu" data-ir="ajustes"><b>Planes y datos</b><span>${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'}${p ? ' · activo: ' + esc(p.nombre) : ''} · exportar, calendario, copia de seguridad, registro de fuerza</span></button>`;
 }
-const SUBVISTA = { ritmos: 'mas', importar: 'mas', ajustes: 'mas' };
 
 /* ============================================================
    EXPORTAR REGISTRO DE FUERZA (CSV)
@@ -3184,6 +3172,8 @@ $('btnGuardarReg').onclick = async () => {
   const f = buscarSesion(registrandoUid); if (!f) return;
   const d = $('cuerpoRegistro').dataset;
   const km = parseFloat($('rKm').value);
+  const tiempo = $('rTiempo').value.trim();
+  if (tiempo && segundos(tiempo) == null) { toast('Poné el tiempo como 45:00, 1:05:30 o 50 min'); $('rTiempo').focus(); return; }
   const ejercicios = [];
   document.querySelectorAll('#cuerpoRegistro [data-ejreg]').forEach(box => {
     const v = c => box.querySelector(`[data-r="${c}"]`).value.trim();
@@ -3311,23 +3301,24 @@ $('fileCopia').onchange = e => {
 /* ============================================================
    ARRANQUE
    ============================================================ */
+const VISTAS_FN = { hoy: () => vistaHoy(), mes: () => vistaMes(), semana: () => vistaSemana(), dia: () => vistaDia(), plan: () => vistaPlan(),
+  panel: () => vistaPanel(), guia: () => vistaGuia(), mas: () => vistaMas(), ritmos: () => vistaRitmos(), importar: () => vistaImportar(), ajustes: () => vistaAjustes() };
 function pintar() {
-  pintarCabecera();
-  if (vista === 'hoy') vistaHoy();
-  if (vista === 'mes') vistaMes();
-  if (vista === 'semana') vistaSemana();
-  if (vista === 'dia') vistaDia();
-  if (vista === 'panel') vistaPanel();
-  if (vista === 'plan') vistaPlan();
-  if (vista === 'guia') vistaGuia();
-  if (vista === 'mas') vistaMas();
-  if (vista === 'ritmos') vistaRitmos();
-  if (vista === 'importar') vistaImportar();
-  if (vista === 'ajustes') vistaAjustes();
-  // las secciones de "Más" llevan un atajo para volver
-  if (SUBVISTA[vista]) $('v-' + vista).insertAdjacentHTML('afterbegin', '<button class="volver" data-ir="mas">‹ Más</button>');
-  // semana y plan son modos del calendario
-  if (vista === 'semana' || vista === 'plan') $('v-' + vista).insertAdjacentHTML('afterbegin', subnavCal(vista));
+  try { pintarCabecera(); } catch (e) { console.error(e); }
+  try {
+    (VISTAS_FN[vista] || VISTAS_FN.hoy)();
+    // las secciones de "Más" llevan un atajo para volver; semana y plan son modos del calendario
+    if (TAB_DE[vista] === 'mas') $('v-' + vista).insertAdjacentHTML('afterbegin', '<button class="volver" data-ir="mas">‹ Más</button>');
+    if (vista === 'semana' || vista === 'plan') $('v-' + vista).insertAdjacentHTML('afterbegin', subnavCal(vista));
+  } catch (e) {
+    // un dato inesperado no puede dejar la pantalla en blanco: se informa y el resto de la app sigue andando
+    console.error(e);
+    const c = $('v-' + vista);
+    if (c) c.innerHTML = `<div class="vacio"><h3>No se pudo mostrar esta vista</h3>
+      <p>Algo en los datos del plan no tiene el formato esperado. Tus datos no se tocaron.</p>
+      <p class="num" style="font-size:11.5px">${esc(e && e.message)}</p>
+      <button class="btn gh" data-ir="hoy">Ir a Hoy</button> <button class="btn gh" data-ir="ajustes">Copia de seguridad</button></div>`;
+  }
 }
 async function arrancar() {
   const g = await Store.get(CLAVE);

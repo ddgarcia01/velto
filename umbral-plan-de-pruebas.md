@@ -149,6 +149,21 @@ Tres niveles, de adentro hacia afuera:
 | N11 | Registro precargado | Km, tiempo, RPE, sensación y cargas sugeridas, marcadas como sugeridas hasta editarlas; se guardan al confirmar | Sí |
 | N12 | Resumen primero | La sesión muestra lo esencial con el peso de cada ejercicio; el paso a paso y el detalle de cada ejercicio se despliegan al tocar | Sí |
 
+### Mejoras 3.0 (ciclos 1–10)
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| C1 | Un toque en "Hecha como el plan" o en el tilde | Registro completo sugerido (km, tiempo, RPE, cargas); aviso con "Editar"; desmarcar no borra datos | Sí |
+| C2 | Carga sugerida de hoy | Con historial, el resumen y la fila del ejercicio muestran "Hoy X kg" | Sí |
+| C3 | Volver a hoy | Botón en Mes, Semana y Día cuando se mira otro período | No |
+| C4 | Panel: racha y suaves frente a la zona E | Racha de sesiones cumplidas; suaves más rápidos que E marcados | Sí |
+| C5 | Guía | ≥ 50 ejercicios; reconoce calentamientos y rutinas habituales | No |
+| C6 | Accesibilidad | Tilde de 28 px con etiqueta y teclado; pestañas con estado; ningún botón sin nombre | Sí |
+| C7 | Modo oscuro | Fondos oscuros y texto claro en todas las vistas; colores de gráfico validados para fondo oscuro | Sí |
+| C8 | Service worker | La página se pide primero a la red (versión nueva al abrir); sin conexión abre la copia | Sí |
+| C9 | Rendimiento | Con 1000 registros de fuerza cada vista se pinta en menos de 50 ms | Sí |
+| C10 | Robustez | Tiempo inválido no se guarda; una sesión corrupta muestra un aviso, no una pantalla en blanco | Sí |
+
 ### Entrega
 
 | ID | Caso | Esperado | Blq |

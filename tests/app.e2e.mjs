@@ -373,6 +373,26 @@ await caso('E05', 'inputs de 16 px o más', async () => {
   ok(chicos === 0, `${chicos} inputs de menos de 16 px`);
 });
 
+await caso('C10', 'robustez: datos corruptos y tiempo inválido', async () => {
+  await ev(() => irA('hoy'));
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'suave').s.uid);
+  await ev(u => abrirRegistro(u), uid);
+  await pg.fill('#rTiempo', 'cuarenta');
+  const antes = await ev(u => JSON.stringify(regDe(buscarSesion(u).s) || null), uid);
+  await pg.click('#btnGuardarReg'); await pg.waitForTimeout(150);
+  ok(await ev(u => JSON.stringify(regDe(buscarSesion(u).s) || null), uid) === antes, 'guardó un tiempo inválido');
+  ok(/Poné el tiempo/.test(await texto('#toast')), 'no avisa el formato');
+  await ev(() => cerrarHojas());
+  // una sesión corrupta no deja la vista en blanco
+  const errores0 = errores.length;
+  await ev(() => { irA('semana'); const s = semanaActual(plan()).sesiones.find(x => x.tipo !== 'descanso'); s.__copia = s.segmentos; s.segmentos = [null]; pintar(); });
+  ok(/No se pudo mostrar esta vista/.test(await texto('#v-semana')), 'la vista quedó en blanco');
+  ok(await pg.isVisible('#v-semana [data-ir="hoy"]'), 'sin salida desde el aviso');
+  await ev(() => { const s = semanaActual(plan()).sesiones.find(x => x.__copia); s.segmentos = s.__copia; delete s.__copia; pintar(); });
+  ok(await pg.locator('#v-semana .dia-blk').count() === 7, 'no se recupera');
+  errores.length = errores0;
+});
+
 await caso('E03/C8', 'service worker: funciona sin conexión y la página se pide primero a la red', async () => {
   await pg.evaluate(() => navigator.serviceWorker.ready);
   await pg.reload(); await pg.waitForTimeout(300);
