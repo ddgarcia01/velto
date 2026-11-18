@@ -373,6 +373,18 @@ await caso('E05', 'inputs de 16 px o más', async () => {
   ok(chicos === 0, `${chicos} inputs de menos de 16 px`);
 });
 
+await caso('E03/C8', 'service worker: funciona sin conexión y la página se pide primero a la red', async () => {
+  await pg.evaluate(() => navigator.serviceWorker.ready);
+  await pg.reload(); await pg.waitForTimeout(300);
+  ok(await ev(() => !!navigator.serviceWorker.controller), 'el service worker no controla la página');
+  await pg.context().setOffline(true);
+  await pg.reload(); await pg.waitForTimeout(300);
+  ok((await texto('#v-hoy')).length > 20, 'sin conexión la app no abre');
+  await pg.context().setOffline(false);
+  const sw = fs.readFileSync(path.join(RAIZ, 'sw.js'), 'utf8');
+  ok(/esPagina/.test(sw) && /SHELL = \[[^\]]*index\.html/.test(sw), 'estrategia o precarga del service worker');
+});
+
 await navegador.close(); srv.close();
 if (errores.length) fallos.push('Errores de JavaScript: ' + [...new Set(errores)].join(' | '));
 if (fallos.length) { console.error(`✗ ${fallos.length} de ${casos} casos fallan:\n  ` + fallos.join('\n  ')); process.exit(1); }

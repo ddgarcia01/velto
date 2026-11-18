@@ -3329,7 +3329,18 @@ async function arrancar() {
 arrancar();
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { }));
+  const habiaVersion = !!navigator.serviceWorker.controller;
+  let recargando = false;
+  // una versión nueva toma el control: se recarga sola, salvo que haya una hoja abierta (registro, editor)
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!habiaVersion || recargando) return;
+    if (document.querySelector('.sheet.on')) { toast('Hay una versión nueva de la app', { txt: 'Actualizar', fn: () => location.reload() }); return; }
+    recargando = true; location.reload();
+  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    // al volver a la app se busca si hay versión nueva
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => { }); });
+  }).catch(() => { }));
 }
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => { });
 
