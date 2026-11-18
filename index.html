@@ -6,7 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Umbral">
-<meta name="theme-color" content="#EDEFF2">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#EDEFF2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1419" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Planificación de entrenamientos de running con planes importables en formato UTP/1.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -30,7 +32,20 @@
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,monospace;
   --sb:env(safe-area-inset-bottom,0px); --st:env(safe-area-inset-top,0px);
+  --ok-bg:var(--ok-bg); --ok-line:var(--ok-line); --ok-ink:var(--ok-ink); --err-bg:var(--err-bg); --err-ink:var(--err-ink);
+  --warn-bg:#FBF4E2; --warn-ink:#7A5A13; --info-bg:var(--info-bg); --info-bg2:var(--info-bg2); --info-line:var(--info-line); --info-ink:#1E4F7C;
+  --kg-bg:#E9E2F3; --kg-ink:var(--kg-ink); --tabs-bg:var(--tabs-bg); --toast-bg:#0E141B; --toast-ink:#FFFFFF; --toast-acc:var(--toast-acc);
+  --serie-hecho:#2a78d6; --serie-plan:#eb6834; --sobre-acento:#FFFFFF;
 }
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F1419; --surface:#171D24; --surface-2:#1E252E; --ink:#E6EBF0; --ink-2:#AAB6C2; --ink-3:#7D8A97;
+  --line:#2A333D; --line-2:#3A4550; --accent:#5B9BDB; --alerta:#E07A55; --ok:#4CB386;
+  --ok-bg:#16302A; --ok-line:#24503F; --ok-ink:#9FDCC0; --err-bg:#3A1E17; --err-ink:#F2B6A3;
+  --warn-bg:#352B14; --warn-ink:#EBCB82; --info-bg:#172A3D; --info-bg2:#172A3D; --info-line:#2D4C6B; --info-ink:#A9CCF0;
+  --kg-bg:#2C2440; --kg-ink:#CDBDF0; --alta:#43271F; --media:#2C2440; --baja:#1A2C3D; --libre:#1E252E;
+  --tabs-bg:rgba(23,29,36,.94); --toast-bg:#E6EBF0; --toast-ink:#0F1419; --toast-acc:#1E4F7C;
+  --serie-hecho:#3987e5; --serie-plan:#d95926; --sobre-acento:#0F1419;
+}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.42;
@@ -88,7 +103,7 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .ritmo-grande em{font-style:normal;font-family:var(--disp);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-bottom:5px}
 .ritmo-sub{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
 .clima-flag{display:inline-block;font-family:var(--disp);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  background:#FBEFD8;color:#8A6314;border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+  background:var(--warn-bg);color:var(--warn-ink);border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:2px}
 
 /* ---------- segmentos ---------- */
 .segs{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}
@@ -122,7 +137,7 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .ses.hoy{background:var(--surface-2);border-radius:var(--r-s)}
 .tick{width:28px;height:28px;border-radius:50%;border:2px solid var(--line-2);flex:0 0 28px;display:grid;place-items:center;cursor:pointer}
 .tick.on{background:var(--ok);border-color:var(--ok)}
-.tick.on::after{content:"";width:7px;height:12px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg) translate(-1px,-1px)}
+.tick.on::after{content:"";width:7px;height:12px;border:solid var(--surface);border-width:0 2px 2px 0;transform:rotate(42deg) translate(-1px,-1px)}
 
 /* ---------- semanas del plan ---------- */
 .sem{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);margin-bottom:9px;overflow:hidden}
@@ -140,7 +155,7 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 
 /* ---------- pestañas ---------- */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);
-  background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  background:var(--tabs-bg);backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:7px 0 calc(7px + var(--sb))}
 .tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--disp);font-size:10px;
   letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:2px 0}
@@ -174,9 +189,9 @@ select.in{-webkit-appearance:none;appearance:none;
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .seg-btns{display:flex;flex-wrap:wrap;gap:6px}
 .seg-btns button{border:1px solid var(--line-2);border-radius:14px;padding:6px 11px;font-size:13px;font-weight:560;color:var(--ink-2);font-family:var(--sans)}
-.seg-btns button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.seg-btns button.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .btn{display:block;width:100%;text-align:center;padding:14px;border-radius:var(--r-m);font-size:15.5px;font-weight:640;margin-top:10px;font-family:var(--sans)}
-.btn.pri{background:var(--accent);color:#fff}
+.btn.pri{background:var(--accent);color:var(--sobre-acento)}
 .btn.gh{border:1px solid var(--line-2)}
 .btn.dg{color:var(--alerta);border:1px solid rgba(181,80,47,.32)}
 .btn:active{opacity:.72}
@@ -213,9 +228,9 @@ select.in{-webkit-appearance:none;appearance:none;
 .tabla td{padding:5px 8px 5px 0;border-bottom:1px solid var(--line);vertical-align:top}
 .tabla td:first-child{font-family:var(--mono);color:var(--accent);white-space:nowrap}
 .aviso{border-radius:var(--r-s);padding:10px 12px;font-size:13px;margin-top:9px;line-height:1.45}
-.aviso.err{background:#FBEDE9;color:#8A3418}
-.aviso.warn{background:#FBF4E2;color:#7A5A13}
-.aviso.ok{background:#E9F4EE;color:#1F5C42}
+.aviso.err{background:var(--err-bg);color:var(--err-ink)}
+.aviso.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.aviso.ok{background:var(--ok-bg);color:var(--ok-ink)}
 .aviso b{font-family:var(--mono);font-size:11px;margin-right:5px}
 
 /* ---------- varios ---------- */
@@ -223,11 +238,11 @@ select.in{-webkit-appearance:none;appearance:none;
 .vacio h3{font-size:19px;color:var(--ink);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em}
 .vacio p{font-size:14px;margin:0 0 16px}
 .toast{position:fixed;left:50%;transform:translate(-50%,14px);bottom:calc(84px + var(--sb));z-index:90;
-  background:var(--ink);color:#fff;padding:11px 16px;border-radius:var(--r-m);font-size:13.5px;font-weight:560;
+  background:var(--toast-bg);color:var(--toast-ink);padding:11px 16px;border-radius:var(--r-m);font-size:13.5px;font-weight:560;
   opacity:0;pointer-events:none;transition:all .24s;max-width:88vw;text-align:center}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast.accion{pointer-events:auto;display:flex;align-items:center;gap:12px}
-.toast-acc{color:#9EC5F4;font-weight:700;font-size:13.5px;padding:2px 0}
+.toast-acc{color:var(--toast-acc);font-weight:700;font-size:13.5px;padding:2px 0}
 .oculto{display:none!important}
 .barras-vol{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:9px;border-bottom:1px solid var(--line-2)}
 .barras-vol i{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.5;min-height:2px}
@@ -312,7 +327,7 @@ a.btn{text-decoration:none;color:inherit}
 .ejd>summary .ejsr{font-size:16px;font-weight:600;font-family:var(--disp);text-align:right}
 .ejd>summary .peso{grid-column:1/-1;justify-self:start}
 .peso{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:1px 7px;line-height:1.5}
-.peso.kg{background:#E9E2F3;color:#4B3577}.peso.pc{background:#E3EEF7;color:#1E4F7C}.peso.libre{background:#FBF4E2;color:#7A5A13}
+.peso.kg{background:var(--kg-bg);color:var(--kg-ink)}.peso.pc{background:var(--info-bg2);color:var(--info-ink)}.peso.libre{background:var(--warn-bg);color:var(--warn-ink)}
 .ejdet{padding:0 0 9px}.ejdet div{display:flex;gap:10px;font-size:13px;padding:2px 0}
 .ejdet span{flex:0 0 92px;color:var(--ink-3)}.ejdet b{font-weight:500}
 .ejdet .btn{width:auto;display:inline-block;padding:7px 12px;margin-top:6px}
@@ -343,8 +358,8 @@ a.btn{text-decoration:none;color:inherit}
 .mini-g em.up{color:var(--ok)}.mini-g em.dn{color:var(--alerta)}.mini-g small{display:block;color:var(--ink-3);font-size:11.5px}
 .spark{width:100%;height:auto;display:block;margin-top:4px}
 .hoy-btn{display:block;margin:0 auto 8px;font-size:13px;font-weight:600;color:var(--accent);background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:6px 14px}
-.reg-aviso{background:#EEF4FB;color:#1E4F7C;border-radius:var(--r-s);padding:9px 11px;font-size:13px;margin:0 0 12px}
-.in.sug{background:#EEF4FB;border-color:#B9D0E8;color:#1E4F7C}
+.reg-aviso{background:var(--info-bg);color:var(--info-ink);border-radius:var(--r-s);padding:9px 11px;font-size:13px;margin:0 0 12px}
+.in.sug{background:var(--info-bg);border-color:var(--info-line);color:var(--info-ink)}
 .ejreg label span{display:block;font-family:var(--disp);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
 .ejreg{border-bottom:1px solid var(--line);padding:9px 0}
 .ejreg .g3{margin-top:6px}
@@ -2441,7 +2456,7 @@ function abrirGuia(k, esTermino) {
         <ol class="pasos">${x.p.map(t => `<li>${esc(t)}</li>`).join('')}</ol></div>
       <div class="card" style="background:var(--surface-2)"><span class="eyebrow">Error común</span><p style="color:var(--ink)">${esc(x.e)}</p></div>
       <div class="card" style="background:var(--surface-2)"><span class="eyebrow">Qué trabaja</span><p style="color:var(--ink)">${esc(x.m)}</p></div>
-      ${u ? `<div class="card" style="background:#E9F4EE;border-color:#BFDCCB"><span class="eyebrow" style="color:#1F5C42">Tu última vez</span><p style="color:#1F5C42" class="num">${esc(txtUltima(u))}</p></div>` : ''}
+      ${u ? `<div class="card" style="background:var(--ok-bg);border-color:var(--ok-line)"><span class="eyebrow" style="color:var(--ok-ink)">Tu última vez</span><p style="color:var(--ok-ink)" class="num">${esc(txtUltima(u))}</p></div>` : ''}
       ${proximas.length ? `<div class="card tight"><span class="eyebrow">Próximas sesiones con este ejercicio</span>${proximas.map(o => filaSesion(o.s, o.w)).join('')}</div>` : ''}
       <a class="btn gh" href="https://www.youtube.com/results?search_query=${encodeURIComponent(x.n + ' técnica ejercicio')}" target="_blank" rel="noopener">Ver videos de la técnica</a>`;
   }
@@ -2631,7 +2646,7 @@ function vistaDia() {
 /* ============================================================
    PANEL: métricas de seguimiento
    ============================================================ */
-const SERIE_HECHO = '#2a78d6', SERIE_PLAN = '#eb6834';
+const SERIE_HECHO = 'var(--serie-hecho)', SERIE_PLAN = 'var(--serie-plan)';
 function datosSemanas(p) {
   const z = zonasActuales();
   return p.semanas.map(w => {
@@ -2653,7 +2668,7 @@ function graficoKm(ds, actual) {
   const col = (x, v, color, tip) => {
     const h = Math.max(0, yy(0) - yy(v)), r = Math.min(4, h / 2);
     const path = h ? `M${x},${yy(0)}V${yy(v) + r}Q${x},${yy(v)} ${x + r},${yy(v)}H${x + ancho - r}Q${x + ancho},${yy(v)} ${x + ancho},${yy(v) + r}V${yy(0)}Z` : '';
-    return `<path d="${path}" fill="${color}"/><rect x="${x - 2}" y="${arriba}" width="${ancho + 4}" height="${H - abajo - arriba}" fill="transparent" data-tip="${esc(tip)}"><title>${esc(tip)}</title></rect>`;
+    return `<path d="${path}" style="fill:${color}"/><rect x="${x - 2}" y="${arriba}" width="${ancho + 4}" height="${H - abajo - arriba}" fill="transparent" data-tip="${esc(tip)}"><title>${esc(tip)}</title></rect>`;
   };
   let svg = ticks.map(t => `<line x1="${izq}" x2="${W}" y1="${yy(t)}" y2="${yy(t)}" class="grid"/><text x="${izq - 4}" y="${yy(t) + 3}" class="ax" text-anchor="end">${t}</text>`).join('');
   ds.forEach((d, i) => {
@@ -2670,8 +2685,8 @@ function graficoLinea(puntos) {
   const vs = puntos.map(p => p.v), min = Math.min(...vs), max = Math.max(...vs), rango = max - min || 1;
   const xs = i => pad + (W - 2 * pad) * i / (puntos.length - 1), ys = v => H - pad - (H - 2 * pad) * (v - min) / rango;
   const d = puntos.map((p, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join('');
-  return `<svg viewBox="0 0 ${W} ${H}" class="spark"><path d="${d}" fill="none" stroke="${SERIE_HECHO}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${puntos.map((p, i) => `<circle cx="${xs(i)}" cy="${ys(p.v)}" r="4" fill="${SERIE_HECHO}" stroke="var(--surface)" stroke-width="2" data-tip="${esc(p.tip)}"><title>${esc(p.tip)}</title></circle>`).join('')}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" class="spark"><path d="${d}" fill="none" style="stroke:${SERIE_HECHO}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${puntos.map((p, i) => `<circle cx="${xs(i)}" cy="${ys(p.v)}" r="4" style="fill:${SERIE_HECHO};stroke:var(--surface)" stroke-width="2" data-tip="${esc(p.tip)}"><title>${esc(p.tip)}</title></circle>`).join('')}</svg>`;
 }
 /* Rodajes suaves registrados frente a la zona E: el error más común es correrlos rápido. */
 function suavesVsZona(p) {
@@ -2790,10 +2805,10 @@ function abrirDetalle(uid) {
     ${s.alternativas.map(a => `<p style="color:var(--ink)"><b>${CUANDO[a.cuando] || a.cuando}:</b> ${esc(a.descripcion)}</p>`).join('')}</div>`;
 
   if (r && r.hecho) {
-    h += `<div class="card" style="background:#E9F4EE;border-color:#BFDCCB"><span class="eyebrow" style="color:#1F5C42">Lo que hiciste</span>
-      <p style="color:#1F5C42" class="num">${[r.km ? r.km + ' km' : null, r.tiempo || null, r.km && r.tiempo && segundos(r.tiempo) ? ritmoTxt(segundos(r.tiempo) / r.km) + '/km' : null, r.rpe ? 'RPE ' + r.rpe : null].filter(Boolean).join(' · ')}</p>
-      ${(r.ejercicios || []).map(e => `<p style="color:#1F5C42" class="num">${esc(e.nombre)}: ${esc(txtUltima({ ...e, fecha: '' }))}</p>`).join('')}
-      ${r.nota ? `<p style="color:#1F5C42">${esc(r.nota)}</p>` : ''}</div>`;
+    h += `<div class="card" style="background:var(--ok-bg);border-color:var(--ok-line)"><span class="eyebrow" style="color:var(--ok-ink)">Lo que hiciste</span>
+      <p style="color:var(--ok-ink)" class="num">${[r.km ? r.km + ' km' : null, r.tiempo || null, r.km && r.tiempo && segundos(r.tiempo) ? ritmoTxt(segundos(r.tiempo) / r.km) + '/km' : null, r.rpe ? 'RPE ' + r.rpe : null].filter(Boolean).join(' · ')}</p>
+      ${(r.ejercicios || []).map(e => `<p style="color:var(--ok-ink)" class="num">${esc(e.nombre)}: ${esc(txtUltima({ ...e, fecha: '' }))}</p>`).join('')}
+      ${r.nota ? `<p style="color:var(--ok-ink)">${esc(r.nota)}</p>` : ''}</div>`;
   }
 
   h += `<button class="btn pri" data-registrar="${s.uid}">${r && r.hecho ? 'Editar el registro' : 'Registrar lo que hiciste'}</button>

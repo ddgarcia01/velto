@@ -353,6 +353,20 @@ await caso('C6', 'áreas de toque y accesibilidad', async () => {
   const sinNombre = await ev(() => [...document.querySelectorAll('button')].filter(b => b.offsetParent && !b.textContent.trim() && !b.getAttribute('aria-label')).length);
   ok(sinNombre === 0, `${sinNombre} botones sin nombre accesible`);
 });
+await caso('C7', 'modo oscuro', async () => {
+  await pg.emulateMedia({ colorScheme: 'dark' });
+  for (const v of ['hoy', 'mes', 'panel', 'guia']) {
+    await ev(v => irA(v), v); await pg.waitForTimeout(80);
+    const [fondo, tarjeta, texto] = await ev(() => [getComputedStyle(document.body).backgroundColor,
+      getComputedStyle(document.querySelector('.vista:not(.off) .card, .vista:not(.off) .hoy-card, .vista:not(.off) .tiles div') || document.body).backgroundColor,
+      getComputedStyle(document.querySelector('.vista:not(.off) b, .vista:not(.off) h2') || document.body).color]);
+    const lum = c => { const [r, g, b] = c.match(/\d+/g).map(Number); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; };
+    ok(lum(fondo) < 0.15 && lum(tarjeta) < 0.2, `${v}: fondo claro en modo oscuro (${fondo} / ${tarjeta})`);
+    ok(lum(texto) > 0.6, `${v}: texto oscuro sobre fondo oscuro (${texto})`);
+    if (CAPT) await pg.screenshot({ path: path.join(CAPT, `oscuro-${v}.png`) });
+  }
+  await pg.emulateMedia({ colorScheme: 'light' });
+});
 await caso('E05', 'inputs de 16 px o más', async () => {
   await ev(() => irA('guia'));
   const chicos = await ev(() => [...document.querySelectorAll('input,select,textarea')].filter(e => e.offsetParent !== null && parseFloat(getComputedStyle(e).fontSize) < 16).length);
