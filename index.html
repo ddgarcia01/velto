@@ -22,9 +22,9 @@
    ============================================================ */
 :root{
   --bg:#EDEFF2; --surface:#FFFFFF; --surface-2:#F6F8FA;
-  --ink:#0E141B; --ink-2:#46525F; --ink-3:#8794A1;
+  --ink:#0E141B; --ink-2:#46525F; --ink-3:#5C6874;
   --line:#DCE1E7; --line-2:#C3CCD5;
-  --accent:#1E4F7C; --alerta:#B5502F; --ok:#2F7A5B;
+  --accent:#1E4F7C; --alerta:#A04428; --ok:#2F7A5B;
   --E:#4E7FA8; --M:#3E8E7E; --T:#D19A2E; --I:#C7502F; --R:#A32E4E;
   --trote:#93A7B8; --caminar:#B3BCC5; --libre:#7E93A6; --carrera:#6B4E9B; --nulo:#AEB8C2;
   --r-s:8px; --r-m:14px; --r-l:20px;
@@ -32,13 +32,14 @@
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,monospace;
   --sb:env(safe-area-inset-bottom,0px); --st:env(safe-area-inset-top,0px);
-  --ok-bg:var(--ok-bg); --ok-line:var(--ok-line); --ok-ink:var(--ok-ink); --err-bg:var(--err-bg); --err-ink:var(--err-ink);
-  --warn-bg:#FBF4E2; --warn-ink:#7A5A13; --info-bg:var(--info-bg); --info-bg2:var(--info-bg2); --info-line:var(--info-line); --info-ink:#1E4F7C;
-  --kg-bg:#E9E2F3; --kg-ink:var(--kg-ink); --tabs-bg:var(--tabs-bg); --toast-bg:#0E141B; --toast-ink:#FFFFFF; --toast-acc:var(--toast-acc);
+  --ok-bg:#E9F4EE; --ok-line:#BFDCCB; --ok-ink:#1F5C42; --err-bg:#FBEDE9; --err-ink:#8A3418;
+  --warn-bg:#FBF4E2; --warn-ink:#7A5A13; --info-bg:#EEF4FB; --info-bg2:#E3EEF7; --info-line:#B9D0E8; --info-ink:#1E4F7C;
+  --kg-bg:#E9E2F3; --kg-ink:#4B3577; --tabs-bg:rgba(255,255,255,.94); --toast-bg:#0E141B; --toast-ink:#FFFFFF; --toast-acc:#9EC5F4;
+  --alta:#F6DDD5; --media:#E9E2F3; --baja:#DDE8F2; --libre:#EEF0F2;
   --serie-hecho:#2a78d6; --serie-plan:#eb6834; --sobre-acento:#FFFFFF;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#0F1419; --surface:#171D24; --surface-2:#1E252E; --ink:#E6EBF0; --ink-2:#AAB6C2; --ink-3:#7D8A97;
+  --bg:#0F1419; --surface:#171D24; --surface-2:#1E252E; --ink:#E6EBF0; --ink-2:#AAB6C2; --ink-3:#8D99A6;
   --line:#2A333D; --line-2:#3A4550; --accent:#5B9BDB; --alerta:#E07A55; --ok:#4CB386;
   --ok-bg:#16302A; --ok-line:#24503F; --ok-ink:#9FDCC0; --err-bg:#3A1E17; --err-ink:#F2B6A3;
   --warn-bg:#352B14; --warn-ink:#EBCB82; --info-bg:#172A3D; --info-bg2:#172A3D; --info-line:#2D4C6B; --info-ink:#A9CCF0;
@@ -95,7 +96,8 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .hoy-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:17px;margin-bottom:11px;position:relative;overflow:hidden}
 .hoy-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--z)}
 .tipo-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--disp);font-size:11px;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--z);border:1px solid currentColor;border-radius:11px;padding:2px 9px}
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink);border:1px solid var(--z);border-radius:11px;padding:2px 9px}
+.tipo-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--z)}
 .hoy-card h2{font-size:27px;line-height:1.08;margin:11px 0 3px;letter-spacing:-.005em}
 .hoy-meta{font-size:13px;color:var(--ink-3);font-family:var(--mono)}
 .ritmo-grande{display:flex;align-items:flex-end;gap:9px;margin:16px 0 4px}
@@ -150,7 +152,7 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .sem-head .barra i{display:block;width:100%;background:var(--accent);border-radius:2px 2px 0 0;opacity:.75}
 .sem.abierta .sem-cuerpo{display:block}
 .sem-cuerpo{display:none;padding:0 13px 8px;border-top:1px solid var(--line)}
-.fase-tag{font-family:var(--disp);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;padding:2px 7px;border-radius:9px;color:#fff}
+.fase-tag{font-family:var(--disp);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;padding:2px 7px;border-radius:9px;color:var(--ink);border:1px solid var(--f,#8794A1);background:color-mix(in srgb,var(--f,#8794A1) 28%,var(--surface))}
 .hoy-marca{position:absolute;left:0;right:0;height:2px;background:var(--alerta)}
 
 /* ---------- pestañas ---------- */
@@ -202,7 +204,7 @@ select.in{-webkit-appearance:none;appearance:none;
 .zt{width:100%;border-collapse:collapse;margin-top:10px}
 .zt td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:middle}
 .zt tr:last-child td{border-bottom:0}
-.zt .z{font-family:var(--disp);font-size:19px;font-weight:600;width:26px}
+.zt .z{font-family:var(--disp);font-size:19px;font-weight:600;width:30px;color:var(--ink);box-shadow:inset 4px 0 0 var(--z);padding-left:10px}
 .zt .nm{font-size:14px}
 .zt .nm small{display:block;color:var(--ink-3);font-size:11.5px}
 .zt .rt{font-family:var(--mono);font-size:14px;text-align:right;white-space:nowrap}
@@ -249,7 +251,7 @@ select.in{-webkit-appearance:none;appearance:none;
 .barras-vol i.act{opacity:1}
 .barras-vol i.desc{background:var(--ink-3)}
 /* ---------- 2.0: semana, guía, ejercicios ---------- */
-:root{--fuerza:#6B4E9B;--estacion:#B5502F;--alta:#F6DDD5;--media:#E9E2F3;--baja:#DDE8F2;--libre:#EEF0F2}
+:root{--fuerza:#6B4E9B;--estacion:#B5502F}
 .tabs .sub-on{color:var(--accent)}
 .hoy-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:2px 2px 10px}
 .hoy-top b{font-family:var(--disp);font-size:17px}
@@ -282,6 +284,7 @@ select.in{-webkit-appearance:none;appearance:none;
 .mapa .m em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--ink-2);margin-top:1px}
 .mapa .m.hoy{border-color:var(--ink)}
 .alta{background:var(--alta)}.media{background:var(--media)}.baja{background:var(--baja)}.libre{background:var(--libre)}
+.mapa .m.libre,.cm.libre,.leyenda i.libre{border:1px solid var(--line-2)}
 .leyenda{font-size:11.5px;color:var(--ink-3);margin:6px 2px 12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .leyenda i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:-6px}
 .dia-blk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px 4px;margin-bottom:8px;scroll-margin-top:10px}
@@ -319,7 +322,7 @@ a.btn{text-decoration:none;color:inherit}
 .mas-det .exp{font-size:13.5px;color:var(--ink-2);margin:8px 0 0}.mas-det .exp b{color:var(--ink)}
 .blq-cab{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-bottom:2px}
 .blq-cab b{font-size:14.5px}
-.mod{font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fuerza);border:1px solid currentColor;border-radius:9px;padding:1px 7px}
+.mod{font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);border:1px solid var(--fuerza);border-radius:9px;padding:1px 7px}
 .blq-como{font-size:12.5px;color:var(--ink-2);margin:2px 0 4px}
 .ejd{border-top:1px dashed var(--line)}.ejd:first-of-type{border-top:0}
 .ejd>summary{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;align-items:baseline}
@@ -340,7 +343,7 @@ a.btn{text-decoration:none;color:inherit}
 .cm.vacia{background:none}.cm.hoy{border-color:var(--ink)}
 .cm b{font-family:var(--mono);font-size:12.5px;font-weight:600}
 .cm .pts{display:flex;gap:2px;margin-top:auto;margin-bottom:3px}.cm .pts i,.leyenda i[class^="c-"]{width:7px;height:7px;border-radius:50%;display:inline-block}
-.cm em{position:absolute;top:2px;right:4px;font-style:normal;font-size:10px;color:var(--ok);font-weight:700}
+.cm em{position:absolute;top:2px;right:4px;font-style:normal;font-size:11px;color:var(--ok-ink);font-weight:700}
 .c-calidad{background:#D19A2E}.c-clase{background:#C7502F}.c-fuerza{background:#6B4E9B}.c-aerobico{background:#4E7FA8}.c-otro{background:#93A7B8}
 .leyenda i[class^="c-"]{margin-right:-5px}
 .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
@@ -1940,7 +1943,7 @@ function vistaPlan() {
           <span class="foco">${esc(w.foco || (f ? f.foco : '') || 'Semana ' + w.numero)}</span>
           <span class="datos">${m.km} km · ${m.sesiones} sesiones${w.descarga ? ' · descarga' : ''}${w.hasta_carrera === 0 ? ' · carrera' : ''}</span>
         </span>
-        ${f ? `<span class="fase-tag" style="background:${COLOR_FASE[f.nombre] || '#8794A1'}">${esc(f.nombre.slice(0, 4))}</span>` : ''}
+        ${f ? `<span class="fase-tag" style="--f:${COLOR_FASE[f.nombre] || '#8794A1'}">${esc(f.nombre.slice(0, 4))}</span>` : ''}
         <span class="barra"><i style="height:${(vols[i] / max * 100).toFixed(0)}%"></i></span>
       </button>
       <div class="sem-cuerpo">${w.sesiones.map(s => filaSesion(s, w, { marcarHoy: true })).join('') || '<p style="padding:12px 0;color:var(--ink-3);font-size:13px">Semana sin sesiones.</p>'}</div>
@@ -1984,7 +1987,7 @@ function vistaRitmos() {
       ${dias != null ? `<p class="num" style="font-size:11.5px;color:${dias > 56 ? 'var(--alerta)' : 'var(--ink-3)'}">
         medido hace ${dias} días${dias > 56 ? ' · conviene volver a testear' : ''}</p>` : ''}
       <table class="zt">${Object.keys(ZONAS).map(k => `<tr>
-        <td class="z" style="color:${colorZona(k)}">${k}</td>
+        <td class="z" style="--z:${colorZona(k)}">${k}</td>
         <td class="nm">${ZONAS[k].nom}<small>${ZONAS[k].desc}</small></td>
         <td class="rt">${ritmoRango(k, z, recargoActual())}</td></tr>`).join('')}</table>
       <span class="eyebrow" style="display:block;margin-top:16px">Marcas equivalentes</span>
@@ -2383,8 +2386,8 @@ function vistaSemana() {
       <button data-semnav="${idx + 1}" ${idx === p.semanas.length - 1 ? 'disabled' : ''} aria-label="Semana siguiente">›</button>
     </div>
     <div class="card tight">
-      <div class="row" style="flex-wrap:wrap;gap:6px">${f ? `<span class="fase-tag" style="background:${COLOR_FASE[f.nombre] || '#8794A1'}">${esc(f.nombre)}</span>` : ''}
-        ${w.descarga ? '<span class="fase-tag" style="background:#93A7B8">descarga</span>' : ''}</div>
+      <div class="row" style="flex-wrap:wrap;gap:6px">${f ? `<span class="fase-tag" style="--f:${COLOR_FASE[f.nombre] || '#8794A1'}">${esc(f.nombre)}</span>` : ''}
+        ${w.descarga ? '<span class="fase-tag" style="--f:#93A7B8">descarga</span>' : ''}</div>
       <p style="color:var(--ink);font-size:15px;margin-top:7px">${esc(w.foco || (f ? f.foco : '') || 'Semana ' + w.numero)}</p>
       <div class="kpis">
         <div><span>Carrera</span><b>${m.km} km</b></div>

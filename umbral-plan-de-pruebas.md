@@ -162,6 +162,8 @@ Tres niveles, de adentro hacia afuera:
 | C7 | Modo oscuro | Fondos oscuros y texto claro en todas las vistas; colores de gráfico validados para fondo oscuro | Sí |
 | C8 | Service worker | La página se pide primero a la red (versión nueva al abrir); sin conexión abre la copia | Sí |
 | C9 | Rendimiento | Con 1000 registros de fuerza cada vista se pinta en menos de 50 ms | Sí |
+| C11 | Contraste | Todo texto visible de las 11 vistas, el detalle, el registro y la guía cumple WCAG AA (4,5:1; 3:1 texto grande) en modo claro y oscuro | Sí |
+| C12 | Tokens de color | Ninguna variable de color se apunta a sí misma; todas tienen valor en ambos temas; la barra de pestañas tiene fondo | Sí |
 | C10 | Robustez | Tiempo inválido no se guarda; una sesión corrupta muestra un aviso, no una pantalla en blanco | Sí |
 
 ### Entrega

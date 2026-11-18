@@ -8,6 +8,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { auditarContraste } from './contraste.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -405,6 +406,44 @@ await caso('E03/C8', 'service worker: funciona sin conexión y la página se pid
   ok(/esPagina/.test(sw) && /SHELL = \[[^\]]*index\.html/.test(sw), 'estrategia o precarga del service worker');
 });
 
+await caso('C11', 'contraste WCAG AA de todo texto, en modo claro y oscuro', async () => {
+  // un bloque en secuencia y un circuito para auditar también esos componentes
+  await ev(() => { const s = semanaActual(plan()).sesiones.find(x => x.tipo !== 'descanso');
+    s.segmentos.push({ rol: 'bloque', duracion_min: 10, descripcion: 'Pie y cadera · elevación de talón a una pierna 2 × 12 + Copenhagen 2 × 20 s por lado' },
+      { rol: 'bloque', duracion_min: 8, descripcion: 'Circuito × 2 vueltas: Pallof press 12 por lado · plancha lateral 40 s por lado' }); });
+  const fallas = [];
+  for (const modo of ['light', 'dark']) {
+    await pg.emulateMedia({ colorScheme: modo });
+    for (const v of ['hoy', 'mes', 'semana', 'dia', 'plan', 'panel', 'guia', 'mas', 'ritmos', 'importar', 'ajustes']) {
+      await ev(v => { irA(v); document.querySelectorAll('.vista:not(.off) details').forEach(d => d.open = true); }, v);
+      for (const f of await pg.evaluate(auditarContraste)) fallas.push(`${modo}/${v}: ${f.elemento} "${f.texto}" ${f.ratio}:1 (mín. ${f.minimo})`);
+    }
+    const uid = await ev(() => semanaActual(plan()).sesiones.find(x => x.tipo !== 'descanso').uid);
+    for (const [hoja, abrir] of [['detalle', u => abrirDetalle(u)], ['registro', u => abrirRegistro(u)], ['guía', () => abrirGuia('sentadilla')]]) {
+      await ev(([u, f]) => { cerrarHojas(); new Function('u', `(${f})(u)`)(u); document.querySelectorAll('.sheet.on details').forEach(d => d.open = true); }, [uid, abrir.toString()]);
+      await pg.waitForTimeout(320);
+      for (const f of await pg.evaluate(auditarContraste)) fallas.push(`${modo}/${hoja}: ${f.elemento} "${f.texto}" ${f.ratio}:1 (mín. ${f.minimo})`);
+    }
+    await ev(() => cerrarHojas());
+  }
+  await pg.emulateMedia({ colorScheme: 'light' });
+  ok(!fallas.length, fallas.length + ' textos con poco contraste:\n    ' + [...new Set(fallas)].slice(0, 12).join('\n    '));
+});
+await caso('C12', 'tokens de color válidos en ambos temas (sin variables que se apunten a sí mismas)', async () => {
+  const css = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
+  const ciclos = [...css.matchAll(/(--[\w-]+)\s*:\s*var\((--[\w-]+)\)/g)].filter(m => m[1] === m[2]).map(m => m[1]);
+  ok(!ciclos.length, 'variables cíclicas: ' + ciclos.join(', '));
+  for (const modo of ['light', 'dark']) {
+    await pg.emulateMedia({ colorScheme: modo });
+    const vacias = await ev(() => { const cs = getComputedStyle(document.documentElement);
+      return ['--bg', '--surface', '--ink', '--ink-3', '--ok-bg', '--ok-ink', '--err-bg', '--warn-bg', '--info-bg', '--info-ink', '--kg-bg', '--kg-ink',
+        '--alta', '--media', '--baja', '--libre', '--tabs-bg', '--toast-bg', '--serie-hecho', '--serie-plan'].filter(v => !cs.getPropertyValue(v).trim()); });
+    ok(!vacias.length, `${modo}: tokens sin valor: ${vacias.join(', ')}`);
+    const tabs = await ev(() => getComputedStyle(document.querySelector('.tabs')).backgroundColor);
+    ok(!/rgba\(0, 0, 0, 0\)|transparent/.test(tabs), `${modo}: barra de pestañas sin fondo`);
+  }
+  await pg.emulateMedia({ colorScheme: 'light' });
+});
 await caso('C9', 'rendimiento con años de historial (1000 registros de fuerza)', async () => {
   const ms = await ev(() => {
     for (let i = 0; i < 1000; i++) D.reg['viejo' + i + ':x'] = { hecho: true, fecha_sesion: ymd(addDays(hoy(), -400 + (i % 390))),

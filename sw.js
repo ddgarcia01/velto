@@ -3,7 +3,7 @@
    sin conexión o si la red tarda más de 3 s, se sirve la copia guardada. Íconos y manifiesto:
    primero la copia, y se refrescan en segundo plano.
    Al publicar una versión nueva, subí el número de CACHE. */
-const CACHE = 'umbral-v3';
+const CACHE = 'umbral-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.png', './icon-180.png'];
 
 self.addEventListener('install', e => {
