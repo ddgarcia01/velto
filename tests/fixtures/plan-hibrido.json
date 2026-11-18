@@ -1,0 +1,1112 @@
+{
+ "formato": "utp/1",
+ "plan": {
+  "nombre": "Plantilla — microciclo híbrido Hyrox (4 semanas)",
+  "autor": "atleta / entrenador",
+  "notas": "PLANTILLA DE REFERENCIA, no un plan personal. Muestra cómo codificar fuerza y estaciones de Hyrox en UTP/1 para que velto las muestre: cada ejercicio es un segmento 'bloque' con descripcion (series × reps @ RIR, pausa) y duracion_min; cada estación es un 'bloque' con zona 'caminar' para no inflar los km.",
+  "objetivo": {
+   "nombre": "Hyrox (plantilla)",
+   "distancia_m": 8000,
+   "meta_tiempo": "1:25:00",
+   "prioridad": "A"
+  },
+  "anclaje": {
+   "modo": "inicio",
+   "fecha_inicio": "2026-11-23",
+   "inicio_semana": "lunes"
+  },
+  "referencia": {
+   "distancia_m": 10000,
+   "tiempo": "48:00",
+   "origen": "estimada"
+  },
+  "supuestos": {
+   "dias_por_semana": 6,
+   "dia_largo": "domingo",
+   "superficies": [
+    "asfalto",
+    "gimnasio"
+   ]
+  },
+  "fases": [
+   {
+    "nombre": "base",
+    "desde_semana": 1,
+    "hasta_semana": 3,
+    "foco": "Base aeróbica, fuerza máxima, técnica de estaciones"
+   },
+   {
+    "nombre": "recuperacion",
+    "desde_semana": 4,
+    "hasta_semana": 4,
+    "foco": "Absorber la carga"
+   }
+  ],
+  "semanas": [
+   {
+    "numero": 1,
+    "foco": "Base híbrida",
+    "descarga": false,
+    "sesiones": [
+     {
+      "dia": "lunes",
+      "tipo": "intervalos",
+      "titulo": "5 × 800 m en I",
+      "proposito": "Subir el techo aeróbico: cuanto más alto el VO2max, más cómodo se vuelve el ritmo de Hyrox.",
+      "fundamento": "Series de 3–4 min cerca del VO2max con recuperación incompleta mantienen el consumo de oxígeno alto durante toda la sesión. Es el estímulo que más mueve el volumen sistólico.",
+      "sensacion": "Duro pero parejo. Si la última serie es la más lenta, la primera fue demasiado rápida.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min: skipping, talones, 4 × 20 s progresivos"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 5,
+        "trabajo": {
+         "distancia_m": 800,
+         "zona": "I"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "cinta",
+        "descripcion": "Mismas series en cinta al 1 % de inclinación."
+       },
+       {
+        "cuando": "poco_tiempo",
+        "descripcion": "Quitar una serie y acortar el calentamiento a 10 min."
+       }
+      ]
+     },
+     {
+      "dia": "lunes",
+      "tipo": "fuerza",
+      "titulo": "Fuerza inferior (PM, ≥ 6 h después de las series)",
+      "proposito": "Fuerza máxima de piernas y cadena posterior: protege del desgaste de trineos y lunges y mejora la economía de carrera.",
+      "fundamento": "Pesado y con pocas repeticiones genera adaptación neural y de rigidez del tendón sin sumar mucho volumen ni dolor muscular. Va el mismo día que la sesión dura para que mañana y el jueves lleguen frescos.",
+      "sensacion": "Cada serie termina con 2–3 repeticiones en reserva. Nunca al fallo.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 8,
+        "descripcion": "Bici 4 min + 2 × 8 sentadilla goblet + 2 × 8 puente de glúteo + 3 × 3 saltos al cajón bajo"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 16,
+        "descripcion": "Sentadilla trasera · 4 × 5 @ RIR 3 (≈75 % 1RM) · pausa 2:30 · bajada en 2 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 10,
+        "descripcion": "Peso muerto rumano · 3 × 8 @ RIR 2–3 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 10,
+        "descripcion": "Zancada búlgara · 3 × 8 por pierna @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8,
+        "descripcion": "Elevación de talones (rodilla extendida) 3 × 12 lentas + Pallof press 3 × 10 por lado"
+       }
+      ]
+     },
+     {
+      "dia": "martes",
+      "tipo": "suave",
+      "titulo": "Rodaje suave + progresivos",
+      "proposito": "Volumen aeróbico barato y piernas sueltas después del día duro.",
+      "fundamento": "En Z2 se construye la base que sostiene los 8 km de Hyrox; los progresivos mantienen la mecánica rápida sin costo.",
+      "sensacion": "Conversación fluida de punta a punta.",
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 40,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "6 × 20 s progresivos con 40 s de trote"
+       }
+      ]
+     },
+     {
+      "dia": "miercoles",
+      "tipo": "fuerza",
+      "titulo": "Fuerza superior + estaciones de tracción",
+      "proposito": "Tren superior y agarre para SkiErg, sled pull, remo y farmers sin cargar las piernas antes del umbral del jueves.",
+      "fundamento": "La tracción y el agarre limitan a muchos atletas en la segunda mitad de Hyrox. Se entrena con cargas de competencia y técnica limpia, lejos de la fatiga.",
+      "sensacion": "Técnica perfecta en las estaciones: se busca eficiencia, no agotarse.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 6,
+        "descripcion": "Remo 4 min suave + 2 × 10 band pull-apart + 2 × 5 dominadas escapulares"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Press de banca con mancuernas · 4 × 6 @ RIR 2 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Dominadas · 4 × 5–8 @ RIR 2 (lastre si superas 8) · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8,
+        "descripcion": "Remo con barra · 3 × 8 @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Técnica: 4 rondas de 12,5 m sled pull (peso de competencia, brazo a brazo, cadera baja) + 50 m farmers carry · 90 s entre rondas"
+       }
+      ]
+     },
+     {
+      "dia": "jueves",
+      "tipo": "tempo",
+      "titulo": "3 × 8 min en T",
+      "proposito": "Correr más rápido sin acumular lactato: es el ritmo que define los 8 km de Hyrox.",
+      "fundamento": "En el umbral el cuerpo limpia lactato tan rápido como lo produce. Es el estímulo con mejor relación rendimiento/recuperación para pruebas de 60–90 min.",
+      "sensacion": "Cómodamente duro: frases cortas, no charla.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 3,
+        "trabajo": {
+         "duracion_min": 8,
+         "zona": "T"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "calor",
+        "descripcion": "Correr por esfuerzo, no por ritmo: con calor el umbral se corre 10–15 s/km más lento."
+       }
+      ]
+     },
+     {
+      "dia": "sabado",
+      "tipo": "intervalos",
+      "titulo": "Hyrox: 3 rondas de 1 km + estación",
+      "proposito": "Carrera comprometida: aprender a correr bien con las piernas cargadas por la estación anterior.",
+      "fundamento": "En Hyrox se pierde más tiempo en los kilómetros posteriores a las estaciones que en las estaciones mismas. Repetir la transición entrena la tolerancia y el pacing.",
+      "sensacion": "Los primeros 200 m después de cada estación se sienten pesados; al km 0,5 tienes que haber recuperado el ritmo.",
+      "clave": true,
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 12,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min + 3 × 20 s progresivos"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 4.5,
+        "descripcion": "SkiErg 1000 m a ritmo de competencia (RPE 7), brazada larga",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Sled push 50 m (4 × 12,5 m) con peso de competencia, pasos cortos y cuerpo a 45°",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Burpee broad jump 40 m, ritmo constante sin parar",
+        "zona": "caminar"
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "otro",
+        "descripcion": "Sin trineo: 4 × 15 m empuje de carro o cuesta empinada 30 s."
+       }
+      ]
+     },
+     {
+      "dia": "domingo",
+      "tipo": "largo",
+      "titulo": "Largo suave",
+      "proposito": "Resistencia aeróbica: la base sobre la que se apoya todo lo demás.",
+      "fundamento": "La tirada larga en Z2 mejora el uso de grasas y endurece tendones. Se mantiene suave porque el sábado ya hubo intensidad.",
+      "sensacion": "Fácil de punta a punta. Si la FC se dispara al final, frena.",
+      "clave": false,
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 60,
+        "zona": "E"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "numero": 2,
+    "foco": "Más volumen",
+    "descarga": false,
+    "sesiones": [
+     {
+      "dia": "lunes",
+      "tipo": "intervalos",
+      "titulo": "6 × 800 m en I",
+      "proposito": "Subir el techo aeróbico: cuanto más alto el VO2max, más cómodo se vuelve el ritmo de Hyrox.",
+      "fundamento": "Series de 3–4 min cerca del VO2max con recuperación incompleta mantienen el consumo de oxígeno alto durante toda la sesión. Es el estímulo que más mueve el volumen sistólico.",
+      "sensacion": "Duro pero parejo. Si la última serie es la más lenta, la primera fue demasiado rápida.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min: skipping, talones, 4 × 20 s progresivos"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 6,
+        "trabajo": {
+         "distancia_m": 800,
+         "zona": "I"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "cinta",
+        "descripcion": "Mismas series en cinta al 1 % de inclinación."
+       },
+       {
+        "cuando": "poco_tiempo",
+        "descripcion": "Quitar una serie y acortar el calentamiento a 10 min."
+       }
+      ]
+     },
+     {
+      "dia": "lunes",
+      "tipo": "fuerza",
+      "titulo": "Fuerza inferior (PM, ≥ 6 h después de las series)",
+      "proposito": "Fuerza máxima de piernas y cadena posterior: protege del desgaste de trineos y lunges y mejora la economía de carrera.",
+      "fundamento": "Pesado y con pocas repeticiones genera adaptación neural y de rigidez del tendón sin sumar mucho volumen ni dolor muscular. Va el mismo día que la sesión dura para que mañana y el jueves lleguen frescos.",
+      "sensacion": "Cada serie termina con 2–3 repeticiones en reserva. Nunca al fallo.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 8,
+        "descripcion": "Bici 4 min + 2 × 8 sentadilla goblet + 2 × 8 puente de glúteo + 3 × 3 saltos al cajón bajo"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 16,
+        "descripcion": "Sentadilla trasera · 5 × 5 @ RIR 2 (≈77 % 1RM) · pausa 2:30 · bajada en 2 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 10,
+        "descripcion": "Peso muerto rumano · 3 × 8 @ RIR 2–3 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 10,
+        "descripcion": "Zancada búlgara · 3 × 8 por pierna @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8,
+        "descripcion": "Elevación de talones (rodilla extendida) 3 × 12 lentas + Pallof press 3 × 10 por lado"
+       }
+      ]
+     },
+     {
+      "dia": "martes",
+      "tipo": "suave",
+      "titulo": "Rodaje suave + progresivos",
+      "proposito": "Volumen aeróbico barato y piernas sueltas después del día duro.",
+      "fundamento": "En Z2 se construye la base que sostiene los 8 km de Hyrox; los progresivos mantienen la mecánica rápida sin costo.",
+      "sensacion": "Conversación fluida de punta a punta.",
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 42,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "6 × 20 s progresivos con 40 s de trote"
+       }
+      ]
+     },
+     {
+      "dia": "miercoles",
+      "tipo": "fuerza",
+      "titulo": "Fuerza superior + estaciones de tracción",
+      "proposito": "Tren superior y agarre para SkiErg, sled pull, remo y farmers sin cargar las piernas antes del umbral del jueves.",
+      "fundamento": "La tracción y el agarre limitan a muchos atletas en la segunda mitad de Hyrox. Se entrena con cargas de competencia y técnica limpia, lejos de la fatiga.",
+      "sensacion": "Técnica perfecta en las estaciones: se busca eficiencia, no agotarse.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 6,
+        "descripcion": "Remo 4 min suave + 2 × 10 band pull-apart + 2 × 5 dominadas escapulares"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Press de banca con mancuernas · 4 × 6 @ RIR 2 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Dominadas · 4 × 5–8 @ RIR 2 (lastre si superas 8) · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8,
+        "descripcion": "Remo con barra · 3 × 8 @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Técnica: 4 rondas de 12,5 m sled pull (peso de competencia, brazo a brazo, cadera baja) + 50 m farmers carry · 90 s entre rondas"
+       }
+      ]
+     },
+     {
+      "dia": "jueves",
+      "tipo": "tempo",
+      "titulo": "3 × 10 min en T",
+      "proposito": "Correr más rápido sin acumular lactato: es el ritmo que define los 8 km de Hyrox.",
+      "fundamento": "En el umbral el cuerpo limpia lactato tan rápido como lo produce. Es el estímulo con mejor relación rendimiento/recuperación para pruebas de 60–90 min.",
+      "sensacion": "Cómodamente duro: frases cortas, no charla.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 3,
+        "trabajo": {
+         "duracion_min": 10,
+         "zona": "T"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "calor",
+        "descripcion": "Correr por esfuerzo, no por ritmo: con calor el umbral se corre 10–15 s/km más lento."
+       }
+      ]
+     },
+     {
+      "dia": "sabado",
+      "tipo": "intervalos",
+      "titulo": "Hyrox: 4 rondas de 1 km + estación",
+      "proposito": "Carrera comprometida: aprender a correr bien con las piernas cargadas por la estación anterior.",
+      "fundamento": "En Hyrox se pierde más tiempo en los kilómetros posteriores a las estaciones que en las estaciones mismas. Repetir la transición entrena la tolerancia y el pacing.",
+      "sensacion": "Los primeros 200 m después de cada estación se sienten pesados; al km 0,5 tienes que haber recuperado el ritmo.",
+      "clave": true,
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 12,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min + 3 × 20 s progresivos"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 4.5,
+        "descripcion": "SkiErg 1000 m a ritmo de competencia (RPE 7), brazada larga",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Sled push 50 m (4 × 12,5 m) con peso de competencia, pasos cortos y cuerpo a 45°",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Burpee broad jump 40 m, ritmo constante sin parar",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 4,
+        "descripcion": "Wall balls 50 reps en series de 10–15, máx. 5 s de pausa",
+        "zona": "caminar"
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "otro",
+        "descripcion": "Sin trineo: 4 × 15 m empuje de carro o cuesta empinada 30 s."
+       }
+      ]
+     },
+     {
+      "dia": "domingo",
+      "tipo": "largo",
+      "titulo": "Largo suave",
+      "proposito": "Resistencia aeróbica: la base sobre la que se apoya todo lo demás.",
+      "fundamento": "La tirada larga en Z2 mejora el uso de grasas y endurece tendones. Se mantiene suave porque el sábado ya hubo intensidad.",
+      "sensacion": "Fácil de punta a punta. Si la FC se dispara al final, frena.",
+      "clave": false,
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 62,
+        "zona": "E"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "numero": 3,
+    "foco": "Más intensidad específica",
+    "descarga": false,
+    "sesiones": [
+     {
+      "dia": "lunes",
+      "tipo": "intervalos",
+      "titulo": "5 × 1000 m en I",
+      "proposito": "Subir el techo aeróbico: cuanto más alto el VO2max, más cómodo se vuelve el ritmo de Hyrox.",
+      "fundamento": "Series de 3–4 min cerca del VO2max con recuperación incompleta mantienen el consumo de oxígeno alto durante toda la sesión. Es el estímulo que más mueve el volumen sistólico.",
+      "sensacion": "Duro pero parejo. Si la última serie es la más lenta, la primera fue demasiado rápida.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min: skipping, talones, 4 × 20 s progresivos"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 5,
+        "trabajo": {
+         "distancia_m": 1000,
+         "zona": "I"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "cinta",
+        "descripcion": "Mismas series en cinta al 1 % de inclinación."
+       },
+       {
+        "cuando": "poco_tiempo",
+        "descripcion": "Quitar una serie y acortar el calentamiento a 10 min."
+       }
+      ]
+     },
+     {
+      "dia": "lunes",
+      "tipo": "fuerza",
+      "titulo": "Fuerza inferior (PM, ≥ 6 h después de las series)",
+      "proposito": "Fuerza máxima de piernas y cadena posterior: protege del desgaste de trineos y lunges y mejora la economía de carrera.",
+      "fundamento": "Pesado y con pocas repeticiones genera adaptación neural y de rigidez del tendón sin sumar mucho volumen ni dolor muscular. Va el mismo día que la sesión dura para que mañana y el jueves lleguen frescos.",
+      "sensacion": "Cada serie termina con 2–3 repeticiones en reserva. Nunca al fallo.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 8,
+        "descripcion": "Bici 4 min + 2 × 8 sentadilla goblet + 2 × 8 puente de glúteo + 3 × 3 saltos al cajón bajo"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 16,
+        "descripcion": "Sentadilla trasera · 4 × 4 @ RIR 2 (≈82 % 1RM) · pausa 2:30 · bajada en 2 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 10,
+        "descripcion": "Peso muerto rumano · 3 × 8 @ RIR 2–3 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 10,
+        "descripcion": "Zancada búlgara · 3 × 8 por pierna @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8,
+        "descripcion": "Elevación de talones (rodilla extendida) 3 × 12 lentas + Pallof press 3 × 10 por lado"
+       }
+      ]
+     },
+     {
+      "dia": "martes",
+      "tipo": "suave",
+      "titulo": "Rodaje suave + progresivos",
+      "proposito": "Volumen aeróbico barato y piernas sueltas después del día duro.",
+      "fundamento": "En Z2 se construye la base que sostiene los 8 km de Hyrox; los progresivos mantienen la mecánica rápida sin costo.",
+      "sensacion": "Conversación fluida de punta a punta.",
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 44,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "6 × 20 s progresivos con 40 s de trote"
+       }
+      ]
+     },
+     {
+      "dia": "miercoles",
+      "tipo": "fuerza",
+      "titulo": "Fuerza superior + estaciones de tracción",
+      "proposito": "Tren superior y agarre para SkiErg, sled pull, remo y farmers sin cargar las piernas antes del umbral del jueves.",
+      "fundamento": "La tracción y el agarre limitan a muchos atletas en la segunda mitad de Hyrox. Se entrena con cargas de competencia y técnica limpia, lejos de la fatiga.",
+      "sensacion": "Técnica perfecta en las estaciones: se busca eficiencia, no agotarse.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 6,
+        "descripcion": "Remo 4 min suave + 2 × 10 band pull-apart + 2 × 5 dominadas escapulares"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Press de banca con mancuernas · 4 × 6 @ RIR 2 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Dominadas · 4 × 5–8 @ RIR 2 (lastre si superas 8) · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8,
+        "descripcion": "Remo con barra · 3 × 8 @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 12,
+        "descripcion": "Técnica: 4 rondas de 12,5 m sled pull (peso de competencia, brazo a brazo, cadera baja) + 50 m farmers carry · 90 s entre rondas"
+       }
+      ]
+     },
+     {
+      "dia": "jueves",
+      "tipo": "tempo",
+      "titulo": "2 × 15 min en T",
+      "proposito": "Correr más rápido sin acumular lactato: es el ritmo que define los 8 km de Hyrox.",
+      "fundamento": "En el umbral el cuerpo limpia lactato tan rápido como lo produce. Es el estímulo con mejor relación rendimiento/recuperación para pruebas de 60–90 min.",
+      "sensacion": "Cómodamente duro: frases cortas, no charla.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 2,
+        "trabajo": {
+         "duracion_min": 15,
+         "zona": "T"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "calor",
+        "descripcion": "Correr por esfuerzo, no por ritmo: con calor el umbral se corre 10–15 s/km más lento."
+       }
+      ]
+     },
+     {
+      "dia": "sabado",
+      "tipo": "intervalos",
+      "titulo": "Hyrox: 4 rondas de 1 km + estación",
+      "proposito": "Carrera comprometida: aprender a correr bien con las piernas cargadas por la estación anterior.",
+      "fundamento": "En Hyrox se pierde más tiempo en los kilómetros posteriores a las estaciones que en las estaciones mismas. Repetir la transición entrena la tolerancia y el pacing.",
+      "sensacion": "Los primeros 200 m después de cada estación se sienten pesados; al km 0,5 tienes que haber recuperado el ritmo.",
+      "clave": true,
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 12,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min + 3 × 20 s progresivos"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 4.5,
+        "descripcion": "SkiErg 1000 m a ritmo de competencia (RPE 7), brazada larga",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Sled push 50 m (4 × 12,5 m) con peso de competencia, pasos cortos y cuerpo a 45°",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Burpee broad jump 40 m, ritmo constante sin parar",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 4,
+        "descripcion": "Wall balls 50 reps en series de 10–15, máx. 5 s de pausa",
+        "zona": "caminar"
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "otro",
+        "descripcion": "Sin trineo: 4 × 15 m empuje de carro o cuesta empinada 30 s."
+       }
+      ]
+     },
+     {
+      "dia": "domingo",
+      "tipo": "largo",
+      "titulo": "Largo suave",
+      "proposito": "Resistencia aeróbica: la base sobre la que se apoya todo lo demás.",
+      "fundamento": "La tirada larga en Z2 mejora el uso de grasas y endurece tendones. Se mantiene suave porque el sábado ya hubo intensidad.",
+      "sensacion": "Fácil de punta a punta. Si la FC se dispara al final, frena.",
+      "clave": false,
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 72,
+        "zona": "E"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "numero": 4,
+    "foco": "Descarga: −30 % de volumen, misma calidad",
+    "descarga": true,
+    "sesiones": [
+     {
+      "dia": "lunes",
+      "tipo": "intervalos",
+      "titulo": "4 × 800 m en I",
+      "proposito": "Subir el techo aeróbico: cuanto más alto el VO2max, más cómodo se vuelve el ritmo de Hyrox.",
+      "fundamento": "Series de 3–4 min cerca del VO2max con recuperación incompleta mantienen el consumo de oxígeno alto durante toda la sesión. Es el estímulo que más mueve el volumen sistólico.",
+      "sensacion": "Duro pero parejo. Si la última serie es la más lenta, la primera fue demasiado rápida.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min: skipping, talones, 4 × 20 s progresivos"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 4,
+        "trabajo": {
+         "distancia_m": 800,
+         "zona": "I"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "cinta",
+        "descripcion": "Mismas series en cinta al 1 % de inclinación."
+       },
+       {
+        "cuando": "poco_tiempo",
+        "descripcion": "Quitar una serie y acortar el calentamiento a 10 min."
+       }
+      ]
+     },
+     {
+      "dia": "lunes",
+      "tipo": "fuerza",
+      "titulo": "Fuerza inferior (PM, ≥ 6 h después de las series)",
+      "proposito": "Fuerza máxima de piernas y cadena posterior: protege del desgaste de trineos y lunges y mejora la economía de carrera.",
+      "fundamento": "Pesado y con pocas repeticiones genera adaptación neural y de rigidez del tendón sin sumar mucho volumen ni dolor muscular. Va el mismo día que la sesión dura para que mañana y el jueves lleguen frescos.",
+      "sensacion": "Cada serie termina con 2–3 repeticiones en reserva. Nunca al fallo.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 8,
+        "descripcion": "Bici 4 min + 2 × 8 sentadilla goblet + 2 × 8 puente de glúteo + 3 × 3 saltos al cajón bajo"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 11.2,
+        "descripcion": "Sentadilla trasera · 3 × 5 @ RIR 4 (≈70 % 1RM) · pausa 2:30 · bajada en 2 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 7.0,
+        "descripcion": "Peso muerto rumano · 2 × 8 @ RIR 2–3 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 7.0,
+        "descripcion": "Zancada búlgara · 2 × 8 por pierna @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 5.6,
+        "descripcion": "Elevación de talones (rodilla extendida) 2 × 12 lentas + Pallof press 2 × 10 por lado"
+       }
+      ]
+     },
+     {
+      "dia": "martes",
+      "tipo": "suave",
+      "titulo": "Rodaje suave + progresivos",
+      "proposito": "Volumen aeróbico barato y piernas sueltas después del día duro.",
+      "fundamento": "En Z2 se construye la base que sostiene los 8 km de Hyrox; los progresivos mantienen la mecánica rápida sin costo.",
+      "sensacion": "Conversación fluida de punta a punta.",
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 35,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "6 × 20 s progresivos con 40 s de trote"
+       }
+      ]
+     },
+     {
+      "dia": "miercoles",
+      "tipo": "fuerza",
+      "titulo": "Fuerza superior + estaciones de tracción",
+      "proposito": "Tren superior y agarre para SkiErg, sled pull, remo y farmers sin cargar las piernas antes del umbral del jueves.",
+      "fundamento": "La tracción y el agarre limitan a muchos atletas en la segunda mitad de Hyrox. Se entrena con cargas de competencia y técnica limpia, lejos de la fatiga.",
+      "sensacion": "Técnica perfecta en las estaciones: se busca eficiencia, no agotarse.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 6,
+        "descripcion": "Remo 4 min suave + 2 × 10 band pull-apart + 2 × 5 dominadas escapulares"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8.4,
+        "descripcion": "Press de banca con mancuernas · 3 × 6 @ RIR 2 · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8.4,
+        "descripcion": "Dominadas · 3 × 5–8 @ RIR 2 (lastre si superas 8) · pausa 2 min"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 5.6,
+        "descripcion": "Remo con barra · 2 × 8 @ RIR 2 · pausa 90 s"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 8.4,
+        "descripcion": "Técnica: 3 rondas de 12,5 m sled pull (peso de competencia, brazo a brazo, cadera baja) + 50 m farmers carry · 90 s entre rondas"
+       }
+      ]
+     },
+     {
+      "dia": "jueves",
+      "tipo": "tempo",
+      "titulo": "2 × 8 min en T",
+      "proposito": "Correr más rápido sin acumular lactato: es el ritmo que define los 8 km de Hyrox.",
+      "fundamento": "En el umbral el cuerpo limpia lactato tan rápido como lo produce. Es el estímulo con mejor relación rendimiento/recuperación para pruebas de 60–90 min.",
+      "sensacion": "Cómodamente duro: frases cortas, no charla.",
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 15,
+        "zona": "E"
+       },
+       {
+        "rol": "serie",
+        "repeticiones": 2,
+        "trabajo": {
+         "duracion_min": 8,
+         "zona": "T"
+        },
+        "recuperacion": {
+         "duracion_min": 2,
+         "zona": "trote"
+        }
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "calor",
+        "descripcion": "Correr por esfuerzo, no por ritmo: con calor el umbral se corre 10–15 s/km más lento."
+       }
+      ]
+     },
+     {
+      "dia": "sabado",
+      "tipo": "intervalos",
+      "titulo": "Hyrox: 2 rondas de 1 km + estación",
+      "proposito": "Carrera comprometida: aprender a correr bien con las piernas cargadas por la estación anterior.",
+      "fundamento": "En Hyrox se pierde más tiempo en los kilómetros posteriores a las estaciones que en las estaciones mismas. Repetir la transición entrena la tolerancia y el pacing.",
+      "sensacion": "Los primeros 200 m después de cada estación se sienten pesados; al km 0,5 tienes que haber recuperado el ritmo.",
+      "clave": true,
+      "segmentos": [
+       {
+        "rol": "calentamiento",
+        "duracion_min": 12,
+        "zona": "E"
+       },
+       {
+        "rol": "tecnica",
+        "descripcion": "Drills 5 min + 3 × 20 s progresivos"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 4.5,
+        "descripcion": "SkiErg 1000 m a ritmo de competencia (RPE 7), brazada larga",
+        "zona": "caminar"
+       },
+       {
+        "rol": "bloque",
+        "distancia_m": 1000,
+        "zona": "M",
+        "descripcion": "1 km a ritmo objetivo de Hyrox"
+       },
+       {
+        "rol": "bloque",
+        "duracion_min": 3,
+        "descripcion": "Sled push 50 m (4 × 12,5 m) con peso de competencia, pasos cortos y cuerpo a 45°",
+        "zona": "caminar"
+       },
+       {
+        "rol": "vuelta_calma",
+        "duracion_min": 10,
+        "zona": "E"
+       }
+      ],
+      "alternativas": [
+       {
+        "cuando": "otro",
+        "descripcion": "Sin trineo: 4 × 15 m empuje de carro o cuesta empinada 30 s."
+       }
+      ]
+     },
+     {
+      "dia": "domingo",
+      "tipo": "largo",
+      "titulo": "Largo suave",
+      "proposito": "Resistencia aeróbica: la base sobre la que se apoya todo lo demás.",
+      "fundamento": "La tirada larga en Z2 mejora el uso de grasas y endurece tendones. Se mantiene suave porque el sábado ya hubo intensidad.",
+      "sensacion": "Fácil de punta a punta. Si la FC se dispara al final, frena.",
+      "clave": false,
+      "segmentos": [
+       {
+        "rol": "continuo",
+        "duracion_min": 45,
+        "zona": "E"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

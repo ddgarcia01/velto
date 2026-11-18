@@ -113,9 +113,9 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .ses .fecha{flex:0 0 34px;text-align:center}
 .ses .fecha b{font-family:var(--disp);font-size:17px;font-weight:600;display:block;line-height:1}
 .ses .fecha span{font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-.ses .cuerpo{flex:1;min-width:0}
-.ses .tit{font-size:14.5px;font-weight:590;letter-spacing:-.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ses .bajo{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
+.ses .cuerpo{flex:1;min-width:0;display:flex;flex-direction:column}
+.ses .tit{display:block;font-size:14.5px;font-weight:590;letter-spacing:-.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ses .bajo{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
 .ses .viz{flex:0 0 62px}
 .ses.hecha .tit{color:var(--ink-3);text-decoration:line-through}
 .ses.hoy{background:var(--surface-2);border-radius:var(--r-s)}
@@ -230,6 +230,67 @@ select.in{-webkit-appearance:none;appearance:none;
 .barras-vol i{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.5;min-height:2px}
 .barras-vol i.act{opacity:1}
 .barras-vol i.desc{background:var(--ink-3)}
+/* ---------- 2.0: semana, guía, ejercicios ---------- */
+:root{--fuerza:#6B4E9B;--estacion:#B5502F;--alta:#F6DDD5;--media:#E9E2F3;--baja:#DDE8F2;--libre:#EEF0F2}
+.tabs .sub-on{color:var(--accent)}
+.hoy-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:2px 2px 10px}
+.hoy-top b{font-family:var(--disp);font-size:17px}
+.hoy-top button{text-align:right}
+.hoy-top button{font-size:13px;color:var(--accent);font-weight:600}
+.pasos-t{margin-top:14px}
+.seg .sub{color:var(--ink-3);font-size:13px}
+.ej{display:inline;color:var(--accent);font-weight:600;border-bottom:1px dashed currentColor;font-size:inherit;line-height:inherit;padding:0}
+.ejrow{padding:4px 0 6px}
+.ejrow+.ejrow{border-top:1px dashed var(--line);padding-top:7px}
+.ejn{font-size:14.5px}
+.ejsr{font-size:18px;font-weight:600;margin-top:1px;font-family:var(--disp)}
+.ejm{font-size:12.5px;color:var(--ink-2);margin-top:1px}
+.ejult{font-size:12px;color:var(--ok);margin-top:3px;font-weight:560}
+.semnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 10px}
+.semnav button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);font-size:22px;text-align:center;background:var(--surface)}
+.semnav button:disabled{opacity:.3}
+.semnav div{text-align:center}.semnav b{display:block;font-family:var(--disp);font-size:18px}
+.semnav span{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}
+.kpis div{background:var(--surface-2);border-radius:var(--r-s);padding:7px 8px}
+.kpis span{display:block;font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.kpis b{font-family:var(--mono);font-size:15px}
+.progreso{height:5px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden}
+.progreso i{display:block;height:100%;background:var(--ok)}
+.mapa{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mapa .m{border-radius:var(--r-s);padding:7px 2px;text-align:center;border:1px solid transparent;color:inherit;text-decoration:none}
+.mapa .m b{display:block;font-family:var(--disp);font-size:12px}
+.mapa .m span{display:block;font-size:9.5px;font-weight:600;letter-spacing:.02em}
+.mapa .m em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--ink-2);margin-top:1px}
+.mapa .m.hoy{border-color:var(--ink)}
+.alta{background:var(--alta)}.media{background:var(--media)}.baja{background:var(--baja)}.libre{background:var(--libre)}
+.leyenda{font-size:11.5px;color:var(--ink-3);margin:6px 2px 12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.leyenda i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:-6px}
+.dia-blk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px 4px;margin-bottom:8px;scroll-margin-top:10px}
+.dia-blk.hoy{border-color:var(--ink)}
+.dia-t{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.dia-t b{font-family:var(--disp);font-size:16px}
+.dia-t b::first-letter{text-transform:uppercase}
+.dia-t span{font-size:12.5px;color:var(--ink-3)}
+.dia-t .carga{margin-left:auto;font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);padding:2px 7px;border-radius:9px}
+.dia-blk .libre{background:none;font-size:13px;color:var(--ink-3);margin:6px 0 8px}
+.buscar{position:sticky;top:0;z-index:2;background:var(--bg);padding:2px 0 10px}
+.glist{margin-top:4px}
+.gitem{display:block;width:100%;padding:10px 0;border-bottom:1px solid var(--line)}
+.gitem:last-child{border-bottom:0}
+.gitem b{display:block;font-size:14.5px}
+.gitem span{display:block;font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.glarga{font-size:15px;color:var(--ink-2);margin:8px 0 0;line-height:1.5}
+.pasos{margin:6px 0 0;padding-left:20px;font-size:14px}.pasos li{margin:5px 0}
+a.btn{text-decoration:none;color:inherit}
+.menu{display:block;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:15px;margin-bottom:9px}
+.menu b{display:block;font-family:var(--disp);font-size:17px;text-transform:uppercase;letter-spacing:.04em}
+.menu span{display:block;font-size:13px;color:var(--ink-2);margin-top:3px}
+.volver{font-size:14px;color:var(--accent);font-weight:600;padding:4px 2px 10px}
+#shGuia{z-index:70}
+.ejreg{border-bottom:1px solid var(--line);padding:9px 0}
+.ejreg .g3{margin-top:6px}
+.ejreg small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
@@ -242,7 +303,10 @@ select.in{-webkit-appearance:none;appearance:none;
   </div>
 
   <div class="vista" id="v-hoy"></div>
+  <div class="vista off" id="v-semana"></div>
   <div class="vista off" id="v-plan"></div>
+  <div class="vista off" id="v-guia"></div>
+  <div class="vista off" id="v-mas"></div>
   <div class="vista off" id="v-ritmos"></div>
   <div class="vista off" id="v-importar"></div>
   <div class="vista off" id="v-ajustes"></div>
@@ -250,14 +314,14 @@ select.in{-webkit-appearance:none;appearance:none;
   <nav class="tabs">
     <button class="on" data-v="hoy">
       <svg viewBox="0 0 24 24"><path d="M12 3v3M5 8l2 2M19 8l-2 2M12 21a7 7 0 100-14 7 7 0 000 14zM12 13v-2"/></svg>Hoy</button>
+    <button data-v="semana">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2"/></svg>Semana</button>
     <button data-v="plan">
       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Plan</button>
-    <button data-v="ritmos">
-      <svg viewBox="0 0 24 24"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-4"/></svg>Ritmos</button>
-    <button data-v="importar">
-      <svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>Importar</button>
-    <button data-v="ajustes">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1A1.6 1.6 0 008 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1A1.6 1.6 0 003.6 9a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H8a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>Ajustes</button>
+    <button data-v="guia">
+      <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 5v16M8 7h7M8 11h5"/></svg>Guía</button>
+    <button data-v="mas">
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Más</button>
   </nav>
 </div>
 
@@ -305,6 +369,17 @@ select.in{-webkit-appearance:none;appearance:none;
     <button id="btnConfirmar">Importar</button>
   </div>
   <div class="sheet-body" id="cuerpoInforme"></div>
+</div>
+
+<!-- guía de un ejercicio o término -->
+<div class="sheet" id="shGuia">
+  <div class="grab"></div>
+  <div class="sheet-head">
+    <button class="plain" id="btnCerrarGuia">Cerrar</button>
+    <h3 id="tituloGuia">Guía</h3>
+    <span style="width:44px"></span>
+  </div>
+  <div class="sheet-body" id="cuerpoGuia"></div>
 </div>
 
 <input type="file" id="fileJson" accept=".json,application/json,text/plain" class="oculto">
@@ -778,19 +853,19 @@ function zonaTecnica(g) {
 function duracionTecnica(g) {
   if (g && g.duracion_min != null) return g.duracion_min;
   const d = String((g && g.descripcion) || '');
+  // minutos escritos explícitamente ("drills 5 min", "8'"): se suman siempre
+  let explicitos = 0;
+  for (const x of d.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:min\b|minutos|')/gi)) explicitos += +x[1].replace(',', '.');
   const m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*(s|seg|segundos|m|mts|metros)\b/i);
-  if (!m) {
-    // "drills 10 min", "8'": una duración suelta en el texto
-    const solo = d.match(/(\d+(?:[.,]\d+)?)\s*(?:min\b|minutos|')/i);
-    return solo ? +solo[1].replace(',', '.') : 3;
-  }
+  if (!m) return explicitos || 3;
   const n = Math.min(60, +m[1]);
   const unidad = m[3].toLowerCase();
   // un tramo en metros se estima a unos 3:30 el kilómetro
   const trabajo = unidad[0] === 's' ? +m[2] : +m[2] * 0.21;
   const rec = d.match(/(\d+)\s*(?:s|seg|segundos)\s*(?:de\s*)?(?:trote|recuperaci|caminando|pausa|descanso)/i);
   const pausa = rec ? +rec[1] : (unidad[0] === 's' ? 40 : 45);
-  return Math.round((n * trabajo + Math.max(0, n - 1) * pausa) / 60 * 10) / 10;
+  const series = (n * trabajo + Math.max(0, n - 1) * pausa) / 60;
+  return Math.round((explicitos + series) * 10) / 10;
 }
 
 /* ============================================================
@@ -1029,6 +1104,268 @@ function textoSegmento(g, zonas, recargo) {
 }
 
 /* ============================================================
+   Guía de ejercicios y términos
+   Las sesiones de fuerza y Hyrox llegan como texto ("Sentadilla · 3 × 5 @ RIR 3 · 80 kg").
+   La app reconoce los ejercicios para explicarlos y los desarma en series, reps,
+   carga y pausa para mostrarlos y registrarlos. No cambia el formato UTP/1.
+   ============================================================ */
+const EJ_CAT = { fuerza: 'Fuerza', hyrox: 'Estaciones de Hyrox', core: 'Core', carrera: 'Técnica de carrera', movilidad: 'Movilidad' };
+// orden importa: los nombres más específicos van antes que los genéricos
+const EJERCICIOS = [
+  { k: 'peso_muerto_rumano', n: 'Peso muerto rumano', a: /peso muerto rumano|\bpmr\b|\brdl\b/i, c: 'fuerza',
+    q: 'Bisagra de cadera con piernas casi estiradas: la barra baja pegada a los muslos hasta media tibia y vuelve.',
+    p: ['Rodillas apenas flexionadas y fijas durante todo el recorrido.', 'Lleva la cadera hacia atrás, como cerrando una puerta con los glúteos; la espalda queda neutra.', 'Baja hasta sentir el estiramiento de los isquios y sube apretando glúteos.'],
+    e: 'Redondear la espalda o convertirlo en sentadilla doblando las rodillas.', m: 'Isquiotibiales, glúteos, espalda baja' },
+  { k: 'peso_muerto', n: 'Peso muerto', a: /peso muerto(?! rumano)|deadlift|trap bar/i, c: 'fuerza',
+    q: 'Levantar la barra desde el piso hasta quedar de pie, con la espalda neutra.',
+    p: ['Barra sobre la mitad del pie, agarre justo por fuera de las piernas.', 'Pecho arriba y espalda firme antes de despegar; empuja el piso con las piernas.', 'La barra sube rozando las piernas; termina con la cadera extendida, sin hiperextender.'],
+    e: 'Despegar con la espalda redondeada o alejar la barra del cuerpo.', m: 'Glúteos, isquios, espalda, cuádriceps' },
+  { k: 'sentadilla_goblet', n: 'Sentadilla goblet', a: /sentadilla goblet|goblet/i, c: 'fuerza',
+    q: 'Sentadilla sosteniendo una mancuerna o kettlebell contra el pecho. Ideal para entrar en calor y aprender el gesto.',
+    p: ['Pesa pegada al pecho, codos hacia abajo.', 'Baja entre las piernas con el torso erguido.', 'Sube empujando con todo el pie.'],
+    e: 'Dejar caer el pecho hacia adelante.', m: 'Cuádriceps, glúteos, core' },
+  { k: 'bulgara', n: 'Sentadilla búlgara', a: /zancada b[uú]lgara|b[uú]lgara|bulgarian|split squat/i, c: 'fuerza',
+    q: 'Sentadilla a una pierna con el pie de atrás apoyado en un banco.',
+    p: ['Pie delantero lo bastante adelante para que la rodilla no se vaya mucho más allá de la punta.', 'Baja vertical hasta que la rodilla de atrás casi toque el piso.', 'Sube empujando con el talón de adelante; todas las reps de una pierna y después la otra.'],
+    e: 'Empujar con la pierna de atrás o perder el equilibrio por un apoyo muy angosto.', m: 'Cuádriceps, glúteos, estabilidad de cadera' },
+  { k: 'sentadilla', n: 'Sentadilla trasera', a: /sentadilla(?! goblet| b[uú]lgara)|back squat|\bsquat\b/i, c: 'fuerza',
+    q: 'Flexionar cadera y rodillas con la barra sobre la espalda alta y volver a subir.',
+    p: ['Pies al ancho de hombros, puntas un poco hacia afuera.', 'Pecho arriba y abdomen firme; baja hasta que la cadera quede a la altura de la rodilla o un poco más abajo.', 'Rodillas en la línea de los pies; sube empujando el piso con todo el pie.'],
+    e: 'Rodillas hacia adentro, talones que se levantan o rebotar abajo.', m: 'Cuádriceps, glúteos, aductores, core' },
+  { k: 'hip_thrust', n: 'Hip thrust', a: /hip thrust/i, c: 'fuerza',
+    q: 'Empuje de cadera con la espalda alta apoyada en un banco y la barra sobre la cadera.',
+    p: ['Escápulas sobre el banco, pies apoyados a la altura de las rodillas.', 'Sube la cadera hasta alinear rodillas, cadera y hombros.', 'Aprieta glúteos arriba un segundo; baja controlado.'],
+    e: 'Arquear la espalda baja en lugar de extender la cadera.', m: 'Glúteos, isquios' },
+  { k: 'floor_press', n: 'Floor press', a: /floor press/i, c: 'fuerza',
+    q: 'Press de pecho acostado en el piso: el codo toca el suelo y frena el recorrido.',
+    p: ['Acostado, rodillas flexionadas, mancuernas sobre el pecho.', 'Baja hasta que el tríceps apoye en el piso, sin rebotar.', 'Empuja hasta estirar los brazos; codos a unos 45° del cuerpo.'],
+    e: 'Dejar caer los codos de golpe o abrirlos a 90°.', m: 'Pectorales, tríceps, hombros' },
+  { k: 'press_banca', n: 'Press de banca', a: /press de banca|press banca|bench press/i, c: 'fuerza',
+    q: 'Empujar la barra o las mancuernas desde el pecho, acostado en un banco.',
+    p: ['Escápulas juntas y pies firmes en el piso.', 'Baja controlado hasta rozar el pecho.', 'Empuja hacia arriba y un poco hacia atrás.'],
+    e: 'Despegar la cadera del banco.', m: 'Pectorales, tríceps, hombros' },
+  { k: 'push_press', n: 'Push press', a: /push press/i, c: 'fuerza',
+    q: 'Press sobre la cabeza ayudado por un pequeño impulso de piernas. Transfiere a las wall balls.',
+    p: ['Barra o mancuernas en los hombros.', 'Flexiona levemente las rodillas y extiéndelas rápido.', 'Usa ese impulso para llevar el peso arriba con los brazos estirados.'],
+    e: 'Hacer una sentadilla profunda o arquear la espalda arriba.', m: 'Hombros, tríceps, piernas' },
+  { k: 'jalon', n: 'Jalón al pecho', a: /jal[oó]n|lat pulldown/i, c: 'fuerza',
+    q: 'Tirar de la barra de la polea alta hacia el pecho, sentado.',
+    p: ['Muslos trabados bajo los apoyos, pecho arriba.', 'Lleva los codos hacia abajo y atrás hasta que la barra llegue a la clavícula.', 'Vuelve controlado hasta estirar los brazos.'],
+    e: 'Tirar con impulso del torso o llevar la barra detrás de la nuca.', m: 'Dorsales, bíceps, espalda media' },
+  { k: 'remo_polea', n: 'Remo en polea', a: /remo (?:en )?polea|remo sentado/i, c: 'fuerza',
+    q: 'Tirar del agarre de la polea baja hacia el abdomen, sentado y con el torso quieto.',
+    p: ['Espalda recta, leve flexión de rodillas.', 'Lleva los codos hacia atrás pegados al cuerpo y junta las escápulas.', 'Vuelve sin redondear la espalda.'],
+    e: 'Balancear el torso hacia atrás para mover más peso.', m: 'Espalda media, dorsales, bíceps' },
+  { k: 'remo_barra', n: 'Remo con barra', a: /remo con barra/i, c: 'fuerza',
+    q: 'Inclinado hacia adelante con la espalda neutra, tirar de la barra hacia el abdomen.',
+    p: ['Bisagra de cadera a unos 45°, rodillas suaves.', 'Lleva la barra al ombligo con los codos hacia atrás.', 'Baja controlado sin perder la posición.'],
+    e: 'Erguirse en cada repetición.', m: 'Espalda, dorsales, bíceps' },
+  { k: 'remo_mancuerna', n: 'Remo con mancuerna', a: /remo (?:con )?mancuerna/i, c: 'fuerza',
+    q: 'Remo a un brazo con la otra mano y rodilla apoyadas en un banco.',
+    p: ['Espalda paralela al piso.', 'Lleva la mancuerna hacia la cadera, codo pegado.', 'Baja hasta estirar el brazo.'],
+    e: 'Girar el torso para subir el peso.', m: 'Dorsal, espalda media, bíceps' },
+  { k: 'dominadas', n: 'Dominadas', a: /dominadas?|pull-?ups?/i, c: 'fuerza',
+    q: 'Colgado de una barra, subir hasta pasar el mentón por encima.',
+    p: ['Agarre algo más ancho que los hombros.', 'Empieza bajando las escápulas y después tira con los codos hacia abajo.', 'Baja hasta estirar los brazos.'],
+    e: 'Balancearse o hacer medio recorrido.', m: 'Dorsales, bíceps, agarre' },
+  { k: 'elevaciones_laterales', n: 'Elevaciones laterales', a: /elevaciones laterales/i, c: 'fuerza',
+    q: 'Subir mancuernas por los costados hasta la altura de los hombros.',
+    p: ['Codos apenas flexionados.', 'Sube hasta la línea de los hombros, sin encogerlos.', 'Baja lento.'],
+    e: 'Usar impulso o subir por encima de los hombros.', m: 'Deltoides' },
+  { k: 'curl_martillo', n: 'Curl martillo', a: /curl martillo|hammer curl/i, c: 'fuerza',
+    q: 'Flexión de codo con las palmas mirándose entre sí.',
+    p: ['Codos pegados al cuerpo.', 'Sube sin balancear el torso.', 'Baja controlado.'],
+    e: 'Mover los codos hacia adelante.', m: 'Bíceps, braquial, antebrazo' },
+  { k: 'gemelo_sentado', n: 'Gemelo sentado (sóleo)', a: /gemelo sentado|s[oó]leo/i, c: 'fuerza',
+    q: 'Elevación de talones sentado con peso sobre las rodillas. Fortalece el sóleo, el músculo que más trabaja al correr.',
+    p: ['Antepié sobre un escalón, peso sobre los muslos.', 'Baja el talón lo más que puedas.', 'Sube hasta la punta y aguanta un segundo arriba.'],
+    e: 'Rebotar abajo o hacer medio recorrido.', m: 'Sóleo, tendón de Aquiles' },
+  { k: 'gemelo_pie', n: 'Elevación de talones de pie', a: /gemelos? de pie|elevaci[oó]n de tal[oó]n(?:es)?|calf raise/i, c: 'fuerza',
+    q: 'Subir en puntas de pie con la rodilla estirada, a dos piernas o a una.',
+    p: ['Antepié en un escalón, rodilla extendida.', 'Baja lento hasta estirar la pantorrilla.', 'Sube hasta la punta sin doblar la rodilla.'],
+    e: 'Ir rápido y con rebote.', m: 'Gemelos, tendón de Aquiles' },
+  { k: 'puente_gluteo', n: 'Puente de glúteo', a: /puente de gl[uú]teo|glute bridge/i, c: 'fuerza',
+    q: 'Acostado boca arriba, subir la cadera apretando glúteos. A una pierna es más exigente.',
+    p: ['Talones cerca de la cadera.', 'Sube hasta alinear rodilla, cadera y hombro.', 'Aguanta un segundo y baja.'],
+    e: 'Arquear la zona lumbar.', m: 'Glúteos, isquios' },
+  { k: 'copenhagen', n: 'Plancha Copenhagen', a: /copenhagen/i, c: 'fuerza',
+    q: 'Plancha lateral con la pierna de arriba apoyada en un banco: fortalece los aductores.',
+    p: ['Antebrazo en el piso, pierna de arriba sobre el banco (rodilla o tobillo).', 'Levanta la cadera hasta alinear el cuerpo.', 'Aguanta el tiempo indicado; empieza apoyando la rodilla si cuesta.'],
+    e: 'Dejar caer la cadera.', m: 'Aductores, core lateral' },
+  { k: 'saltos_cajon', n: 'Salto al cajón', a: /saltos? al caj[oó]n|box jumps?/i, c: 'fuerza',
+    q: 'Saltar con los dos pies a un cajón y caer suave. Trabaja potencia.',
+    p: ['Contramovimiento con los brazos.', 'Cae en el cajón con las rodillas flexionadas y en silencio.', 'Baja caminando, no saltando.'],
+    e: 'Usar un cajón demasiado alto y caer en sentadilla profunda.', m: 'Potencia de piernas' },
+  { k: 'nordico', n: 'Curl nórdico', a: /n[oó]rdico/i, c: 'fuerza',
+    q: 'De rodillas con los tobillos sujetos, bajar el torso hacia adelante frenando con los isquios.',
+    p: ['Cuerpo recto de rodillas a cabeza.', 'Baja lo más lento posible.', 'Ayúdate con las manos para volver.'],
+    e: 'Doblar la cadera.', m: 'Isquiotibiales (prevención de lesiones)' },
+  // ---- Hyrox
+  { k: 'skierg', n: 'SkiErg', a: /ski ?erg|\bski\b/i, c: 'hyrox',
+    q: 'Ergómetro que imita el empuje de bastones del esquí de fondo. Primera estación del formato estándar.',
+    p: ['Brazos arriba, tira hacia abajo con todo el cuerpo: bisagra de cadera y brazos al mismo tiempo.', 'Termina con las manos junto a los muslos; vuelve estirándote.', 'Damper 5–7; mira el ritmo por 500 m en la pantalla.'],
+    e: 'Tirar solo con los brazos o salir demasiado rápido.', m: 'Dorsales, tríceps, core, cadera' },
+  { k: 'rowerg', n: 'Remo (RowErg)', a: /row ?erg|remo 1000|remoerg|rowing/i, c: 'hyrox',
+    q: 'Remo en máquina. Orden de la palada: piernas, tronco, brazos; al volver, al revés.',
+    p: ['Empuja primero con las piernas; los brazos esperan estirados.', 'Cuando las piernas terminan, lleva el torso un poco atrás y el mango al esternón.', '26–30 paladas por minuto; mira el ritmo por 500 m.'],
+    e: 'Tirar con los brazos antes de empujar con las piernas.', m: 'Piernas, espalda, brazos' },
+  { k: 'sled_push', n: 'Sled push (empuje de trineo)', a: /sled push|empuje de trineo/i, c: 'hyrox',
+    q: 'Empujar un trineo cargado por tramos de 12,5 m.',
+    p: ['Brazos flexionados o cortos, cuerpo inclinado a unos 45°.', 'Pasos cortos y rápidos empujando con la punta del pie.', 'Mirada al piso; si se frena, no pares: arrancar de nuevo cuesta el doble.'],
+    e: 'Brazos estirados y cadera alta: se pierde fuerza.', m: 'Cuádriceps, glúteos, gemelos' },
+  { k: 'sled_pull', n: 'Sled pull (arrastre de trineo)', a: /sled pull|arrastre/i, c: 'hyrox',
+    q: 'Arrastrar el trineo hacia ti tirando de una cuerda, mano sobre mano.',
+    p: ['Pies firmes, sentado hacia atrás como en una sentadilla.', 'Tira mano sobre mano con todo el cuerpo, no solo con los brazos.', 'Retrocede dentro del área cuando se acumule cuerda y ordénala.'],
+    e: 'Tirar de pie y erguido, solo con los brazos.', m: 'Espalda, bíceps, agarre, piernas' },
+  { k: 'bbj', n: 'Burpee broad jump', a: /burpee broad jump|\bbbj\b/i, c: 'hyrox',
+    q: 'Burpee con el pecho al piso seguido de un salto horizontal hacia adelante.',
+    p: ['Pecho y cadera tocan el piso.', 'Sube y salta hacia adelante con los dos pies; caída suave.', 'Ritmo constante desde el primero; salto corto y eficiente.'],
+    e: 'Saltos largos al principio que te funden para el resto.', m: 'Todo el cuerpo' },
+  { k: 'farmers', n: 'Farmers carry', a: /farmers?(?: carry| hold)?/i, c: 'hyrox',
+    q: 'Caminar (o sostener) con una pesa pesada en cada mano.',
+    p: ['Hombros abajo y atrás, core firme.', 'Pasos cortos y rápidos.', 'Si el agarre falla, suelta antes del fallo total y retoma en 3 s.'],
+    e: 'Encorvarse o dar pasos largos que balancean las pesas.', m: 'Agarre, trapecios, core' },
+  { k: 'lunges', n: 'Sandbag lunges (estocadas)', a: /sandbag lunges|lunges|estocadas?|zancadas?(?! b[uú]lgara)/i, c: 'hyrox',
+    q: 'Estocadas caminando con una bolsa de arena sobre los hombros.',
+    p: ['Bolsa apoyada sobre los hombros, torso erguido.', 'La rodilla de atrás toca el piso en cada paso.', 'Paso medio y ritmo constante; pausas cortas planificadas mejor que paradas largas.'],
+    e: 'Pasos muy largos o no tocar el piso con la rodilla.', m: 'Cuádriceps, glúteos' },
+  { k: 'wall_balls', n: 'Wall balls', a: /wall ?balls?/i, c: 'hyrox',
+    q: 'Sentadilla con balón medicinal y lanzamiento a un objetivo en la pared.',
+    p: ['Balón en el pecho, baja a sentadilla completa.', 'Sube explosivo y usa ese impulso para lanzar al objetivo.', 'Recibe el balón alto y baja directo a la siguiente; series fijas con pausas cortas.'],
+    e: 'Sentadilla incompleta (no cuenta) o ir al fallo en la primera serie.', m: 'Piernas, hombros' },
+  { k: 'devil_press', n: 'Devil press', a: /devil press/i, c: 'hyrox',
+    q: 'Burpee con dos mancuernas que termina llevándolas sobre la cabeza en un solo movimiento.',
+    p: ['Pecho al piso entre las mancuernas.', 'Sube a bisagra de cadera y balancea las mancuernas entre las piernas.', 'Llévalas arriba con un movimiento continuo de cadera.'],
+    e: 'Tirar con la espalda redondeada.', m: 'Todo el cuerpo' },
+  // ---- Core
+  { k: 'pallof', n: 'Pallof press', a: /pallof/i, c: 'core',
+    q: 'Con una banda o polea lateral, estirar los brazos al frente sin dejar que el torso gire.',
+    p: ['De costado a la polea, pies al ancho de hombros.', 'Lleva el agarre al pecho y empuja al frente.', 'Aguanta 1–2 s resistiendo el giro y vuelve.'],
+    e: 'Dejar que el tronco rote.', m: 'Core anti-rotación' },
+  { k: 'dead_bug', n: 'Dead bug', a: /dead ?bug/i, c: 'core',
+    q: 'Boca arriba con brazos y piernas arriba, estirar brazo y pierna opuestos sin despegar la espalda baja.',
+    p: ['Espalda baja pegada al piso todo el tiempo.', 'Estira brazo y pierna contrarios lentamente.', 'Exhala al estirar; vuelve y cambia de lado.'],
+    e: 'Arquear la zona lumbar.', m: 'Core profundo' },
+  { k: 'plancha_lateral', n: 'Plancha lateral', a: /plancha lateral|side plank/i, c: 'core',
+    q: 'Sobre un antebrazo y el costado de los pies, cuerpo recto de lado.',
+    p: ['Codo bajo el hombro.', 'Cadera arriba, cuerpo en línea.', 'Aguanta el tiempo indicado por lado.'],
+    e: 'Dejar caer la cadera.', m: 'Oblicuos, glúteo medio' },
+  { k: 'plancha', n: 'Plancha', a: /plancha(?! lateral| copenhagen)|\bplank\b/i, c: 'core',
+    q: 'Apoyo sobre antebrazos y puntas de pie con el cuerpo recto.',
+    p: ['Codos bajo los hombros.', 'Aprieta glúteos y abdomen; cuerpo en línea.', 'Respira normal durante todo el tiempo.'],
+    e: 'Cadera caída o demasiado alta.', m: 'Core' },
+  { k: 'bird_dog', n: 'Bird dog', a: /bird ?dog/i, c: 'core',
+    q: 'En cuadrupedia, estirar brazo y pierna opuestos manteniendo la espalda quieta.',
+    p: ['Manos bajo hombros, rodillas bajo cadera.', 'Estira brazo y pierna contrarios hasta la horizontal.', 'Aguanta un segundo sin rotar la cadera.'],
+    e: 'Arquear la espalda o subir la pierna de más.', m: 'Core, glúteos, espalda' },
+  { k: 'russian_twist', n: 'Russian twist', a: /russian twist/i, c: 'core',
+    q: 'Sentado con el torso inclinado, girar de lado a lado.',
+    p: ['Pies apoyados o elevados.', 'Gira desde el torso, no solo los brazos.', 'Control antes que velocidad.'],
+    e: 'Redondear la espalda.', m: 'Oblicuos' },
+  { k: 'mountain_climbers', n: 'Mountain climbers', a: /mountain climbers?/i, c: 'core',
+    q: 'En posición de plancha alta, llevar rodillas al pecho alternando rápido.',
+    p: ['Manos bajo los hombros.', 'Cadera baja y quieta.', 'Ritmo constante.'],
+    e: 'Subir la cadera.', m: 'Core, cadera, cardio' },
+  // ---- Carrera
+  { k: 'progresivos', n: 'Progresivos (strides)', a: /progresivos?|strides?/i, c: 'carrera',
+    q: 'Aceleraciones cortas de 15–20 s hasta casi la velocidad máxima, relajadas, con trote de recuperación.',
+    p: ['Empieza trotando y acelera de forma gradual.', 'Los últimos 5 s cerca de tu velocidad de 1500 m, pero sueltos.', 'Recupera trotando o caminando hasta respirar normal.'],
+    e: 'Convertirlos en sprints tensos o acortar la recuperación.', m: 'Mecánica y economía de carrera' },
+  { k: 'drills', n: 'Drills de técnica', a: /drills?|skipping|t[eé]cnica de carrera/i, c: 'carrera',
+    q: 'Ejercicios de técnica de carrera: skipping, talones a los glúteos, rodillas arriba, zancadas exageradas.',
+    p: ['20–30 m de cada ejercicio, volviendo al trote.', 'Contacto rápido con el piso, postura alta.', 'Calidad antes que velocidad.'],
+    e: 'Hacerlos con fatiga o de forma descuidada.', m: 'Coordinación, pies, tobillos' },
+  { k: 'movilidad', n: 'Movilidad', a: /movilidad/i, c: 'movilidad',
+    q: 'Movimientos controlados para ganar rango en cadera, tobillo y espalda.',
+    p: ['Movimientos lentos y sin dolor.', 'Cadera: balanceos de pierna y rotaciones. Tobillo: rodilla a la pared.', 'Columna: gato-vaca y rotaciones torácicas.'],
+    e: 'Forzar estiramientos en frío.', m: 'Articulaciones' },
+];
+const EJ_POR_K = Object.fromEntries(EJERCICIOS.map(x => [x.k, x]));
+
+const TERMINOS = [
+  { k: 'rir', n: 'RIR (repeticiones en reserva)', q: 'Cuántas repeticiones más podrías haber hecho con buena técnica al terminar la serie. "@ RIR 2" significa parar cuando quedan 2. RIR 0 es al fallo.' },
+  { k: 'rpe', n: 'RPE (esfuerzo percibido)', q: 'Qué tan duro se sintió, de 1 (nada) a 10 (máximo). Un rodaje suave es 3–4; un umbral 6–7; una carrera 9–10.' },
+  { k: 'zonas', n: 'Zonas E · M · T · I · R', q: 'E suave (conversación), M maratón, T umbral (cómodamente duro), I intervalos (duro, 3–5 min), R repeticiones (rápido y suelto). La app calcula tus ritmos de cada zona desde tu marca de referencia.' },
+  { k: 'carrera_zona', n: 'Ritmo de carrera', q: 'El ritmo meta del objetivo del plan (por ejemplo, el de tu 10K). Sale de la meta de tiempo, no de tu forma actual.' },
+  { k: 'vdot', n: 'VDOT', q: 'Índice de forma de Jack Daniels calculado a partir de una carrera o test. Define todas las zonas de ritmo. Se actualiza con cada marca nueva.' },
+  { k: 'superserie', n: 'Superserie', q: 'Dos ejercicios alternados sin descanso entre ellos; la pausa va al final de cada ronda. Ahorra tiempo sin perder calidad.' },
+  { k: 'pausa', n: 'Pausa', q: 'Descanso entre series. "Pausa 2:30" son dos minutos y medio. En fuerza pesada, respetarla es parte del estímulo.' },
+  { k: 'tempo', n: 'Tempo de ejecución', q: '"Bajada en 2 s" indica cuánto tiempo dura la fase de bajada. Controlar la bajada mejora técnica y fuerza.' },
+  { k: 'aproximacion', n: 'Series de aproximación', q: 'Series livianas con carga creciente antes de las series de trabajo. Preparan el cuerpo sin cansarlo.' },
+  { k: 'clave', n: 'Sesión clave', q: 'Las sesiones que más importan en la semana. Si hay que mover algo, se mueve otra; las claves nunca van en días seguidos.' },
+  { k: 'descarga', n: 'Semana de descarga', q: 'Semana con menos volumen para absorber el trabajo acumulado. La mejora ocurre cuando el cuerpo se recupera.' },
+  { k: 'afinamiento', n: 'Afinamiento', q: 'Las últimas 1–3 semanas antes de una carrera: baja el volumen y se mantiene la intensidad para llegar fresco.' },
+  { k: 'comprometida', n: 'Carrera comprometida', q: 'Correr justo después de una estación de Hyrox, con las piernas cargadas. Se entrena repitiendo la transición.' },
+  { k: 'roxzone', n: 'Roxzone', q: 'La zona de transición de Hyrox entre la carrera y cada estación. Se camina rápido, nunca se para.' },
+  { k: 'techo_fc', n: 'Techo de FC', q: 'Frecuencia cardíaca que no conviene superar en un rodaje suave. Si la pasas, baja el ritmo aunque quede lento.' },
+  { k: 'damper', n: 'Damper', q: 'La palanca de resistencia del SkiErg y el RowErg (1 a 10). Más alto no es mejor: 5–7 es lo habitual.' },
+];
+
+function _re(rx) { return new RegExp(rx.source, rx.flags.includes('g') ? rx.flags : rx.flags + 'g'); }
+/* Ejercicios mencionados en un texto, en orden de aparición y sin solapamientos. */
+function detectarEjercicios(texto) {
+  const t = String(texto || '');
+  const hall = [];
+  EJERCICIOS.forEach((x, prio) => { for (const m of t.matchAll(_re(x.a))) hall.push({ i: m.index, f: m.index + m[0].length, k: x.k, prio, txt: m[0] }); });
+  hall.sort((a, b) => a.i - b.i || a.prio - b.prio || (b.f - b.i) - (a.f - a.i));
+  const out = []; let fin = -1;
+  for (const h of hall) if (h.i >= fin) { out.push(h); fin = h.f; }
+  return out;
+}
+
+/* "Sentadilla trasera · 3 × 5 @ RIR 3–4 · 75–80 kg · pausa 2:30 · bajada en 2 s"
+   → [{ nombre, k, series, reps, rir, carga, pausa, nota }]. Las superseries ("A ... + B ...") dan dos. */
+function parseEjercicios(desc) {
+  const d = String(desc || '').trim();
+  if (!d) return [];
+  const sinPrefijo = d.replace(/^superserie:\s*/i, '');
+  const pausaGlobal = (d.match(/·\s*(\d+\s*s|\d+:\d{2}|\d+\s*min)\s+entre rondas/i) || [])[1] || null;
+  const trozos = /^superserie/i.test(d) ? sinPrefijo.split(/\s\+\s(?=[a-záéíóúñ])/i) : [d];
+  const out = [];
+  for (const tr of trozos) {
+    // la primera "S × R" fuera de paréntesis: "(4 × 12,5 m)" es un desglose, no la prescripción
+    let sxr = null;
+    for (const m of tr.matchAll(/(\d+)\s*[x×]\s*(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+)?(?:\s*(?:s|m)\b)?)(\s*por (?:pierna|lado|mano))?/gi)) {
+      const previo = tr.slice(0, m.index);
+      if ((previo.match(/\(/g) || []).length <= (previo.match(/\)/g) || []).length) { sxr = m; break; }
+    }
+    if (!sxr) continue;
+    const antes = tr.slice(0, sxr.index).replace(/[·:]\s*$/, '').trim();
+    const nombre = antes.split('·')[0].trim() || (detectarEjercicios(tr)[0] || {}).txt || 'Ejercicio';
+    const resto = tr.slice(sxr.index + sxr[0].length);
+    const rir = (resto.match(/RIR\s*([\d–\-]+)/i) || [])[1] || null;
+    const carga = (resto.match(/(?:≈\s*)?[\d.,]+(?:\s*[–-]\s*[\d.,]+)?\s*(?:kg|lb)(?:\s*por (?:mano|lado))?(?:\s*\([^)]*\))?|≈?\s*\d+\s*%\s*(?:1RM|de tu 1RM)/i) || [])[0] || null;
+    const pausa = (resto.match(/pausa\s*([\d:]+\s*(?:s|min)?)/i) || [])[1] || pausaGlobal;
+    const partes = resto.split('·').map(x => x.trim()).filter(Boolean);
+    const nota = partes.filter(x => !/^@|RIR|^pausa|kg|lb|%|entre rondas/i.test(x)).join(' · ') || null;
+    const det = detectarEjercicios(nombre)[0] || detectarEjercicios(tr)[0];
+    out.push({ nombre: nombre.replace(/^\w/, c => c.toUpperCase()), k: det ? det.k : null, series: +sxr[1],
+      reps: (sxr[2] + (sxr[3] || '')).trim(), rir, carga: carga ? carga.trim() : null, pausa: pausa ? pausa.trim() : null, nota });
+  }
+  return out;
+}
+
+/* Una estación de Hyrox dentro de una sesión: un bloque sin distancia de carrera
+   que menciona una estación. No es "caminar" aunque el plan use esa zona para no inflar los km. */
+function esEstacion(g) {
+  if (!g || !['bloque', 'continuo'].includes(g.rol) || g.distancia_m != null) return false;
+  const det = detectarEjercicios(g.descripcion);
+  if (!det.length || EJ_POR_K[det[0].k].c !== 'hyrox') return false;
+  // con zona "caminar" es la convención de los planes híbridos; sin zona, solo si no es una
+  // prescripción de fuerza (series × reps), que se muestra como ejercicio
+  return g.zona === 'caminar' || (!g.zona && !parseEjercicios(g.descripcion).length);
+}
+
+/* Cuánto pesa cada día para el mapa de carga de la semana. */
+function cargaDia(sesiones) {
+  const ss = sesiones.filter(s => s.tipo !== 'descanso');
+  if (!ss.length) return 'libre';
+  if (ss.some(s => s.clave)) return 'alta';
+  if (ss.some(s => s.tipo === 'fuerza' && !/core|movilidad/i.test(s.titulo || ''))) return 'media';
+  return 'baja';
+}
+
+/* ============================================================
    Plan de ejemplo (referencia viva del estándar)
    ============================================================ */
 function planEjemplo(fechaCarrera) {
@@ -1208,7 +1545,7 @@ function filaSesion(s, w, opts = {}) {
   const bajo = s.tipo === 'descanso' ? 'Sin entrenamiento'
     : [m.km ? `${m.km} km` : null, m.min ? duracionTxt(m.min) : null, TIPOS[s.tipo].n].filter(Boolean).join(' · ');
   return `<button class="ses${r && r.hecho ? ' hecha' : ''}${esHoy && opts.marcarHoy ? ' hoy' : ''}" data-ses="${s.uid}">
-    <span class="fecha"><b>${d.getDate()}</b><span>${DIAS_MIN[(d.getDay() + 6) % 7]}</span></span>
+    ${opts.sinFecha ? '' : `<span class="fecha"><b>${d.getDate()}</b><span>${DIAS_MIN[(d.getDay() + 6) % 7]}</span></span>`}
     <span class="cuerpo"><span class="tit">${esc(tituloAuto(s, z))}</span><span class="bajo">${esc(bajo)}</span></span>
     ${s.tipo === 'descanso' ? '' : `<span class="viz">${perfilHTML(s, 'xs')}</span>`}
     ${opts.sinRegistro ? '' : `<span class="tick${r && r.hecho ? ' on' : ''}" data-tick="${s.uid}"></span>`}
@@ -1254,7 +1591,12 @@ function vistaHoy() {
   const delDia = todasSesiones(p).filter(x => x.s.fecha === hoyStr);
   const dentro = hoyStr >= p.inicio && hoyStr <= p.fin;
 
-  let html = '';
+  const semH = p.semanas.find(w => hoyStr >= w.inicio && hoyStr <= w.fin);
+  const actH = semH ? semH.sesiones.filter(s => s.tipo !== 'descanso') : [];
+  const hechH = actH.filter(s => { const r = regDe(s); return r && r.hecho; }).length;
+  const diaTxt = DIAS_LBL[(hoy().getDay() + 6) % 7];
+  let html = `<div class="hoy-top"><b>${diaTxt[0].toUpperCase() + diaTxt.slice(1)} ${fmtFecha(hoy())}</b>
+    ${semH ? `<button data-ir="semana">Semana ${semH.numero} · ${hechH}/${actH.length} ›</button>` : ''}</div>`;
   if (delDia.length) {
     delDia.forEach(({ s }) => { html += tarjetaHoy(s, z, rec); });
   } else if (dentro) {
@@ -1269,6 +1611,12 @@ function vistaHoy() {
       <p style="color:var(--ink-2);font-size:14px;margin-top:8px">${arranca
         ? `Empieza el ${fmtFecha(parseYMD(p.inicio))}.` : `Terminó el ${fmtFecha(parseYMD(p.fin))}. Importá el próximo ciclo cuando lo tengas.`}</p></div>`;
   }
+
+  // mañana
+  const manStr = ymd(addDays(hoy(), 1));
+  const manana = todasSesiones(p).filter(x => x.s.fecha === manStr && x.s.tipo !== 'descanso');
+  if (dentro || manana.length) html += `<div class="card tight"><span class="eyebrow">Mañana</span>
+    ${manana.length ? manana.map(x => filaSesion(x.s, x.w)).join('') : '<p>Descanso.</p>'}</div>`;
 
   // semana en curso
   const sem = p.semanas.find(w => hoyStr >= w.inicio && hoyStr <= w.fin) || p.semanas[0];
@@ -1286,8 +1634,8 @@ function vistaHoy() {
         ${ss.length && ss[0].tipo !== 'descanso' ? perfilHTML(ss[0], 'xs') : '<div class="perfil xs"></div>'}
         <div class="k">${mm ? mm.toFixed(0) : '–'}</div></div>`;
     }
-    html += `<div class="card tight">
-      <div class="spread"><span class="eyebrow">Semana ${sem.numero} de ${p.semanas.length}</span>
+    html += `<div class="card tight" data-ir="semana" style="cursor:pointer">
+      <div class="spread"><span class="eyebrow">Semana ${sem.numero} de ${p.semanas.length} · ver la semana ›</span>
         <span class="num" style="font-size:12px;color:var(--ink-2)">${m.km} km · ${m.sesiones} ses.</span></div>
       ${sem.foco ? `<p style="margin-top:5px;font-size:13.5px">${esc(sem.foco)}</p>` : ''}
       <div class="sem-strip">${strip}</div></div>`;
@@ -1323,10 +1671,13 @@ function tarjetaHoy(s, z, rec) {
       ${r && r.hecho ? '<span class="eyebrow" style="color:var(--ok)">Hecha</span>' : ''}</div>
     <h2>${esc(tituloAuto(s, z))}</h2>
     <div class="hoy-meta">${[m.km ? m.km + ' km' : null, m.min ? duracionTxt(m.min) : null].filter(Boolean).join(' · ')}</div>
-    ${rango ? `<div class="ritmo-grande"><b>${rango.replace('/km', '')}</b><em>${dom && ZONAS[dom] ? ZONAS[dom].nom : 'ritmo'} /km</em></div>
+    ${rango && !NO_CORRER.includes(s.tipo) ? `<div class="ritmo-grande"><b>${rango.replace('/km', '')}</b><em>${dom && ZONAS[dom] ? ZONAS[dom].nom : 'ritmo'} /km</em></div>
       ${ajustado ? `<div class="ritmo-sub">Sin ajuste: ${rangoBase}<span class="clima-flag">clima +${Math.round(recargoActual() * 100)}%</span></div>` : ''}` : ''}
-    <div style="margin:15px 0 3px">${perfilHTML(s, 'xl')}</div>
+    ${NO_CORRER.includes(s.tipo) ? '' : `<div style="margin:15px 0 3px">${perfilHTML(s, 'xl')}</div>`}
     ${s.proposito ? `<p style="font-size:14px;color:var(--ink-2);margin-top:13px">${esc(s.proposito)}</p>` : ''}
+    ${(s.segmentos || []).length ? `<div class="segs pasos-t"><span class="eyebrow">Paso a paso</span>
+      ${s.segmentos.map(g => segmentoHTML(g, z, rec, claveReg(plan(), s))).join('')}</div>` : ''}
+    ${s.sensacion ? `<p style="font-size:13.5px;color:var(--ink-2);margin-top:10px"><b style="color:var(--ink)">Cómo se tiene que sentir:</b> ${esc(s.sensacion)}</p>` : ''}
     <div class="btn-row"><button class="btn gh mini" data-ses="${s.uid}">Ver la sesión</button>
       <button class="btn pri mini" data-registrar="${s.uid}">${r && r.hecho ? 'Editar registro' : 'Registrar'}</button></div>
   </div>`;
@@ -1642,6 +1993,12 @@ function vistaAjustes() {
   </div>
 
   <div class="card">
+    <h3>Registro de fuerza</h3>
+    <p>Las cargas que anotás al registrar sesiones de fuerza (${historialFuerza().length} registros), en CSV: fecha, ejercicio, series, reps, carga y RIR. Sirve para seguir tu progreso o compartirlo con tu entrenador.</p>
+    <button class="btn gh" id="btnExpFuerza" ${historialFuerza().length ? '' : 'disabled'}>Exportar registro de fuerza (CSV)</button>
+  </div>
+
+  <div class="card">
     <h3>Copia de seguridad</h3>
     <p>Todo vive en este iPhone. Guardá una copia cada tanto: incluye planes, ritmos y registros.</p>
     <div class="btn-row">
@@ -1653,8 +2010,254 @@ function vistaAjustes() {
   <div class="card">
     <h3>Umbral</h3>
     <p>${instalada ? 'Instalada en la pantalla de inicio. Funciona sin conexión.' : 'Estás en Safari. Tocá Compartir y después Añadir a pantalla de inicio para instalarla.'}</p>
-    <p class="num" style="font-size:11.5px;margin-top:8px">Umbral 1.0 · formato UTP/1 · ${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'} · ${Object.keys(D.reg).length} registros</p>
+    <p class="num" style="font-size:11.5px;margin-top:8px">Umbral 2.0 · formato UTP/1 · ${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'} · ${Object.keys(D.reg).length} registros</p>
   </div>`;
+}
+
+/* ============================================================
+   GUÍA: ejercicios enlazados, historial de cargas
+   ============================================================ */
+/* Envuelve los ejercicios reconocidos de un texto en botones que abren la guía. */
+function enlazar(texto) {
+  const t = String(texto || '');
+  const det = detectarEjercicios(t);
+  if (!det.length) return esc(t);
+  let out = '', pos = 0;
+  for (const h of det) {
+    out += esc(t.slice(pos, h.i)) + `<button class="ej" data-ej="${h.k}">${esc(t.slice(h.i, h.f))}</button>`;
+    pos = h.f;
+  }
+  return out + esc(t.slice(pos));
+}
+
+/* Registros de fuerza de todos los planes, del más nuevo al más viejo. */
+function historialFuerza() {
+  const out = [];
+  for (const [clave, r] of Object.entries(D.reg)) {
+    for (const e of (r && r.ejercicios) || []) out.push({ ...e, fecha: r.fecha_sesion || r.fecha || '', clave });
+  }
+  return out.sort((a, b) => b.fecha.localeCompare(a.fecha));
+}
+const normNombre = n => sinAcentos(n).replace(/\s+/g, ' ').trim();
+function ultimaVez(ej, excluirClave) {
+  return historialFuerza().find(h => h.clave !== excluirClave &&
+    ((ej.k && h.k === ej.k) || normNombre(h.nombre) === normNombre(ej.nombre))) || null;
+}
+const txtUltima = u => u ? [u.carga_kg ? `${u.carga_kg} kg` : null, u.reps ? `× ${u.reps}` : null, u.rir !== '' && u.rir != null ? `RIR ${u.rir}` : null]
+  .filter(Boolean).join(' ') + (u.fecha ? ` · ${fmtCorta(parseYMD(u.fecha))}` : '') : '';
+
+/* Ejercicios de una sesión que vale la pena registrar (sin calentamiento), sin repetir. */
+function ejerciciosDeSesion(s) {
+  const vistos = new Set(), out = [];
+  for (const g of s.segmentos || []) {
+    if (g.rol === 'calentamiento' || esEstacion(g)) continue;
+    for (const e of parseEjercicios(g.descripcion)) {
+      const id = e.k || normNombre(e.nombre);
+      if (vistos.has(id)) continue;
+      vistos.add(id); out.push(e);
+    }
+  }
+  return out;
+}
+
+/* ============================================================
+   SEGMENTO: una fila de la estructura de la sesión (detalle y Hoy)
+   ============================================================ */
+const NOMBRE_ROL = { calentamiento: 'Calentamiento', vuelta_calma: 'Vuelta a la calma', tecnica: 'Técnica', recuperacion: 'Recuperación', bloque: 'Bloque', serie: 'Serie', continuo: 'Bloque principal' };
+function filaEjercicio(e, claveRegActual) {
+  const u = ultimaVez(e, claveRegActual);
+  const meta = [e.rir ? `RIR ${e.rir}` : null, e.carga, e.pausa ? `pausa ${e.pausa}` : null].filter(Boolean).join(' · ');
+  return `<div class="ejrow">
+    <div class="ejn">${e.k ? `<button class="ej" data-ej="${e.k}">${esc(e.nombre)}</button>` : `<b>${esc(e.nombre)}</b>`}</div>
+    <div class="ejsr num">${e.series} × ${esc(e.reps)}</div>
+    ${meta ? `<div class="ejm">${esc(meta)}</div>` : ''}
+    ${e.nota ? `<div class="ejm">${enlazar(e.nota)}</div>` : ''}
+    ${u ? `<div class="ejult">Última vez: ${esc(txtUltima(u))}</div>` : ''}
+  </div>`;
+}
+function segmentoHTML(g, z, rec, claveRegActual) {
+  const z1 = g.rol === 'serie' ? (g.trabajo && g.trabajo.zona) : (g.rol === 'tecnica' ? zonaTecnica(g) : g.zona);
+  let rol = NOMBRE_ROL[g.rol] || '';
+  let cuerpo, ritmo = '', color = colorZona(z1 || 'nulo');
+  if (g.rol === 'serie') {
+    cuerpo = `<b>${g.repeticiones || 1} × ${g.trabajo ? (g.trabajo.distancia_m != null ? (g.trabajo.distancia_m >= 1000 ? g.trabajo.distancia_m / 1000 + ' km' : g.trabajo.distancia_m + ' m') : duracionTxt(g.trabajo.duracion_min)) : ''}</b>`;
+    if (g.recuperacion) cuerpo += `<br><span class="sub">recuperá ${g.recuperacion.duracion_min != null ? duracionTxt(g.recuperacion.duracion_min) : (g.recuperacion.distancia_m + ' m')} ${ritmoRango(g.recuperacion.zona || 'trote', z, rec) || ''}</span>`;
+    ritmo = esc(g.trabajo && g.trabajo.ritmo ? g.trabajo.ritmo : (ritmoRango(z1, z, rec) || ''));
+  } else if (g.rol === 'tecnica') {
+    cuerpo = `<b>${enlazar(g.descripcion || 'Técnica')}</b>`;
+    const zt = zonaTecnica(g);
+    const r1 = g.zona || TEC_SUAVE.test(sinAcentos(g.descripcion)) || TEC_RAPIDA.test(sinAcentos(g.descripcion)) ? (ritmoRango(zt, z, rec) || '') : '';
+    ritmo = [duracionTecnica(g) ? `≈ ${duracionTxt(duracionTecnica(g))}` : '', esc(r1)].filter(Boolean).join('<br>');
+  } else if (esEstacion(g)) {
+    rol = 'Estación'; color = 'var(--estacion)';
+    cuerpo = `<b>${enlazar(g.descripcion || '')}</b>`;
+    ritmo = g.duracion_min != null ? `≈ ${duracionTxt(g.duracion_min)}` : '';
+  } else {
+    const ejs = g.rol !== 'calentamiento' ? parseEjercicios(g.descripcion) : [];
+    if (ejs.length) {
+      rol = ejs.length > 1 ? 'Superserie' : 'Ejercicio'; color = 'var(--fuerza)';
+      cuerpo = ejs.map(e => filaEjercicio(e, claveRegActual)).join('');
+      ritmo = g.duracion_min != null ? `≈ ${duracionTxt(g.duracion_min)}` : '';
+    } else {
+      const medida = g.distancia_m != null ? (g.distancia_m >= 1000 ? +(g.distancia_m / 1000).toFixed(2) + ' km' : g.distancia_m + ' m') : duracionTxt(g.duracion_min);
+      cuerpo = `<b>${medida}</b>`;
+      if (g.descripcion) cuerpo += `<br><span class="sub">${enlazar(g.descripcion)}</span>`;
+      ritmo = esc(g.ritmo || (ritmoRango(z1, z, rec) || ''));
+    }
+  }
+  return `<div class="seg" style="--z:${color}"><span class="marca"></span>
+    <span class="t"><span class="rol">${rol}</span>${cuerpo}</span><span class="r">${ritmo}</span></div>`;
+}
+
+/* ============================================================
+   VISTA SEMANA
+   ============================================================ */
+let semSel = null;   // número de semana elegido; null = la semana en curso
+function semanaActual(p) {
+  const h = ymd(hoy());
+  return p.semanas.find(w => h >= w.inicio && h <= w.fin) || (h < p.inicio ? p.semanas[0] : p.semanas[p.semanas.length - 1]);
+}
+const CARGA_TXT = { alta: 'Intenso', media: 'Fuerza', baja: 'Suave', libre: 'Libre' };
+function vistaSemana() {
+  const p = plan(); const c = $('v-semana');
+  if (!p || !p.semanas.length) { c.innerHTML = `<div class="vacio"><h3>Sin plan</h3><p>Importá un plan para ver tu semana.</p><button class="btn pri" data-ir="importar">Importar un plan</button></div>`; return; }
+  const actual = semanaActual(p);
+  const w = p.semanas.find(x => x.numero === semSel) || actual;
+  const z = zonasActuales();
+  const m = metricaSemana(w, z);
+  const f = faseDe(p, w.numero);
+  const fuerza = w.sesiones.filter(s => s.tipo === 'fuerza').reduce((a, s) => a + metricaSesion(s, z).min, 0);
+  const porDia = {};
+  w.sesiones.forEach(s => (porDia[s.fecha] ||= []).push(s));
+  const activas = w.sesiones.filter(s => s.tipo !== 'descanso');
+  const hechas = activas.filter(s => { const r = regDe(s); return r && r.hecho; }).length;
+  const intensos = Object.values(porDia).filter(ss => cargaDia(ss) === 'alta').length;
+  const idx = p.semanas.indexOf(w);
+  const hoyStr = ymd(hoy());
+  let mapa = '', dias = '';
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(parseYMD(w.inicio), i), k = ymd(d), ss = porDia[k] || [];
+    const nivel = cargaDia(ss);
+    const min = ss.reduce((a, s) => a + (s.tipo === 'descanso' ? 0 : metricaSesion(s, z).min), 0);
+    mapa += `<a class="m ${nivel}${k === hoyStr ? ' hoy' : ''}" href="#dia-${k}"><b>${DIAS_MIN[(d.getDay() + 6) % 7]}</b><span>${CARGA_TXT[nivel]}</span><em>${min ? duracionTxt(min) : '—'}</em></a>`;
+    dias += `<div class="dia-blk${k === hoyStr ? ' hoy' : ''}" id="dia-${k}">
+      <div class="dia-t"><b>${DIAS_LBL[(d.getDay() + 6) % 7]}</b> <span>${fmtFecha(d)}${k === hoyStr ? ' · hoy' : ''}</span>
+        <span class="carga ${nivel}">${CARGA_TXT[nivel]}</span></div>
+      ${ss.filter(s => s.tipo !== 'descanso').map(s => filaSesion(s, w, { sinFecha: true })).join('') || `<p class="libre">Sin entrenamiento: descanso.</p>`}
+    </div>`;
+  }
+  c.innerHTML = `
+    <div class="semnav">
+      <button data-semnav="${idx - 1}" ${idx === 0 ? 'disabled' : ''} aria-label="Semana anterior">‹</button>
+      <div><b>Semana ${w.numero} de ${p.semanas.length}</b><span>${fmtCorta(parseYMD(w.inicio))} – ${fmtCorta(parseYMD(w.fin))}${w === actual ? ' · en curso' : ''}</span></div>
+      <button data-semnav="${idx + 1}" ${idx === p.semanas.length - 1 ? 'disabled' : ''} aria-label="Semana siguiente">›</button>
+    </div>
+    <div class="card tight">
+      <div class="row" style="flex-wrap:wrap;gap:6px">${f ? `<span class="fase-tag" style="background:${COLOR_FASE[f.nombre] || '#8794A1'}">${esc(f.nombre)}</span>` : ''}
+        ${w.descarga ? '<span class="fase-tag" style="background:#93A7B8">descarga</span>' : ''}</div>
+      <p style="color:var(--ink);font-size:15px;margin-top:7px">${esc(w.foco || (f ? f.foco : '') || 'Semana ' + w.numero)}</p>
+      <div class="kpis">
+        <div><span>Carrera</span><b>${m.km} km</b></div>
+        <div><span>Tiempo total</span><b>${duracionTxt(m.min)}</b></div>
+        <div><span>Fuerza</span><b>${fuerza ? duracionTxt(fuerza) : '—'}</b></div>
+        <div><span>Días intensos</span><b>${intensos}</b></div>
+        <div><span>Hechas</span><b>${hechas}/${activas.length}</b></div>
+      </div>
+      <div class="progreso"><i style="width:${activas.length ? Math.round(hechas / activas.length * 100) : 0}%"></i></div>
+    </div>
+    <span class="eyebrow" style="display:block;margin:4px 2px 7px">Mapa de carga</span>
+    <div class="mapa">${mapa}</div>
+    <p class="leyenda"><i class="alta"></i>Intenso <i class="media"></i>Fuerza <i class="baja"></i>Suave <i class="libre"></i>Libre</p>
+    ${dias}`;
+}
+
+/* ============================================================
+   VISTA GUÍA
+   ============================================================ */
+function vistaGuia() {
+  const c = $('v-guia'), p = plan();
+  const q = sinAcentos(($('guiaBuscar') && $('guiaBuscar').value) || '');
+  const coincide = (n, extra) => !q || sinAcentos(n + ' ' + (extra || '')).includes(q);
+  // ejercicios de la semana en curso, en orden de aparición
+  const enSemana = [];
+  if (p && p.semanas.length) {
+    const w = semanaActual(p);
+    for (const s of w.sesiones) for (const g of s.segmentos || [])
+      for (const h of detectarEjercicios(g.descripcion)) if (!enSemana.includes(h.k)) enSemana.push(h.k);
+  }
+  const item = x => `<button class="gitem" data-ej="${x.k}"><b>${esc(x.n)}</b><span>${esc(x.q)}</span></button>`;
+  let html = `<div class="buscar"><input class="in" id="guiaBuscar" placeholder="Buscar ejercicio o término" value="${esc(q ? $('guiaBuscar').value : '')}" autocomplete="off"></div>`;
+  const sem = enSemana.map(k => EJ_POR_K[k]).filter(x => coincide(x.n, x.q));
+  if (sem.length) html += `<div class="card tight"><span class="eyebrow">En tu semana</span><div class="glist">${sem.map(item).join('')}</div></div>`;
+  for (const cat of Object.keys(EJ_CAT)) {
+    const xs = EJERCICIOS.filter(x => x.c === cat && coincide(x.n, x.q));
+    if (xs.length) html += `<div class="card tight"><span class="eyebrow">${EJ_CAT[cat]}</span><div class="glist">${xs.map(item).join('')}</div></div>`;
+  }
+  const ts = TERMINOS.filter(x => coincide(x.n, x.q));
+  if (ts.length) html += `<div class="card tight"><span class="eyebrow">Términos del plan</span><div class="glist">${ts.map(x =>
+    `<button class="gitem" data-term="${x.k}"><b>${esc(x.n)}</b><span>${esc(x.q)}</span></button>`).join('')}</div></div>`;
+  html += `<div class="card tight"><span class="eyebrow">Tus ritmos</span>
+    <p>Las zonas E, M, T, I y R se calculan con tu marca de referencia.</p>
+    <button class="btn gh mini" data-ir="ritmos">Ver tus ritmos por zona</button></div>`;
+  if (html.indexOf('gitem') < 0) html += `<p class="vacio" style="padding:20px">Nada coincide con la búsqueda.</p>`;
+  const foco = document.activeElement && document.activeElement.id === 'guiaBuscar';
+  c.innerHTML = html;
+  if (foco) { const i = $('guiaBuscar'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+}
+
+function abrirGuia(k, esTermino) {
+  if (esTermino) {
+    const t = TERMINOS.find(x => x.k === k); if (!t) return;
+    $('tituloGuia').textContent = 'Término';
+    $('cuerpoGuia').innerHTML = `<h2 class="disp" style="font-size:24px;line-height:1.1">${esc(t.n)}</h2><p class="glarga">${esc(t.q)}</p>`;
+  } else {
+    const x = EJ_POR_K[k]; if (!x) return;
+    const p = plan();
+    const proximas = p ? todasSesiones(p).filter(o => o.s.fecha >= ymd(hoy()) &&
+      (o.s.segmentos || []).some(g => detectarEjercicios(g.descripcion).some(h => h.k === k))).slice(0, 3) : [];
+    const u = ultimaVez({ k, nombre: x.n });
+    $('tituloGuia').textContent = EJ_CAT[x.c];
+    $('cuerpoGuia').innerHTML = `
+      <h2 class="disp" style="font-size:25px;line-height:1.1">${esc(x.n)}</h2>
+      <p class="glarga">${esc(x.q)}</p>
+      <div class="card" style="background:var(--surface-2);margin-top:12px"><span class="eyebrow">Cómo se hace</span>
+        <ol class="pasos">${x.p.map(t => `<li>${esc(t)}</li>`).join('')}</ol></div>
+      <div class="card" style="background:var(--surface-2)"><span class="eyebrow">Error común</span><p style="color:var(--ink)">${esc(x.e)}</p></div>
+      <div class="card" style="background:var(--surface-2)"><span class="eyebrow">Qué trabaja</span><p style="color:var(--ink)">${esc(x.m)}</p></div>
+      ${u ? `<div class="card" style="background:#E9F4EE;border-color:#BFDCCB"><span class="eyebrow" style="color:#1F5C42">Tu última vez</span><p style="color:#1F5C42" class="num">${esc(txtUltima(u))}</p></div>` : ''}
+      ${proximas.length ? `<div class="card tight"><span class="eyebrow">Próximas sesiones con este ejercicio</span>${proximas.map(o => filaSesion(o.s, o.w)).join('')}</div>` : ''}
+      <a class="btn gh" href="https://www.youtube.com/results?search_query=${encodeURIComponent(x.n + ' técnica ejercicio')}" target="_blank" rel="noopener">Ver videos de la técnica</a>`;
+  }
+  $('shGuia').classList.add('on'); scrim().classList.add('on');
+}
+function cerrarGuia() {
+  $('shGuia').classList.remove('on');
+  if (!document.querySelector('.sheet.on')) scrim().classList.remove('on');
+}
+
+/* ============================================================
+   VISTA MÁS
+   ============================================================ */
+function vistaMas() {
+  const v = vdotActual(), p = plan();
+  $('v-mas').innerHTML = `
+    <button class="menu" data-ir="ritmos"><b>Tus ritmos</b><span>${v ? `VDOT ${v.toFixed(1)} · zonas, marca de referencia y ajuste por clima` : 'Cargá una marca para calcular tus zonas'}</span></button>
+    <button class="menu" data-ir="importar"><b>Importar un plan</b><span>Pegar o abrir un plan UTP/1, copiar el prompt para generarlo, reglas del formato</span></button>
+    <button class="menu" data-ir="ajustes"><b>Planes y datos</b><span>${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'}${p ? ' · activo: ' + esc(p.nombre) : ''} · exportar, calendario, copia de seguridad, registro de fuerza</span></button>`;
+}
+const SUBVISTA = { ritmos: 'mas', importar: 'mas', ajustes: 'mas' };
+
+/* ============================================================
+   EXPORTAR REGISTRO DE FUERZA (CSV)
+   ============================================================ */
+function registroFuerzaCSV() {
+  const fila = v => { const t = String(v ?? ''); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+  const out = ['fecha,ejercicio,series,reps,carga_kg,rir,notas'];
+  for (const h of historialFuerza().slice().reverse()) {
+    const reps = String(h.reps || '').split(/[^\d]+/).filter(Boolean).map(Number);
+    out.push([h.fecha, h.nombre, reps.length || '', reps.length ? Math.max(...reps) : '', h.carga_kg ?? '', h.rir ?? '', h.reps ? 'reps ' + h.reps : ''].map(fila).join(','));
+  }
+  return out.join('\n') + '\n';
 }
 
 /* ============================================================
@@ -1677,28 +2280,7 @@ function abrirDetalle(uid) {
 
   if (s.tipo !== 'descanso') {
     h += `<div style="margin:16px 0 3px">${perfilHTML(s, 'xl')}</div>`;
-    h += `<div class="segs">` + (s.segmentos || []).map(g => {
-      const z1 = g.rol === 'serie' ? (g.trabajo && g.trabajo.zona) : (g.rol === 'tecnica' ? zonaTecnica(g) : g.zona);
-      const rol = { calentamiento: 'Calentamiento', vuelta_calma: 'Vuelta a la calma', tecnica: 'Técnica', recuperacion: 'Recuperación', bloque: 'Bloque', serie: 'Serie', continuo: 'Bloque principal' }[g.rol] || '';
-      let cuerpo, ritmo = '';
-      if (g.rol === 'serie') {
-        cuerpo = `<b>${g.repeticiones || 1} × ${g.trabajo ? (g.trabajo.distancia_m != null ? (g.trabajo.distancia_m >= 1000 ? g.trabajo.distancia_m / 1000 + ' km' : g.trabajo.distancia_m + ' m') : duracionTxt(g.trabajo.duracion_min)) : ''}</b>`;
-        if (g.recuperacion) cuerpo += `<br><span style="color:var(--ink-3);font-size:13px">recuperá ${g.recuperacion.duracion_min != null ? duracionTxt(g.recuperacion.duracion_min) : (g.recuperacion.distancia_m + ' m')} ${ritmoRango(g.recuperacion.zona || 'trote', z, rec) || ''}</span>`;
-        ritmo = g.trabajo && g.trabajo.ritmo ? g.trabajo.ritmo : (ritmoRango(z1, z, rec) || '');
-      } else if (g.rol === 'tecnica') {
-        cuerpo = `<b>${esc(g.descripcion || 'Técnica')}</b>`;
-        const zt = zonaTecnica(g);
-        ritmo = g.zona || TEC_SUAVE.test(sinAcentos(g.descripcion)) || TEC_RAPIDA.test(sinAcentos(g.descripcion))
-          ? (ritmoRango(zt, z, rec) || '') : '';
-        ritmo = [duracionTecnica(g) ? `≈ ${duracionTxt(duracionTecnica(g))}` : '', ritmo].filter(Boolean).join('<br>');
-      } else {
-        cuerpo = `<b>${g.distancia_m != null ? (g.distancia_m >= 1000 ? +(g.distancia_m / 1000).toFixed(2) + ' km' : g.distancia_m + ' m') : duracionTxt(g.duracion_min)}</b>`;
-        if (g.descripcion) cuerpo += `<br><span style="color:var(--ink-3);font-size:13px">${esc(g.descripcion)}</span>`;
-        ritmo = g.ritmo || (ritmoRango(z1, z, rec) || '');
-      }
-      return `<div class="seg" style="--z:${colorZona(z1 || 'nulo')}"><span class="marca"></span>
-        <span class="t"><span class="rol">${rol}</span>${cuerpo}</span><span class="r">${g.rol === 'tecnica' ? ritmo : esc(ritmo)}</span></div>`;
-    }).join('') + `</div>`;
+    h += `<div class="segs">` + (s.segmentos || []).map(g => segmentoHTML(g, z, rec, claveReg(f.p, s))).join('') + `</div>`;
     if (rec > 0) h += `<p style="font-size:12.5px;color:var(--ink-2);margin-top:9px">Ritmos ajustados +${Math.round(rec * 100)} % por calor y humedad.</p>`;
   }
 
@@ -1711,6 +2293,7 @@ function abrirDetalle(uid) {
   if (r && r.hecho) {
     h += `<div class="card" style="background:#E9F4EE;border-color:#BFDCCB"><span class="eyebrow" style="color:#1F5C42">Lo que hiciste</span>
       <p style="color:#1F5C42" class="num">${[r.km ? r.km + ' km' : null, r.tiempo || null, r.km && r.tiempo && segundos(r.tiempo) ? ritmoTxt(segundos(r.tiempo) / r.km) + '/km' : null, r.rpe ? 'RPE ' + r.rpe : null].filter(Boolean).join(' · ')}</p>
+      ${(r.ejercicios || []).map(e => `<p style="color:#1F5C42" class="num">${esc(e.nombre)}: ${esc(txtUltima({ ...e, fecha: '' }))}</p>`).join('')}
       ${r.nota ? `<p style="color:#1F5C42">${esc(r.nota)}</p>` : ''}</div>`;
   }
 
@@ -1848,14 +2431,26 @@ function abrirRegistro(uid) {
   $('cuerpoRegistro').innerHTML = `
     <h2 class="disp" style="font-size:20px;margin-bottom:12px">${esc(tituloAuto(f.s, zonasActuales()))}</h2>
     <div class="g2">
-      <div class="f"><label>Distancia (km)</label><input class="in mono" type="number" step="0.1" id="rKm" value="${r.km ?? (m.km || '')}"></div>
+      <div class="f"><label>Distancia (km)</label><input class="in mono" type="number" step="0.1" id="rKm" value="${r.km ?? (m.km || '')}" placeholder="${m.km ? '' : 'sin carrera'}"></div>
       <div class="f"><label>Tiempo</label><input class="in mono" id="rTiempo" placeholder="48:20" value="${esc(r.tiempo || '')}"></div>
     </div>
     <div class="f"><label>Esfuerzo percibido (1 a 10)</label>
       <div class="seg-btns">${[1,2,3,4,5,6,7,8,9,10].map(n => `<button data-rpe="${n}" class="${r.rpe === n ? 'on' : ''}">${n}</button>`).join('')}</div></div>
     <div class="f"><label>Cómo te sentiste</label>
       <div class="seg-btns">${['muy bien','bien','normal','pesado','muy mal'].map(v => `<button data-sens="${v}" class="${r.sensacion === v ? 'on' : ''}">${v}</button>`).join('')}</div></div>
-    <div class="f"><label>Notas</label><textarea class="in" id="rNota" placeholder="Viento en la rambla, molestia en el gemelo…">${esc(r.nota || '')}</textarea></div>
+    ${ejerciciosDeSesion(f.s).length ? `<span class="eyebrow" style="display:block;margin:4px 0 2px">Cargas de fuerza</span>
+      <p style="font-size:12.5px;color:var(--ink-3);margin:0 0 4px">Kilos usados, repeticiones de cada serie (por ejemplo 5-5-5) y RIR de la última serie.</p>
+      ${ejerciciosDeSesion(f.s).map((e, i) => {
+        const prev = (r.ejercicios || []).find(x => (e.k && x.k === e.k) || normNombre(x.nombre) === normNombre(e.nombre)) || {};
+        const u = ultimaVez(e, claveReg(f.p, f.s));
+        return `<div class="ejreg" data-ejreg="${i}" data-k="${e.k || ''}" data-nombre="${esc(e.nombre)}">
+          <b>${esc(e.nombre)}</b> <span class="num" style="color:var(--ink-3);font-size:12.5px">${e.series} × ${esc(e.reps)}${e.rir ? ' @ RIR ' + esc(e.rir) : ''}</span>
+          ${u ? `<small>Última vez: ${esc(txtUltima(u))}</small>` : ''}
+          <div class="g3"><input class="in mono" inputmode="decimal" data-r="carga_kg" placeholder="kg" value="${esc(prev.carga_kg ?? '')}">
+            <input class="in mono" data-r="reps" placeholder="${esc(Array(e.series).fill(String(e.reps).split(/\s/)[0]).join('-'))}" value="${esc(prev.reps ?? '')}">
+            <input class="in mono" inputmode="numeric" data-r="rir" placeholder="RIR" value="${esc(prev.rir ?? '')}"></div></div>`;
+      }).join('')}` : ''}
+    <div class="f" style="margin-top:12px"><label>Notas</label><textarea class="in" id="rNota" placeholder="Viento en la rambla, molestia en el gemelo…">${esc(r.nota || '')}</textarea></div>
     ${r.hecho ? '<button class="btn dg" id="btnBorrarReg">Borrar el registro</button>' : ''}`;
   $('cuerpoRegistro').dataset.rpe = r.rpe || '';
   $('cuerpoRegistro').dataset.sens = r.sensacion || '';
@@ -1963,7 +2558,7 @@ function planAUTP(p) {
    EVENTOS
    ============================================================ */
 document.addEventListener('click', async ev => {
-  const t = ev.target.closest('[data-ses],[data-tick],[data-registrar],[data-ir],[data-toggle],[data-acc],[data-clima],[data-flag],[data-rpe],[data-sens],[data-quitar-seg],[data-activar],[data-borrar-plan],[data-borrar-ses],[data-duplicar],[data-icsses]');
+  const t = ev.target.closest('[data-ej],[data-term],[data-semnav],[data-ses],[data-tick],[data-registrar],[data-ir],[data-toggle],[data-acc],[data-clima],[data-flag],[data-rpe],[data-sens],[data-quitar-seg],[data-activar],[data-borrar-plan],[data-borrar-ses],[data-duplicar],[data-icsses]');
   if (!t) return;
   const p = plan();
 
@@ -1977,12 +2572,15 @@ document.addEventListener('click', async ev => {
     D.reg[k] = r; await guardar(); pintar();
     return;
   }
+  if (t.dataset.ej) { ev.stopPropagation(); abrirGuia(t.dataset.ej); return; }
+  if (t.dataset.term) { abrirGuia(t.dataset.term, true); return; }
+  if (t.dataset.semnav != null) { const w = p && p.semanas[+t.dataset.semnav]; if (w) { semSel = w.numero; vistaSemana(); $('v-semana').scrollTop = 0; } return; }
   if (t.dataset.ses) { abrirDetalle(t.dataset.ses); return; }
   if (t.dataset.registrar) { cerrarHojas(); setTimeout(() => abrirRegistro(t.dataset.registrar), 240); return; }
-  if (t.dataset.ir) { irA(t.dataset.ir); return; }
+  if (t.dataset.ir) { cerrarHojas(); irA(t.dataset.ir); return; }
   if (t.dataset.toggle) { t.closest('.sem').classList.toggle('abierta'); return; }
   if (t.hasAttribute('data-acc')) { t.parentElement.classList.toggle('on'); return; }
-  if (t.dataset.clima != null) { D.cfg.clima = t.dataset.clima === '1'; await guardar(); vistaRitmos(); return; }
+  if (t.dataset.clima != null) { D.cfg.clima = t.dataset.clima === '1'; await guardar(); pintar(); return; }
   if (t.dataset.flag) {
     const d = $('cuerpoEditor').dataset;
     d[t.dataset.flag] = d[t.dataset.flag] === '1' ? '' : '1';
@@ -2033,8 +2631,10 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => irA(b.d
 
 function irA(v) {
   vista = v;
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
-  ['hoy', 'plan', 'ritmos', 'importar', 'ajustes'].forEach(k => $('v-' + k).classList.toggle('off', k !== v));
+  if (v === 'semana') semSel = null;
+  const tab = SUBVISTA[v] || v;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === tab));
+  ['hoy', 'semana', 'plan', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'].forEach(k => $('v-' + k).classList.toggle('off', k !== v));
   pintar();
   document.querySelector('.vista:not(.off)').scrollTop = 0;
 }
@@ -2045,9 +2645,17 @@ $('btnGuardarReg').onclick = async () => {
   const f = buscarSesion(registrandoUid); if (!f) return;
   const d = $('cuerpoRegistro').dataset;
   const km = parseFloat($('rKm').value);
+  const ejercicios = [];
+  document.querySelectorAll('#cuerpoRegistro [data-ejreg]').forEach(box => {
+    const v = c => box.querySelector(`[data-r="${c}"]`).value.trim();
+    const carga = v('carga_kg').replace(',', '.'), reps = v('reps'), rir = v('rir');
+    if (carga || reps || rir) ejercicios.push({ nombre: box.dataset.nombre, k: box.dataset.k || null,
+      carga_kg: carga && !isNaN(+carga) ? +carga : (carga || null), reps: reps || null, rir: rir === '' ? null : (isNaN(+rir) ? rir : +rir) });
+  });
   D.reg[claveReg(plan(), f.s)] = {
     hecho: true, km: isNaN(km) ? null : km, tiempo: $('rTiempo').value.trim() || null,
-    rpe: d.rpe ? +d.rpe : null, sensacion: d.sens || null, nota: $('rNota').value.trim() || null, fecha: ymd(hoy())
+    rpe: d.rpe ? +d.rpe : null, sensacion: d.sens || null, nota: $('rNota').value.trim() || null, fecha: ymd(hoy()),
+    fecha_sesion: f.s.fecha, ...(ejercicios.length ? { ejercicios } : {})
   };
   await guardar(); cerrarHojas(); pintar(); toast('Registrado');
 };
@@ -2066,7 +2674,7 @@ document.addEventListener('click', async ev => {
     const t = $('refTiempo').value.trim();
     if (!segundos(t)) { toast('Poné el tiempo como 48:20 o 1:45:30'); return; }
     D.ref = { distancia_m: +$('refDist').value, tiempo: t, fecha: $('refFecha').value || ymd(hoy()), origen: $('refOrigen').value };
-    await guardar(); vistaRitmos(); toast('Ritmos actualizados');
+    await guardar(); pintar(); toast('Ritmos actualizados');
   }
   if (id === 'btnCopiarPrompt') {
     const txt = armarPrompt();
@@ -2105,6 +2713,8 @@ document.addEventListener('click', async ev => {
     compartir(armarICS(ses, p, zonasActuales(), recargoActual()), 'plan.ics', 'text/calendar', p.nombre,
       'Abrilo desde Archivos y elegí añadir al calendario.');
   }
+  if (id === 'btnExpFuerza') compartir(registroFuerzaCSV(), `registro-fuerza-${ymd(hoy())}.csv`, 'text/csv', 'Registro de fuerza', 'Registro de fuerza guardado en Archivos.');
+  if (id === 'btnCerrarGuia') cerrarGuia();
   if (id === 'btnCopia') compartir(JSON.stringify(D), `umbral-copia-${ymd(hoy())}.json`, 'application/json', 'Copia de Umbral', 'Copia guardada en Archivos.');
   if (id === 'btnRestaurar') $('fileCopia').click();
 });
@@ -2123,9 +2733,11 @@ document.addEventListener('change', ev => {
     const lbl = box.querySelectorAll('.lbl')[1];
     if (lbl) lbl.textContent = ev.target.value === 'd' ? 'Metros' : 'Minutos';
   }
-  if (ev.target.id === 'climaT') { D.cfg.temp = +ev.target.value; guardar(); vistaRitmos(); }
-  if (ev.target.id === 'climaH') { D.cfg.hum = +ev.target.value; guardar(); vistaRitmos(); }
+  if (ev.target.id === 'climaT') { D.cfg.temp = +ev.target.value; guardar(); pintar(); }
+  if (ev.target.id === 'climaH') { D.cfg.hum = +ev.target.value; guardar(); pintar(); }
 });
+
+document.addEventListener('input', ev => { if (ev.target.id === 'guiaBuscar') vistaGuia(); });
 
 $('fileJson').onchange = e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
@@ -2156,10 +2768,15 @@ $('fileCopia').onchange = e => {
 function pintar() {
   pintarCabecera();
   if (vista === 'hoy') vistaHoy();
+  if (vista === 'semana') vistaSemana();
   if (vista === 'plan') vistaPlan();
+  if (vista === 'guia') vistaGuia();
+  if (vista === 'mas') vistaMas();
   if (vista === 'ritmos') vistaRitmos();
   if (vista === 'importar') vistaImportar();
   if (vista === 'ajustes') vistaAjustes();
+  // las secciones de "Más" llevan un atajo para volver
+  if (SUBVISTA[vista]) $('v-' + vista).insertAdjacentHTML('afterbegin', '<button class="volver" data-ir="mas">‹ Más</button>');
 }
 async function arrancar() {
   const g = await Store.get(CLAVE);

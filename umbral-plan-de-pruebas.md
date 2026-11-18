@@ -1,6 +1,6 @@
 # Umbral — Plan de pruebas
 
-Versión 1.0 · ejecutado sobre el build servido en `http://localhost:8137`
+Versión 2.0 · automatizado en `tests/` (núcleo: `node --test tests/*.test.mjs` · recorridos: `node tests/app.e2e.mjs`)
 
 ## Alcance y estrategia
 
@@ -29,7 +29,7 @@ Tres niveles, de adentro hacia afuera:
 | ID | Caso | Esperado | Blq |
 |---|---|---|---|
 | U01 | VDOT de 21,1 km en 1:45:30 | 42,4 ± 0,3 | Sí |
-| U02 | VDOT de 10 km en 40:00 | 49,8 ± 0,5 | Sí |
+| U02 | VDOT de 10 km en 40:00 | 51,9 ± 0,3 (tabla de Daniels; la 1.0 documentaba 49,8 por error) | Sí |
 | U03 | Ritmos derivados de VDOT 42,4 | E 6:07, T 4:57, I 4:28 ± 4 s | Sí |
 | U04 | Orden de las zonas | E más lento que M, M que T, T que I, I que R | Sí |
 | U05 | Riegel de 21,1 km a 10 km | ≈ 47:48 | No |
@@ -105,11 +105,36 @@ Tres niveles, de adentro hacia afuera:
 | I19 | Plan que ya empezó | Avisa y deja importar igual | No |
 | I20 | Plan de una sola semana | No rompe ninguna vista | Sí |
 
+### Núcleo 2.0 — guía, ejercicios y estaciones
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| U50 | `Sentadilla · 3 × 5 @ RIR 3–4 · 75–80 kg · pausa 2:30` | Ejercicio, series, reps, RIR, carga y pausa separados | Sí |
+| U50b | Superserie `A … + B …` | Dos ejercicios con la pausa entre rondas | Sí |
+| U50c | `(4 × 12,5 m)` entre paréntesis | No se toma como prescripción | Sí |
+| U51 | Detección de ejercicios | Sin solapamientos; el nombre más específico gana (rumano > peso muerto, búlgara > zancada) | Sí |
+| U52 | Estación de Hyrox | Bloque con estación y zona `caminar` se muestra como Estación, sin ritmo de caminata | Sí |
+| U44b | Técnica con minutos explícitos | `Drills 5 min + 4 × 20 s` suma 5 + 3,3 min | Sí |
+| U53 | Plan de ejemplo y plantilla híbrida | Siguen validando sin errores | Sí |
+
+### Integración 2.0 — recorridos nuevos
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| N01 | Hoy | Paso a paso con ejercicios enlazados, "Mañana", sin ritmo de carrera en sesiones de fuerza | Sí |
+| N02 | Semana | Mapa de carga de 7 días, totales, progreso y navegación entre semanas | Sí |
+| N03 | Guía | Búsqueda; cada ejercicio con qué es, cómo se hace, error común y qué trabaja; términos | Sí |
+| N04 | Registro de fuerza | Kilos, reps y RIR por ejercicio; "Última vez" en la próxima sesión | Sí |
+| N05 | CSV de fuerza | `fecha,ejercicio,series,reps,carga_kg,rir,notas` | Sí |
+| N06 | Detalle con estaciones | "Estación" en lugar de "caminando" | Sí |
+| N07 | 390 px | Ninguna vista desborda en horizontal | Sí |
+| N08 | Más | Ritmos, Importar y Ajustes conservan todo y tienen "‹ Más" para volver | Sí |
+
 ### Entrega
 
 | ID | Caso | Esperado | Blq |
 |---|---|---|---|
-| E01 | Los cinco archivos por HTTP | 200 con el MIME correcto | Sí |
+| E01 | Los archivos de la app por HTTP | 200 con el MIME correcto | Sí |
 | E02 | Manifiesto válido | JSON con íconos y `start_url` | Sí |
 | E03 | Service worker | Sintaxis válida, precarga los cinco | Sí |
 | E04 | Sin dependencias externas | Cero pedidos a dominios de terceros | Sí |

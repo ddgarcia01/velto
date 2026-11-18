@@ -1,0 +1,254 @@
+#!/usr/bin/env node
+// Recorridos de integración de Umbral en un navegador real (Playwright, 390 px).
+//   node tests/app.e2e.mjs [--capturas carpeta]
+// Cubre los casos I del plan de pruebas y los nuevos de la 2.0 (N). Falla ante
+// cualquier error de JavaScript, desborde horizontal o caso no cumplido.
+import fs from 'node:fs';
+import http from 'node:http';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
+const { chromium } = require('playwright');
+const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const HIBRIDO = fs.readFileSync(path.join(RAIZ, 'tests/fixtures/plan-hibrido.json'), 'utf8');
+const args = process.argv.slice(2);
+const CAPT = args.includes('--capturas') ? args[args.indexOf('--capturas') + 1] : null;
+const HOY = '2026-11-25T10:00:00';   // miércoles de la semana 1 del plan híbrido
+
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.webmanifest': 'application/manifest+json', '.png': 'image/png' };
+const srv = http.createServer((req, res) => {
+  const f = path.join(RAIZ, decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/\/$/, '/index.html'));
+  if (!f.startsWith(RAIZ) || !fs.existsSync(f)) { res.writeHead(404); return res.end(); }
+  res.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' });
+  fs.createReadStream(f).pipe(res);
+});
+await new Promise(ok => srv.listen(0, '127.0.0.1', ok));
+const URL_APP = `http://127.0.0.1:${srv.address().port}/index.html`;
+
+const navegador = await chromium.launch();
+const pg = await navegador.newPage({ viewport: { width: 390, height: 844 } });
+const errores = [], fallos = [];
+let casos = 0;
+pg.on('pageerror', e => errores.push(e.message));
+pg.on('dialog', d => d.accept());
+await pg.addInitScript(f => {
+  const F = new Date(f).getTime(), O = Date;
+  globalThis.Date = class extends O { constructor(...a) { super(...(a.length ? a : [F])); } static now() { return F; } };
+}, HOY);
+
+const ev = (fn, arg) => pg.evaluate(fn, arg);
+const texto = sel => pg.textContent(sel);
+async function caso(id, nombre, fn) {
+  casos++;
+  try { await fn(); } catch (e) { fallos.push(`${id} ${nombre}: ${e.message.split('\n')[0]}`); }
+}
+const ok = (cond, msg) => { if (!cond) throw new Error(msg || 'no se cumple'); };
+async function importar(txt) {
+  await ev(() => irA('importar'));
+  await ev(t => { document.getElementById('pegado').value = t; }, txt);
+  await pg.click('#btnRevisar');
+  await pg.waitForSelector('#shInforme.on');
+  ok(await pg.isVisible('#btnConfirmar'), 'la app rechazó el plan');
+  await pg.click('#btnConfirmar');
+  await pg.waitForTimeout(350);
+}
+const VISTAS = ['hoy', 'semana', 'plan', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'];
+async function sinDesborde(v) {
+  const w = await ev(() => document.querySelector('.vista:not(.off)').scrollWidth);
+  ok(w <= 391, `desborde horizontal en ${v}: ${w}px`);
+}
+
+await pg.goto(URL_APP);
+
+await caso('I01', 'arranque sin datos', async () => {
+  ok((await texto('#v-hoy')).includes('Todavía no hay plan'));
+  for (const v of VISTAS) { await ev(v => irA(v), v); await sinDesborde(v); }
+});
+await caso('I02', 'plan de ejemplo', async () => {
+  await ev(() => irA('importar')); await pg.click('#btnEjemplo');
+  await pg.waitForSelector('#shInforme.on'); await pg.click('#btnConfirmar'); await pg.waitForTimeout(300);
+  ok(await ev(() => plan().semanas.length) === 12);
+});
+await caso('I17', 'segundo plan y cambio del activo', async () => {
+  await importar(HIBRIDO);
+  ok(await ev(() => D.planes.length) === 2);
+  ok((await texto('#hTitulo')).toUpperCase().includes('HYROX'));
+});
+await caso('I03/N07', 'todas las vistas abren sin errores ni desborde', async () => {
+  for (const v of VISTAS) {
+    await ev(v => irA(v), v); await pg.waitForTimeout(80);
+    ok((await ev(() => document.querySelector('.vista:not(.off)').innerText.length)) > 20, `vista ${v} vacía`);
+    await sinDesborde(v);
+    if (CAPT) await pg.screenshot({ path: path.join(CAPT, `vista-${v}.png`) });
+  }
+});
+await caso('N08', 'secciones de Más con atajo para volver', async () => {
+  for (const v of ['ritmos', 'importar', 'ajustes']) {
+    await ev(v => irA(v), v);
+    ok(await pg.isVisible(`#v-${v} .volver`), `sin "volver" en ${v}`);
+    ok(await ev(() => document.querySelector('.tabs button.on').dataset.v) === 'mas', 'la pestaña Más no queda marcada');
+  }
+  await pg.click('#v-ajustes .volver');
+  ok(await ev(() => vista) === 'mas');
+});
+await caso('N01', 'Hoy: paso a paso con ejercicios y estado de la semana', async () => {
+  await ev(() => irA('hoy'));
+  const t = await texto('#v-hoy');
+  ok(t.includes('Paso a paso'), 'falta el paso a paso');
+  ok(t.includes('Mañana'), 'falta mañana');
+  ok(await pg.locator('#v-hoy .ej').count() > 0, 'no hay ejercicios enlazados');
+  ok(!(await texto('#v-hoy .hoy-card')).includes('/KM'), 'una sesión de fuerza muestra ritmo de carrera');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'hoy-completo.png'), fullPage: true });
+});
+await caso('N02', 'Semana: mapa de carga, totales y navegación', async () => {
+  await ev(() => irA('semana'));
+  ok(await pg.locator('#v-semana .mapa .m').count() === 7);
+  ok((await texto('#v-semana .semnav')).includes('Semana 1 de 4'));
+  await pg.click('[data-semnav="1"]');
+  ok((await texto('#v-semana .semnav')).includes('Semana 2 de 4'), 'no avanza de semana');
+  await ev(() => irA('semana'));
+  ok((await texto('#v-semana .semnav')).includes('Semana 1 de 4'), 'no vuelve a la semana en curso');
+});
+await caso('N03', 'Guía: búsqueda y explicación de un ejercicio', async () => {
+  await ev(() => irA('guia'));
+  ok((await texto('#v-guia')).includes('En tu semana'));
+  await pg.fill('#guiaBuscar', 'wall');
+  const res = await pg.locator('#v-guia .gitem').allInnerTexts();
+  ok(res.length > 0 && res.length < 6 && res.every(t => /wall/i.test(t)), 'la búsqueda no filtra: ' + res.length);
+  await pg.click('#v-guia .gitem');
+  await pg.waitForSelector('#shGuia.on');
+  const g = await texto('#cuerpoGuia');
+  ok(g.includes('Cómo se hace') && g.includes('Error común'), 'guía incompleta');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'guia-ejercicio.png') });
+  await pg.click('#btnCerrarGuia');
+  await pg.fill('#guiaBuscar', '');
+  await pg.locator('#v-guia [data-term="rir"]').click();
+  ok((await texto('#cuerpoGuia')).includes('reserva'));
+  await pg.click('#btnCerrarGuia');
+});
+await caso('I05/N06', 'detalle: estructura, explicaciones, ejercicios y estaciones', async () => {
+  const uids = await ev(() => todasSesiones(plan()).map(x => x.s.uid));
+  for (const uid of uids) {
+    await ev(u => { cerrarHojas(); abrirDetalle(u); }, uid);
+    ok((await ev(() => document.querySelector('#shDetalle.on').innerText.length)) > 40, `sesión ${uid} vacía`);
+  }
+  const hy = await ev(() => todasSesiones(plan()).find(x => /hyrox/i.test(x.s.titulo || '')).s.uid);
+  await ev(u => { cerrarHojas(); abrirDetalle(u); }, hy);
+  const d = await texto('#cuerpoDetalle');
+  ok(d.includes('Estación') && !/caminando/.test(d), 'las estaciones se ven como caminata');
+  ok(d.includes('Para qué') && d.includes('Por qué funciona') && d.includes('Cómo se tiene que sentir'));
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'detalle-hyrox.png') });
+  // un ejercicio dentro del detalle abre la guía encima
+  const fu = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'fuerza').s.uid);
+  await ev(u => { cerrarHojas(); abrirDetalle(u); }, fu);
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'detalle-fuerza.png') });
+  await pg.locator('#cuerpoDetalle .ej').first().click();
+  await pg.waitForSelector('#shGuia.on');
+  ok(await pg.isVisible('#shDetalle.on'), 'cerrar la guía no debe cerrar el detalle');
+  await pg.click('#btnCerrarGuia');
+  ok(await ev(() => document.getElementById('shDetalle').classList.contains('on')), 'el detalle se cerró');
+  await ev(() => cerrarHojas());
+});
+await caso('I06', 'editar título, tipo y fecha', async () => {
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'suave').s.uid);
+  await ev(u => abrirEditor(u), uid);
+  await pg.fill('#eTitulo', 'Rodaje editado');
+  await pg.click('#btnGuardarSes'); await pg.waitForTimeout(250);
+  ok(await ev(u => buscarSesion(u).s.titulo, uid) === 'Rodaje editado');
+});
+await caso('I07/I08', 'editor de segmentos', async () => {
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.titulo === 'Rodaje editado').s.uid);
+  await ev(u => abrirEditor(u), uid);
+  const n0 = await pg.locator('#segsEditor [data-seg]').count();
+  await pg.click('#btnAddSeg');
+  await pg.selectOption('#segsEditor [data-seg]:last-child [data-c="rol"]', 'serie');
+  ok(await pg.locator('#segsEditor [data-seg]:last-child [data-c="repeticiones"]').count() === 1, 'no aparecen repeticiones');
+  await pg.click('#btnGuardarSes'); await pg.waitForTimeout(250);
+  ok(await ev(u => buscarSesion(u).s.segmentos.length, uid) === n0 + 1);
+});
+await caso('I09/N04', 'registro con cargas de fuerza y "última vez"', async () => {
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'fuerza' && x.s.segmentos.some(g => /Sentadilla/.test(g.descripcion || ''))).s.uid);
+  await ev(u => abrirRegistro(u), uid);
+  ok(await pg.locator('#cuerpoRegistro [data-ejreg]').count() >= 3, 'no hay filas de ejercicios');
+  const fila = pg.locator('#cuerpoRegistro [data-ejreg]').first();
+  await fila.locator('[data-r="carga_kg"]').fill('80');
+  await fila.locator('[data-r="reps"]').fill('5-5-5-5');
+  await fila.locator('[data-r="rir"]').fill('3');
+  await pg.click('[data-rpe="7"]');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'registro-fuerza.png') });
+  await pg.click('#btnGuardarReg'); await pg.waitForTimeout(250);
+  const r = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(r.hecho && r.rpe === 7 && r.ejercicios && r.ejercicios[0].carga_kg === 80 && r.ejercicios[0].reps === '5-5-5-5', 'no guardó las cargas');
+  // la próxima sesión con sentadilla muestra la última carga
+  const otra = await ev(u => todasSesiones(plan()).find(x => x.s.uid !== u && x.s.segmentos.some(g => /Sentadilla trasera/.test(g.descripcion || ''))).s.uid, uid);
+  await ev(u => { cerrarHojas(); abrirDetalle(u); }, otra);
+  ok((await texto('#cuerpoDetalle')).includes('Última vez: 80 kg × 5-5-5-5'), 'no muestra la última vez');
+  await ev(() => cerrarHojas());
+});
+await caso('N05', 'exportar registro de fuerza en CSV', async () => {
+  const csv = await ev(() => registroFuerzaCSV());
+  const [cab, l1] = csv.trim().split('\n');
+  ok(cab === 'fecha,ejercicio,series,reps,carga_kg,rir,notas');
+  ok(/^2026-11-23,Sentadilla trasera,4,5,80,3,reps 5-5-5-5$/.test(l1), 'fila inesperada: ' + l1);
+});
+await caso('I10', 'marcar hecha desde la lista', async () => {
+  await ev(() => irA('semana'));
+  const antes = await ev(() => Object.values(D.reg).filter(r => r.hecho).length);
+  await pg.locator('#v-semana .tick:not(.on)').first().click();
+  ok(await ev(() => Object.values(D.reg).filter(r => r.hecho).length) === antes + 1);
+});
+await caso('I11', 'duplicar y eliminar', async () => {
+  const total = () => ev(() => todasSesiones(plan()).length);
+  const n0 = await total();
+  const uid = await ev(() => todasSesiones(plan())[0].s.uid);
+  await ev(u => abrirDetalle(u), uid); await pg.click(`[data-duplicar="${uid}"]`); await pg.waitForTimeout(200);
+  ok(await total() === n0 + 1);
+  await ev(u => abrirDetalle(u), uid); await pg.click(`[data-borrar-ses="${uid}"]`); await pg.waitForTimeout(200);
+  ok(await total() === n0);
+});
+await caso('I12/I13', 'referencia y ajuste por clima', async () => {
+  await ev(() => irA('ritmos'));
+  await pg.selectOption('#refDist', '10000'); await pg.fill('#refTiempo', '45:00');
+  await pg.click('#btnRef'); await pg.waitForTimeout(150);
+  ok(Math.abs(await ev(() => vdotActual()) - 45.3) < 0.2);
+  ok(await pg.isVisible('#v-ritmos .volver'), 'perdió el "volver" al recalcular');
+  const e0 = await ev(() => ritmoRango('E', zonasActuales(), recargoActual())), t0 = await ev(() => ritmoRango('T', zonasActuales(), recargoActual()));
+  await pg.click('[data-clima="1"]'); await pg.fill('#climaT', '30'); await pg.dispatchEvent('#climaT', 'change');
+  ok(await ev(() => ritmoRango('E', zonasActuales(), recargoActual())) === e0, 'E no debe ajustarse');
+  ok(await ev(() => ritmoRango('T', zonasActuales(), recargoActual())) !== t0, 'T debe ajustarse');
+  await pg.click('[data-clima="0"]');
+});
+await caso('I14/I15', 'exportar UTP/1 y reimportar; ICS', async () => {
+  const utp = await ev(() => planAUTP(plan()));
+  const km0 = await ev(() => plan().semanas.map(w => metricaSemana(w, zonasActuales()).km).join());
+  await importar(utp);
+  ok(await ev(() => plan().semanas.map(w => metricaSemana(w, zonasActuales()).km).join()) === km0, 'volúmenes distintos');
+  const ics = await ev(() => armarICS(todasSesiones(plan()).map(x => x.s).filter(s => s.tipo !== 'descanso'), plan(), zonasActuales(), 0));
+  ok(ics.split('BEGIN:VEVENT').length - 1 === await ev(() => todasSesiones(plan()).filter(x => x.s.tipo !== 'descanso').length));
+  ok(ics.split('\r\n').every(l => new TextEncoder().encode(l).length <= 75), 'línea ICS de más de 75 octetos');
+});
+await caso('I16', 'copia de seguridad y restauración', async () => {
+  const copia = await ev(() => JSON.stringify(D));
+  await ev(() => { D.planes = []; D.reg = {}; D.activo = null; pintar(); });
+  await pg.setInputFiles('#fileCopia', { name: 'copia.json', mimeType: 'application/json', buffer: Buffer.from(copia) });
+  await pg.waitForTimeout(400);
+  ok(await ev(() => JSON.stringify(D)) === copia, 'la restauración no devolvió todo');
+});
+await caso('I18', 'borrar un plan borra sus registros', async () => {
+  await ev(() => irA('ajustes'));
+  const id = await ev(() => D.activo);
+  await pg.click(`[data-borrar-plan="${id}"]`); await pg.waitForTimeout(250);
+  ok(await ev(i => !D.planes.some(p => p.id === i) && !Object.keys(D.reg).some(k => k.startsWith(i + ':')), id));
+});
+await caso('E05', 'inputs de 16 px o más', async () => {
+  await ev(() => irA('guia'));
+  const chicos = await ev(() => [...document.querySelectorAll('input,select,textarea')].filter(e => e.offsetParent !== null && parseFloat(getComputedStyle(e).fontSize) < 16).length);
+  ok(chicos === 0, `${chicos} inputs de menos de 16 px`);
+});
+
+await navegador.close(); srv.close();
+if (errores.length) fallos.push('Errores de JavaScript: ' + [...new Set(errores)].join(' | '));
+if (fallos.length) { console.error(`✗ ${fallos.length} de ${casos} casos fallan:\n  ` + fallos.join('\n  ')); process.exit(1); }
+console.log(`✓ ${casos} recorridos sin errores`);
