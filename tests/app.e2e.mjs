@@ -184,6 +184,23 @@ await caso('N11', 'registro precargado: solo revisar y guardar', async () => {
   if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'registro-precargado.png') });
   await ev(() => cerrarHojas());
 });
+await caso('C1', 'un toque registra la sesión como planificada, con deshacer y editar', async () => {
+  await ev(() => irA('hoy'));
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.fecha === ymd(hoy()) && x.s.tipo === 'fuerza').s.uid);
+  await ev(u => { const p = plan(); delete D.reg[claveReg(p, buscarSesion(u).s)]; pintar(); }, uid);
+  await pg.click(`#v-hoy .btn[data-tick="${uid}"]`); await pg.waitForTimeout(150);
+  const r = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(r.hecho && r.segun_plan && r.rpe === 7 && r.ejercicios && r.ejercicios.length >= 2 && r.ejercicios.every(e => e.reps), 'registro incompleto: ' + JSON.stringify(r));
+  ok(await pg.isVisible('#toastAcc'), 'falta "Editar" en el aviso');
+  await pg.click('#toastAcc'); await pg.waitForSelector('#shRegistro.on');
+  ok(await pg.inputValue('#cuerpoRegistro [data-ejreg] [data-r="reps"]') !== '', 'el registro no trae lo guardado');
+  await ev(() => cerrarHojas());
+  // tocar de nuevo desmarca sin borrar los datos
+  await ev(u => { irA('semana'); }, uid);
+  await pg.click(`#v-semana .tick[data-tick="${uid}"]`); await pg.waitForTimeout(150);
+  const r2 = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(!r2.hecho && r2.ejercicios, 'desmarcar no debe borrar lo registrado');
+});
 await caso('N10', 'Panel: indicadores, gráficos y tabla', async () => {
   await pg.click('.tabs button[data-v="panel"]');
   ok(await pg.locator('#v-panel .tiles > div').count() >= 4, 'faltan indicadores');

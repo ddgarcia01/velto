@@ -225,6 +225,8 @@ select.in{-webkit-appearance:none;appearance:none;
   background:var(--ink);color:#fff;padding:11px 16px;border-radius:var(--r-m);font-size:13.5px;font-weight:560;
   opacity:0;pointer-events:none;transition:all .24s;max-width:88vw;text-align:center}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.accion{pointer-events:auto;display:flex;align-items:center;gap:12px}
+.toast-acc{color:#9EC5F4;font-weight:700;font-size:13.5px;padding:2px 0}
 .oculto{display:none!important}
 .barras-vol{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:9px;border-bottom:1px solid var(--line-2)}
 .barras-vol i{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.5;min-height:2px}
@@ -1646,9 +1648,14 @@ const regDe = s => { const p = plan(); return p ? (D.reg[claveReg(p, s)] || null
 
 /* ---------- utilidades de vista ---------- */
 let toastT;
-function toast(m) {
-  const t = $('toast'); t.textContent = m; t.classList.add('on');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200);
+let toastAccion = null;
+function toast(m, accion) {
+  const t = $('toast');
+  t.innerHTML = esc(m) + (accion ? ` <button class="toast-acc" id="toastAcc">${esc(accion.txt)}</button>` : '');
+  toastAccion = accion ? accion.fn : null;
+  t.classList.toggle('accion', !!accion);
+  t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => { t.classList.remove('on'); toastAccion = null; }, accion ? 5200 : 3200);
 }
 const scrim = () => $('scrim');
 function abrirHoja(id) { $(id).classList.add('on'); scrim().classList.add('on'); }
@@ -1828,8 +1835,9 @@ function tarjetaHoy(s, z, rec) {
       <div class="segs">${s.segmentos.map(g => segmentoHTML(g, z, rec, claveReg(plan(), s))).join('')}</div>
       ${s.proposito ? `<p class="exp"><b>Para qué:</b> ${esc(s.proposito)}</p>` : ''}
       ${s.sensacion ? `<p class="exp"><b>Cómo se tiene que sentir:</b> ${esc(s.sensacion)}</p>` : ''}</details>` : ''}
-    <div class="btn-row"><button class="btn gh mini" data-ses="${s.uid}">Ver la sesión</button>
-      <button class="btn pri mini" data-registrar="${s.uid}">${r && r.hecho ? 'Editar registro' : 'Registrar'}</button></div>
+    <div class="btn-row">${r && r.hecho ? `<button class="btn gh mini" data-registrar="${s.uid}">Editar registro</button>`
+      : `<button class="btn gh mini" data-registrar="${s.uid}">Registrar con cambios</button>
+         <button class="btn pri mini" data-tick="${s.uid}">✓ Hecha como el plan</button>`}</div>
   </div>`;
 }
 
@@ -2209,6 +2217,18 @@ function ejerciciosDeSesion(s) {
     }
   }
   return out;
+}
+
+/* Registro completo "como estaba planificado": lo que se guarda con un toque. */
+function registroPlanificado(s, p) {
+  const sg = registroSugerido(s, zonasActuales());
+  const ej = ejerciciosDeSesion(s).map(e => {
+    const u = ultimaVez(e, claveReg(p, s));
+    const carga = !e.carga && e.pesoDefecto ? null : cargaSugerida(e, u);
+    return { nombre: e.nombre, k: e.k, carga_kg: carga, reps: repsSugeridas(e) || null, rir: rirSugerido(e) };
+  });
+  return { hecho: true, km: sg.km, tiempo: sg.tiempo, rpe: sg.rpe, sensacion: sg.sensacion, nota: null,
+    fecha: ymd(hoy()), fecha_sesion: s.fecha, segun_plan: true, ...(ej.length ? { ejercicios: ej } : {}) };
 }
 
 /* ============================================================
@@ -2968,10 +2988,12 @@ document.addEventListener('click', async ev => {
     ev.stopPropagation();
     const f = buscarSesion(t.dataset.tick); if (!f) return;
     const k = claveReg(p, f.s);
-    const r = D.reg[k] || {};
-    r.hecho = !r.hecho;
-    if (r.hecho && r.km == null) r.km = metricaSesion(f.s, zonasActuales()).km || null;
-    D.reg[k] = r; await guardar(); pintar();
+    const r = D.reg[k];
+    if (r && r.hecho) { r.hecho = false; await guardar(); pintar(); toast('Marcada como no hecha'); return; }
+    // un toque = hecha como estaba planificada; los datos sugeridos quedan guardados y se pueden editar
+    D.reg[k] = r && (r.km != null || r.ejercicios) ? { ...r, hecho: true } : registroPlanificado(f.s, p);
+    await guardar(); pintar();
+    toast('Hecha como estaba planificada', { txt: 'Editar', fn: () => abrirRegistro(f.s.uid) });
     return;
   }
   if (t.dataset.tip) { const tip = t.closest('.graf-card') && t.closest('.graf-card').querySelector('.tip'); if (tip) tip.textContent = t.dataset.tip; return; }
@@ -3121,6 +3143,7 @@ document.addEventListener('click', async ev => {
   }
   if (id === 'btnExpFuerza') compartir(registroFuerzaCSV(), `registro-fuerza-${ymd(hoy())}.csv`, 'text/csv', 'Registro de fuerza', 'Registro de fuerza guardado en Archivos.');
   if (id === 'btnCerrarGuia') cerrarGuia();
+  if (id === 'toastAcc' && toastAccion) { const fn = toastAccion; toastAccion = null; $('toast').classList.remove('on'); fn(); }
   if (id === 'btnCopia') compartir(JSON.stringify(D), `umbral-copia-${ymd(hoy())}.json`, 'application/json', 'Copia de Umbral', 'Copia guardada en Archivos.');
   if (id === 'btnRestaurar') $('fileCopia').click();
 });
