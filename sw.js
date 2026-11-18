@@ -1,7 +1,7 @@
 /* Umbral — service worker.
    Guarda el caparazón para que la app abra sin conexión.
    Al publicar una versión nueva, subí el número de CACHE. */
-const CACHE = 'umbral-v1';
+const CACHE = 'umbral-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.png', './icon-180.png'];
 
 self.addEventListener('install', e => {

@@ -1,7 +1,7 @@
 {
-  "name": "Umbral — entrenamiento de running",
+  "name": "Umbral — entrenamiento de running, fuerza y Hyrox",
   "short_name": "Umbral",
-  "description": "Planes de running con ritmos por zona y planes importables en formato UTP/1.",
+  "description": "Tu plan del día y de la semana: running por zonas, fuerza e Hyrox, con guía de ejercicios y registro de cargas. Planes importables en formato UTP/1.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -10,8 +10,21 @@
   "theme_color": "#EDEFF2",
   "lang": "es-UY",
   "icons": [
-    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "icon.png", "sizes": "1024x1024", "type": "image/png" },
-    { "src": "icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
