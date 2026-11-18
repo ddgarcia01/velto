@@ -11,7 +11,7 @@ const ctx = vm.createContext({ console, TextEncoder, Date, Math, JSON });
 vm.runInContext(html.slice(ini, html.lastIndexOf('/*', fin)) + `
 globalThis.N = { vdotDe, zonasDe, ritmoDe, segundos, parseTolerante, normalizarPlan, resolverFechas, validar,
   advertenciasCarga, metricaSesion, duracionTecnica, zonaTecnica, parseEjercicios, detectarEjercicios, esEstacion,
-  cargaDia, EJERCICIOS, TERMINOS, planEjemplo };`, ctx);
+  cargaDia, EJERCICIOS, TERMINOS, planEjemplo, parseBloque, cargaSugerida, repsSugeridas, rirSugerido, registroSugerido, e1rm };`, ctx);
 const N = ctx.N;
 const plano = x => JSON.parse(JSON.stringify(x));   // los objetos del vm tienen otro prototipo
 
@@ -62,7 +62,10 @@ test('U50 parseo de ejercicios de fuerza', () => {
   assert.deepEqual(ss.map(e => [e.k, e.reps, e.pausa]), [['bulgara', '6 por pierna', '60 s'], ['gemelo_sentado', '10', '60 s']]);
   assert.equal(N.parseEjercicios('Sled push 50 m (4 × 12,5 m) · 120 kg').length, 0);   // desglose entre paréntesis
   assert.equal(plano(N.parseEjercicios('Técnica de sled pull · 4 × 12,5 m con 90 kg'))[0].reps, '12,5 m');
-  assert.equal(N.parseEjercicios('Circuito × 2 vueltas: Pallof 12 por lado').length, 0);
+  // 3.0: los circuitos se leen (cada ejercicio con las vueltas como series)
+  const ci = plano(N.parseBloque('Circuito × 2 vueltas: Pallof press 12 por lado · plancha lateral 40 s por lado'));
+  assert.deepEqual([ci.modalidad, ci.rondas, ci.items.map(e => [e.k, e.series, e.reps, e.pesoDefecto])],
+    ['circuito', 2, [['pallof', 2, '12 por lado', 'Banda o polea liviana'], ['plancha_lateral', 2, '40 s por lado', 'Peso corporal']]]);
 });
 
 test('U51 detección de ejercicios sin solapamientos', () => {
@@ -94,4 +97,34 @@ test('U53 el plan de ejemplo y la plantilla híbrida siguen validando', () => {
     const p = N.resolverFechas(N.normalizarPlan(crudo));
     assert.equal(N.validar(crudo, p).err.length, 0);
   }
+});
+
+test('U54 bloques de fuerza: modalidad, título y peso', () => {
+  const b = plano(N.parseBloque('Pie y cadera para la maratón · elevación de talón a una pierna 2 × 12 + puente de glúteo a una pierna 2 × 10 + Copenhagen 2 × 20 s por lado'));
+  assert.equal(b.modalidad, 'secuencia');
+  assert.equal(b.titulo, 'Pie y cadera para la maratón');
+  assert.deepEqual(b.items.map(e => [e.k, e.series, e.reps, e.pesoDefecto]),
+    [['gemelo_pie', 2, '12', 'Peso corporal'], ['puente_gluteo', 2, '10', 'Peso corporal'], ['copenhagen', 2, '20 s por lado', 'Peso corporal']]);
+  const ss = plano(N.parseBloque('Superserie: floor press 3 × 8 @ RIR 2 (27,5 kg por mano) + jalón neutro 3 × 8 @ RIR 2 · 75 s entre rondas'));
+  assert.deepEqual([ss.modalidad, ss.pausa, ss.items[0].carga, ss.items[1].carga], ['superserie', '75 s', '27,5 kg por mano', null]);
+  assert.equal(plano(N.parseBloque('Farmers hold 3 × 40 s con 2 × 24 kg')).items[0].carga, '2 × 24 kg');
+  assert.equal(plano(N.parseBloque('Sentadilla · 3 × 5 @ RIR 3')).modalidad, 'ejercicio');
+});
+
+test('U55 precarga del registro', () => {
+  const it = plano(N.parseBloque('Sentadilla trasera · 3 × 5 @ RIR 3–4 · 75–80 kg · pausa 2:30')).items[0];
+  assert.equal(N.cargaSugerida(it, null), 75);                        // sin historial: lo más bajo del rango
+  assert.equal(N.cargaSugerida(it, { carga_kg: 80, rir: 5 }), 82.5);  // sobró: +2,5 kg
+  assert.equal(N.cargaSugerida(it, { carga_kg: 80, rir: 3 }), 80);    // en lo planificado: igual
+  assert.equal(N.cargaSugerida(it, { carga_kg: 80, rir: 1 }), 75);    // pasado: −5 %
+  assert.equal(N.cargaSugerida({ carga: '27,5 kg por mano', rir: '2' }, { carga_kg: 20, rir: 4 }), 21);   // mancuerna: +1
+  assert.equal(N.cargaSugerida({ carga: '≈75 % 1RM' }, null), null);
+  assert.equal(N.cargaSugerida({ carga: '14 lb' }, null), 6.5);
+  assert.equal(N.repsSugeridas(it), '5-5-5');
+  assert.equal(N.repsSugeridas({ series: 2, reps: '20 s por lado' }), '20s-20s');
+  assert.equal(N.rirSugerido(it), 3);
+  const r = plano(N.registroSugerido({ tipo: 'suave', segmentos: [{ rol: 'continuo', duracion_min: 45, zona: 'E' }] }, N.zonasDe(50)));
+  assert.equal(r.tiempo, '45:00'); assert.equal(r.rpe, 3); assert.ok(r.km > 7 && r.km < 10);
+  assert.equal(plano(N.registroSugerido({ tipo: 'fuerza', segmentos: [{ rol: 'bloque', duracion_min: 40 }] }, null)).tiempo, null);
+  assert.equal(N.e1rm(100, 5, 2), 123.3); assert.equal(N.e1rm(50, 15, 0), null);
 });

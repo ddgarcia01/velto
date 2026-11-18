@@ -54,7 +54,7 @@ async function importar(txt) {
   await pg.click('#btnConfirmar');
   await pg.waitForTimeout(350);
 }
-const VISTAS = ['hoy', 'semana', 'plan', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'];
+const VISTAS = ['hoy', 'mes', 'semana', 'dia', 'plan', 'panel', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'];
 async function sinDesborde(v) {
   const w = await ev(() => document.querySelector('.vista:not(.off)').scrollWidth);
   ok(w <= 391, `desborde horizontal en ${v}: ${w}px`);
@@ -128,6 +128,72 @@ await caso('N03', 'Guía: búsqueda y explicación de un ejercicio', async () =>
   ok((await texto('#cuerpoGuia')).includes('reserva'));
   await pg.click('#btnCerrarGuia');
 });
+await caso('N09', 'Calendario: mes, día y modos', async () => {
+  await pg.click('.tabs button[data-v="calendario"]');
+  ok(await ev(() => vista) === 'semana', 'el calendario abre en la semana');
+  await pg.click('#v-semana .segctl [data-ir="mes"]');
+  ok(await pg.locator('#v-mes .cm:not(.vacia)').count() === 30, 'noviembre debe tener 30 días');
+  ok((await texto('#v-mes .semnav')).toLowerCase().includes('noviembre 2026'));
+  ok(await pg.locator('#v-mes .cm.hoy').count() === 1);
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'cal-mes.png') });
+  await pg.click('#v-mes [data-mes="2026-12"]');
+  ok((await texto('#v-mes .semnav')).toLowerCase().includes('diciembre'), 'no avanza de mes');
+  await pg.click('#v-mes [data-mes="2026-11"]');
+  await pg.click('#v-mes [data-dia="2026-11-28"]');
+  ok(await ev(() => vista) === 'dia');
+  ok((await texto('#v-dia')).includes('28 de noviembre') && await pg.locator('#v-dia .hoy-card').count() >= 1, 'el día no muestra sus sesiones');
+  await pg.click('#v-dia .semnav [data-dia="2026-11-29"]');
+  ok((await texto('#v-dia .semnav')).includes('29 de noviembre'));
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'cal-dia.png') });
+  await pg.click('#v-dia .segctl [data-ir="plan"]');
+  ok(await ev(() => vista) === 'plan' && await pg.isVisible('#v-plan .segctl'));
+});
+await caso('N12', 'resumen primero; bloques con modalidad y peso al desplegar', async () => {
+  await ev(() => irA('hoy'));
+  ok(await pg.locator('#v-hoy .resumen li').count() > 0, 'falta el resumen');
+  ok(!(await pg.locator('#v-hoy .mas-det').first().evaluate(d => d.open)), 'el detalle debe arrancar cerrado');
+  ok(await pg.locator('#v-hoy .peso').count() > 0, 'el resumen no muestra el peso');
+  await pg.locator('#v-hoy .mas-det > summary').first().click();
+  ok(await pg.locator('#v-hoy .mas-det').first().evaluate(d => d.open), 'no despliega');
+  const ejd = pg.locator('#v-hoy .ejd').first();
+  await ejd.locator('summary').click();
+  ok((await ejd.innerText()).match(/Reserva|Pausa|Cómo se hace/), 'el ejercicio no muestra su detalle');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'hoy-detalle.png'), fullPage: false });
+  // un bloque de varios ejercicios muestra modalidad y peso de cada uno
+  const html = await ev(() => bloqueFuerzaHTML(parseBloque('Pie y cadera · elevación de talón a una pierna 2 × 12 + puente de glúteo a una pierna 2 × 10 + Copenhagen 2 × 20 s por lado'), ''));
+  ok(html.includes('En secuencia') && (html.match(/Peso corporal/g) || []).length === 3, 'bloque mixto poco claro');
+});
+await caso('N11', 'registro precargado: solo revisar y guardar', async () => {
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'suave' && !regDe(x.s)).s.uid);
+  await ev(u => abrirRegistro(u), uid);
+  ok(await pg.isVisible('#cuerpoRegistro .reg-aviso'), 'falta el aviso de precarga');
+  const km = await pg.inputValue('#rKm'), t = await pg.inputValue('#rTiempo');
+  ok(+km > 0 && /:\d\d$/.test(t), `sin precarga: ${km} / ${t}`);
+  ok(await pg.locator('#rKm.sug').count() === 1, 'la precarga no se distingue');
+  ok(await pg.locator('#cuerpoRegistro [data-rpe].on').count() === 1, 'sin RPE sugerido');
+  await pg.fill('#rKm', String(+km + 1));
+  ok(await pg.locator('#rKm.sug').count() === 0, 'al editar debe dejar de verse como sugerido');
+  await pg.click('#btnGuardarReg'); await pg.waitForTimeout(200);
+  const r = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(r.hecho && Math.abs(r.km - (+km + 1)) < 0.01 && r.tiempo === t && r.rpe === 3, 'no guardó lo precargado: ' + JSON.stringify(r));
+  // fuerza: kilos, reps y RIR sugeridos
+  const fu = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'fuerza' && /Sentadilla/.test(JSON.stringify(x.s.segmentos)) && !regDe(x.s)).s.uid);
+  await ev(u => abrirRegistro(u), fu);
+  const f1 = pg.locator('#cuerpoRegistro [data-ejreg]').first();
+  ok(await f1.locator('[data-r="reps"]').inputValue() !== '' && await f1.locator('[data-r="rir"]').inputValue() !== '', 'fuerza sin precarga');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'registro-precargado.png') });
+  await ev(() => cerrarHojas());
+});
+await caso('N10', 'Panel: indicadores, gráficos y tabla', async () => {
+  await pg.click('.tabs button[data-v="panel"]');
+  ok(await pg.locator('#v-panel .tiles > div').count() >= 4, 'faltan indicadores');
+  ok(await pg.locator('#v-panel .graf path').count() > 0, 'falta el gráfico de km');
+  await pg.locator('#v-panel .graf [data-tip]').nth(1).click();
+  ok(/Semana 1: hecho/.test(await texto('#v-panel .graf-card .tip')), 'el toque no muestra el detalle');
+  ok((await texto('#v-panel')).includes('1RM estimado'));
+  ok(await pg.locator('#v-panel .graf-card table').count() === 1, 'falta la vista de tabla');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'panel.png'), fullPage: false });
+});
 await caso('I05/N06', 'detalle: estructura, explicaciones, ejercicios y estaciones', async () => {
   const uids = await ev(() => todasSesiones(plan()).map(x => x.s.uid));
   for (const uid of uids) {
@@ -184,14 +250,15 @@ await caso('I09/N04', 'registro con cargas de fuerza y "última vez"', async () 
   // la próxima sesión con sentadilla muestra la última carga
   const otra = await ev(u => todasSesiones(plan()).find(x => x.s.uid !== u && x.s.segmentos.some(g => /Sentadilla trasera/.test(g.descripcion || ''))).s.uid, uid);
   await ev(u => { cerrarHojas(); abrirDetalle(u); }, otra);
-  ok((await texto('#cuerpoDetalle')).includes('Última vez: 80 kg × 5-5-5-5'), 'no muestra la última vez');
+  const det = await texto('#cuerpoDetalle');
+  ok(det.includes('Última vez') && det.includes('80 kg × 5-5-5-5'), 'no muestra la última vez');
   await ev(() => cerrarHojas());
 });
 await caso('N05', 'exportar registro de fuerza en CSV', async () => {
   const csv = await ev(() => registroFuerzaCSV());
-  const [cab, l1] = csv.trim().split('\n');
+  const [cab, ...filas] = csv.trim().split('\n');
   ok(cab === 'fecha,ejercicio,series,reps,carga_kg,rir,notas');
-  ok(/^2026-11-23,Sentadilla trasera,4,5,80,3,reps 5-5-5-5$/.test(l1), 'fila inesperada: ' + l1);
+  ok(filas.some(l => /^2026-11-23,Sentadilla trasera,4,5,80,3,reps 5-5-5-5$/.test(l)), 'falta la sentadilla: ' + filas.join(' | '));
 });
 await caso('I10', 'marcar hecha desde la lista', async () => {
   await ev(() => irA('semana'));

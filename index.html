@@ -288,6 +288,60 @@ a.btn{text-decoration:none;color:inherit}
 .menu span{display:block;font-size:13px;color:var(--ink-2);margin-top:3px}
 .volver{font-size:14px;color:var(--accent);font-weight:600;padding:4px 2px 10px}
 #shGuia{z-index:70}
+/* ---------- 3.0 ---------- */
+.tabs button{font-size:9.5px;letter-spacing:.06em}
+.resumen{list-style:none;margin:12px 0 0;padding:0}
+.resumen li{font-size:14px;padding:6px 0;border-top:1px solid var(--line);line-height:1.35}
+.resumen li .sub{color:var(--ink-2);font-size:13px}
+.mas-det{margin-top:8px;border-top:1px solid var(--line)}
+.mas-det>summary,.ejd>summary,.graf-card details>summary{cursor:pointer;list-style:none}
+.mas-det>summary::-webkit-details-marker,.ejd>summary::-webkit-details-marker{display:none}
+.mas-det>summary{font-size:14px;font-weight:600;color:var(--accent);padding:11px 0 4px}
+.mas-det>summary::after{content:" ▾"}.mas-det[open]>summary::after{content:" ▴"}
+.mas-det .exp{font-size:13.5px;color:var(--ink-2);margin:8px 0 0}.mas-det .exp b{color:var(--ink)}
+.blq-cab{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-bottom:2px}
+.blq-cab b{font-size:14.5px}
+.mod{font-family:var(--disp);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fuerza);border:1px solid currentColor;border-radius:9px;padding:1px 7px}
+.blq-como{font-size:12.5px;color:var(--ink-2);margin:2px 0 4px}
+.ejd{border-top:1px dashed var(--line)}.ejd:first-of-type{border-top:0}
+.ejd>summary{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;align-items:baseline}
+.ejd>summary .ejn{font-weight:600;font-size:14.5px}
+.ejd>summary .ejsr{font-size:16px;font-weight:600;font-family:var(--disp);text-align:right}
+.ejd>summary .peso{grid-column:1/-1;justify-self:start}
+.peso{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:1px 7px;line-height:1.5}
+.peso.kg{background:#E9E2F3;color:#4B3577}.peso.pc{background:#E3EEF7;color:#1E4F7C}.peso.libre{background:#FBF4E2;color:#7A5A13}
+.ejdet{padding:0 0 9px}.ejdet div{display:flex;gap:10px;font-size:13px;padding:2px 0}
+.ejdet span{flex:0 0 92px;color:var(--ink-3)}.ejdet b{font-weight:500}
+.ejdet .btn{width:auto;display:inline-block;padding:7px 12px;margin-top:6px}
+.segctl{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;margin:2px 0 10px}
+.segctl button{text-align:center;padding:7px 0;font-size:13.5px;font-weight:600;color:var(--ink-2);border-radius:8px}
+.segctl button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.cal-sem,.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-sem span{text-align:center;font-family:var(--disp);font-size:10.5px;color:var(--ink-3);padding:2px 0}
+.cm{aspect-ratio:1/1.15;border-radius:8px;border:1px solid transparent;padding:4px 3px;display:flex;flex-direction:column;align-items:center;position:relative}
+.cm.vacia{background:none}.cm.hoy{border-color:var(--ink)}
+.cm b{font-family:var(--mono);font-size:12.5px;font-weight:600}
+.cm .pts{display:flex;gap:2px;margin-top:auto;margin-bottom:3px}.cm .pts i,.leyenda i[class^="c-"]{width:7px;height:7px;border-radius:50%;display:inline-block}
+.cm em{position:absolute;top:2px;right:4px;font-style:normal;font-size:10px;color:var(--ok);font-weight:700}
+.c-calidad{background:#D19A2E}.c-clase{background:#C7502F}.c-fuerza{background:#6B4E9B}.c-aerobico{background:#4E7FA8}.c-otro{background:#93A7B8}
+.leyenda i[class^="c-"]{margin-right:-5px}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.tiles div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px}
+.tiles span{display:block;font-family:var(--disp);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tiles b{display:block;font-family:var(--disp);font-size:26px;line-height:1.1}
+.tiles em{font-style:normal;font-size:12px;color:var(--ink-2)}
+.graf{width:100%;height:auto;display:block;margin-top:6px}
+.graf .grid{stroke:var(--line);stroke-width:1}.graf .ax{font-family:var(--mono);font-size:9px;fill:var(--ink-3)}.graf .ax.act{fill:var(--ink);font-weight:700}
+.ley{display:flex;gap:14px;font-size:12px;color:var(--ink-2);margin-top:6px}.ley i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tip{font-size:12.5px;color:var(--ink-2);margin:6px 0 0;min-height:18px}
+.graf-card details{margin-top:6px;font-size:13px}.graf-card details>summary{color:var(--accent);font-weight:600}
+.multi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.mini-g b{display:block;font-size:13px}.mini-g .num{font-size:15px}.mini-g em{font-style:normal;font-size:12px}
+.mini-g em.up{color:var(--ok)}.mini-g em.dn{color:var(--alerta)}.mini-g small{display:block;color:var(--ink-3);font-size:11.5px}
+.spark{width:100%;height:auto;display:block;margin-top:4px}
+.reg-aviso{background:#EEF4FB;color:#1E4F7C;border-radius:var(--r-s);padding:9px 11px;font-size:13px;margin:0 0 12px}
+.in.sug{background:#EEF4FB;border-color:#B9D0E8;color:#1E4F7C}
+.ejreg label span{display:block;font-family:var(--disp);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
 .ejreg{border-bottom:1px solid var(--line);padding:9px 0}
 .ejreg .g3{margin-top:6px}
 .ejreg small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
@@ -303,7 +357,10 @@ a.btn{text-decoration:none;color:inherit}
   </div>
 
   <div class="vista" id="v-hoy"></div>
+  <div class="vista off" id="v-mes"></div>
   <div class="vista off" id="v-semana"></div>
+  <div class="vista off" id="v-dia"></div>
+  <div class="vista off" id="v-panel"></div>
   <div class="vista off" id="v-plan"></div>
   <div class="vista off" id="v-guia"></div>
   <div class="vista off" id="v-mas"></div>
@@ -314,10 +371,10 @@ a.btn{text-decoration:none;color:inherit}
   <nav class="tabs">
     <button class="on" data-v="hoy">
       <svg viewBox="0 0 24 24"><path d="M12 3v3M5 8l2 2M19 8l-2 2M12 21a7 7 0 100-14 7 7 0 000 14zM12 13v-2"/></svg>Hoy</button>
-    <button data-v="semana">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2"/></svg>Semana</button>
-    <button data-v="plan">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Plan</button>
+    <button data-v="calendario">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario</button>
+    <button data-v="panel">
+      <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Panel</button>
     <button data-v="guia">
       <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 5v16M8 7h7M8 11h5"/></svg>Guía</button>
     <button data-v="mas">
@@ -1313,36 +1370,128 @@ function detectarEjercicios(texto) {
   return out;
 }
 
-/* "Sentadilla trasera · 3 × 5 @ RIR 3–4 · 75–80 kg · pausa 2:30 · bajada en 2 s"
-   → [{ nombre, k, series, reps, rir, carga, pausa, nota }]. Las superseries ("A ... + B ...") dan dos. */
-function parseEjercicios(desc) {
-  const d = String(desc || '').trim();
-  if (!d) return [];
-  const sinPrefijo = d.replace(/^superserie:\s*/i, '');
-  const pausaGlobal = (d.match(/·\s*(\d+\s*s|\d+:\d{2}|\d+\s*min)\s+entre rondas/i) || [])[1] || null;
-  const trozos = /^superserie/i.test(d) ? sinPrefijo.split(/\s\+\s(?=[a-záéíóúñ])/i) : [d];
-  const out = [];
-  for (const tr of trozos) {
-    // la primera "S × R" fuera de paréntesis: "(4 × 12,5 m)" es un desglose, no la prescripción
-    let sxr = null;
-    for (const m of tr.matchAll(/(\d+)\s*[x×]\s*(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+)?(?:\s*(?:s|m)\b)?)(\s*por (?:pierna|lado|mano))?/gi)) {
-      const previo = tr.slice(0, m.index);
-      if ((previo.match(/\(/g) || []).length <= (previo.match(/\)/g) || []).length) { sxr = m; break; }
-    }
-    if (!sxr) continue;
-    const antes = tr.slice(0, sxr.index).replace(/[·:]\s*$/, '').trim();
-    const nombre = antes.split('·')[0].trim() || (detectarEjercicios(tr)[0] || {}).txt || 'Ejercicio';
-    const resto = tr.slice(sxr.index + sxr[0].length);
-    const rir = (resto.match(/RIR\s*([\d–\-]+)/i) || [])[1] || null;
-    const carga = (resto.match(/(?:≈\s*)?[\d.,]+(?:\s*[–-]\s*[\d.,]+)?\s*(?:kg|lb)(?:\s*por (?:mano|lado))?(?:\s*\([^)]*\))?|≈?\s*\d+\s*%\s*(?:1RM|de tu 1RM)/i) || [])[0] || null;
-    const pausa = (resto.match(/pausa\s*([\d:]+\s*(?:s|min)?)/i) || [])[1] || pausaGlobal;
-    const partes = resto.split('·').map(x => x.trim()).filter(Boolean);
-    const nota = partes.filter(x => !/^@|RIR|^pausa|kg|lb|%|entre rondas/i.test(x)).join(' · ') || null;
-    const det = detectarEjercicios(nombre)[0] || detectarEjercicios(tr)[0];
-    out.push({ nombre: nombre.replace(/^\w/, c => c.toUpperCase()), k: det ? det.k : null, series: +sxr[1],
-      reps: (sxr[2] + (sxr[3] || '')).trim(), rir, carga: carga ? carga.trim() : null, pausa: pausa ? pausa.trim() : null, nota });
+/* Peso por defecto cuando el plan no indica carga: evita la duda de "¿lleva peso o no?". */
+const PESO_DEFECTO = {
+  puente_gluteo: 'Peso corporal', copenhagen: 'Peso corporal', gemelo_pie: 'Peso corporal', dominadas: 'Peso corporal',
+  plancha: 'Peso corporal', plancha_lateral: 'Peso corporal', dead_bug: 'Peso corporal', bird_dog: 'Peso corporal',
+  mountain_climbers: 'Peso corporal', nordico: 'Peso corporal', bbj: 'Peso corporal', saltos_cajon: 'Peso corporal',
+  russian_twist: 'Peso corporal o disco liviano', pallof: 'Banda o polea liviana', progresivos: 'Sin carga', drills: 'Sin carga',
+  movilidad: 'Sin carga'
+};
+
+const RX_SXR = /(\d+)\s*[x×]\s*(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+)?(?:\s*(?:s|m)\b)?)(\s*por (?:pierna|lado|mano))?/gi;
+const RX_CARGA = /(?:≈\s*)?(?:\d+\s*[x×]\s*)?\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?\s*(?:kg|lb)(?:\s*por (?:mano|lado))?(?:\s*\([^)]*\))?|≈?\s*\d+\s*%\s*(?:1RM|de tu 1RM)|peso corporal/i;
+
+/* Primera "S × R" fuera de paréntesis: "(4 × 12,5 m)" es un desglose, no la prescripción. */
+function _sxr(tr) {
+  for (const m of tr.matchAll(RX_SXR)) {
+    const previo = tr.slice(0, m.index);
+    if ((previo.match(/\(/g) || []).length <= (previo.match(/\)/g) || []).length) return m;
   }
-  return out;
+  return null;
+}
+function _item(tr, pausaGlobal, seriesCircuito) {
+  let nombre, series, reps, resto;
+  const sxr = _sxr(tr);
+  if (sxr) {
+    nombre = tr.slice(0, sxr.index).replace(/[·:]\s*$/, '').trim().split('·').pop().trim();
+    series = +sxr[1]; reps = (sxr[2] + (sxr[3] || '')).trim(); resto = tr.slice(sxr.index + sxr[0].length);
+  } else if (seriesCircuito) {
+    // en un circuito cada ejercicio trae solo las reps o el tiempo: "Pallof press 12 por lado"
+    const m = tr.match(/(\d+(?:[.,]\d+)?\s*(?:s|seg|min|m)?\b(?:\s*por (?:pierna|lado|mano))?)/i);
+    if (!m) return null;
+    nombre = tr.slice(0, m.index).trim(); series = seriesCircuito; reps = m[1].trim(); resto = tr.slice(m.index + m[0].length);
+  } else return null;
+  const det = detectarEjercicios(nombre)[0] || detectarEjercicios(tr)[0];
+  if (!nombre) nombre = det ? det.txt : 'Ejercicio';
+  const rir = (resto.match(/RIR\s*([\d–\-]+)/i) || [])[1] || null;
+  const carga = (resto.match(RX_CARGA) || [])[0] || null;
+  const pausa = (resto.match(/pausa\s*([\d:]+\s*(?:s|min)?)/i) || [])[1] || pausaGlobal;
+  const nota = resto.split('·').map(x => x.trim()).filter(x => x && !/^@|RIR|^pausa|kg\b|lb\b|%|entre rondas|peso corporal/i.test(x))
+    .join(' · ').replace(/^[,;]\s*/, '') || null;
+  const k = det ? det.k : null;
+  return { nombre: nombre.replace(/^\w/, c => c.toUpperCase()), k, series, reps, rir, carga: carga ? carga.trim() : null,
+    pausa: pausa ? pausa.trim() : null, nota, pesoDefecto: k ? (PESO_DEFECTO[k] || null) : null };
+}
+
+/* Lee un bloque de fuerza escrito en texto y devuelve su estructura:
+   { modalidad: 'ejercicio' | 'superserie' | 'circuito' | 'secuencia', titulo, rondas, pausa, items: [...] }
+   Formatos que entiende:
+   - "Sentadilla · 3 × 5 @ RIR 3 · 80 kg · pausa 2:30"                    → ejercicio
+   - "Superserie: A 3 × 8 @ RIR 2 + B 3 × 8 · 75 s entre rondas"         → superserie
+   - "Circuito × 2 vueltas: A 12 por lado · B 40 s por lado"              → circuito
+   - "Pie y cadera · A 2 × 12 + B 2 × 10 + C 2 × 20 s por lado"           → secuencia con título */
+function parseBloque(desc) {
+  const d = String(desc || '').trim();
+  const vacio = { modalidad: null, titulo: null, rondas: null, pausa: null, items: [] };
+  if (!d) return vacio;
+  const pausaGlobal = (d.match(/·\s*(\d+\s*s|\d+:\d{2}|\d+\s*min)\s+entre (?:rondas|vueltas)/i) || [])[1] || null;
+  const circ = d.match(/circuito\s*[x×]\s*(\d+)\s*vueltas?\s*:?/i);
+  if (circ) {
+    const cuerpo = d.slice(circ.index + circ[0].length);
+    const items = cuerpo.split(/\s*·\s*|\s\+\s/).map(t => _item(t, pausaGlobal, +circ[1])).filter(Boolean);
+    const titulo = d.slice(0, circ.index).replace(/[·:]\s*$/, '').trim() || null;
+    return { modalidad: 'circuito', titulo, rondas: +circ[1], pausa: pausaGlobal, items };
+  }
+  if (/^superserie/i.test(d)) {
+    const items = d.replace(/^superserie:\s*/i, '').split(/\s\+\s(?=[a-záéíóúñ])/i).map(t => _item(t, pausaGlobal)).filter(Boolean);
+    return { modalidad: items.length > 1 ? 'superserie' : 'ejercicio', titulo: null, rondas: null, pausa: pausaGlobal, items };
+  }
+  // título de grupo: lo que va antes del primer "·" si no es un ejercicio ni tiene series × reps
+  let titulo = null, cuerpo = d;
+  const pri = d.indexOf('·');
+  if (pri > 0) {
+    const cabeza = d.slice(0, pri).trim();
+    if (!detectarEjercicios(cabeza).length && !_sxr(cabeza)) { titulo = cabeza; cuerpo = d.slice(pri + 1).trim(); }
+  }
+  const trozos = cuerpo.split(/\s\+\s(?=[a-záéíóúñ])/i);
+  const items = trozos.map(t => _item(t, pausaGlobal)).filter(Boolean);
+  if (!items.length) return vacio;
+  return { modalidad: items.length > 1 ? 'secuencia' : 'ejercicio', titulo, rondas: null, pausa: pausaGlobal, items };
+}
+function parseEjercicios(desc) { return parseBloque(desc).items; }
+
+/* ---------- precarga del registro ---------- */
+const _num = t => { const m = String(t || '').match(/\d+(?:[.,]\d+)?/g); return m ? m.map(x => +x.replace(',', '.')) : []; };
+/* Carga sugerida en kg: parte de la última vez y la ajusta por el RIR que dejaste frente al
+   planificado; si no hay historial, el valor más bajo del rango del plan (conservador). */
+function cargaSugerida(item, ultima) {
+  const rirPlan = _num(item.rir)[0];
+  const ult = ultima && typeof ultima.carga_kg === 'number' ? ultima.carga_kg : null;
+  if (ult != null) {
+    const paso = ult >= 40 ? 2.5 : 1;
+    const rirUlt = ultima.rir == null || ultima.rir === '' ? null : +ultima.rir;
+    if (rirPlan != null && rirUlt != null) {
+      if (rirUlt >= rirPlan + 2) return ult + paso;          // sobró: subir
+      if (rirUlt < rirPlan) return Math.round(ult * 0.95 / paso) * paso;   // pasado: bajar 5 %
+    }
+    return ult;
+  }
+  if (!item.carga || /%|corporal/i.test(item.carga)) return null;
+  const n = _num(item.carga.replace(/\([^)]*\)/g, ''));
+  if (!n.length) return null;
+  const kg = Math.min(...n.slice(0, 2));
+  return /lb/i.test(item.carga) ? Math.round(kg * 0.4536 * 2) / 2 : kg;
+}
+function repsSugeridas(item) {
+  const r = String(item.reps || '').match(/\d+(?:[.,]\d+)?\s*(?:s\b|m\b)?/);
+  if (!r) return '';
+  return Array(Math.max(1, Math.min(item.series || 1, 10))).fill(r[0].replace(/\s+/g, '')).join('-');
+}
+const rirSugerido = item => { const n = _num(item.rir); return n.length ? n[0] : null; };
+const RPE_TIPO = { suave: 3, largo: 4, progresivo: 6, tempo: 7, fartlek: 7, intervalos: 8, repeticiones: 8, cuestas: 8,
+  test: 9, carrera: 9, fuerza: 7, cruzado: 8, movilidad: 2 };
+/* Lo que la app propone al registrar: lo planificado. El atleta revisa y ajusta. */
+function registroSugerido(s, zonas) {
+  const m = metricaSesion(s, zonas);
+  return { km: m.km ? Math.round(m.km * 10) / 10 : null, tiempo: m.min && !NO_CORRER.includes(s.tipo) ? hms(m.min * 60) : null,
+    rpe: RPE_TIPO[s.tipo] || 5, sensacion: 'bien' };
+}
+/* 1RM estimado (Epley con RIR): carga × (1 + (reps + RIR) / 30), solo series de 12 reps efectivas o menos. */
+function e1rm(carga, reps, rir) {
+  const r = (+reps || 0) + (+rir || 0);
+  if (!carga || !reps || r > 12) return null;
+  return Math.round(carga * (1 + r / 30) * 10) / 10;
 }
 
 /* Una estación de Hyrox dentro de una sesión: un bloque sin distancia de carrera
@@ -1673,11 +1822,12 @@ function tarjetaHoy(s, z, rec) {
     <div class="hoy-meta">${[m.km ? m.km + ' km' : null, m.min ? duracionTxt(m.min) : null].filter(Boolean).join(' · ')}</div>
     ${rango && !NO_CORRER.includes(s.tipo) ? `<div class="ritmo-grande"><b>${rango.replace('/km', '')}</b><em>${dom && ZONAS[dom] ? ZONAS[dom].nom : 'ritmo'} /km</em></div>
       ${ajustado ? `<div class="ritmo-sub">Sin ajuste: ${rangoBase}<span class="clima-flag">clima +${Math.round(recargoActual() * 100)}%</span></div>` : ''}` : ''}
-    ${NO_CORRER.includes(s.tipo) ? '' : `<div style="margin:15px 0 3px">${perfilHTML(s, 'xl')}</div>`}
-    ${s.proposito ? `<p style="font-size:14px;color:var(--ink-2);margin-top:13px">${esc(s.proposito)}</p>` : ''}
-    ${(s.segmentos || []).length ? `<div class="segs pasos-t"><span class="eyebrow">Paso a paso</span>
-      ${s.segmentos.map(g => segmentoHTML(g, z, rec, claveReg(plan(), s))).join('')}</div>` : ''}
-    ${s.sensacion ? `<p style="font-size:13.5px;color:var(--ink-2);margin-top:10px"><b style="color:var(--ink)">Cómo se tiene que sentir:</b> ${esc(s.sensacion)}</p>` : ''}
+    ${NO_CORRER.includes(s.tipo) ? '' : `<div style="margin:15px 0 3px">${perfilHTML(s, 'md')}</div>`}
+    ${resumenSesion(s, z, rec).length ? `<ul class="resumen">${resumenSesion(s, z, rec).map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
+    ${(s.segmentos || []).length ? `<details class="mas-det"><summary>Paso a paso y detalles</summary>
+      <div class="segs">${s.segmentos.map(g => segmentoHTML(g, z, rec, claveReg(plan(), s))).join('')}</div>
+      ${s.proposito ? `<p class="exp"><b>Para qué:</b> ${esc(s.proposito)}</p>` : ''}
+      ${s.sensacion ? `<p class="exp"><b>Cómo se tiene que sentir:</b> ${esc(s.sensacion)}</p>` : ''}</details>` : ''}
     <div class="btn-row"><button class="btn gh mini" data-ses="${s.uid}">Ver la sesión</button>
       <button class="btn pri mini" data-registrar="${s.uid}">${r && r.hecho ? 'Editar registro' : 'Registrar'}</button></div>
   </div>`;
@@ -2010,7 +2160,7 @@ function vistaAjustes() {
   <div class="card">
     <h3>Umbral</h3>
     <p>${instalada ? 'Instalada en la pantalla de inicio. Funciona sin conexión.' : 'Estás en Safari. Tocá Compartir y después Añadir a pantalla de inicio para instalarla.'}</p>
-    <p class="num" style="font-size:11.5px;margin-top:8px">Umbral 2.0 · formato UTP/1 · ${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'} · ${Object.keys(D.reg).length} registros</p>
+    <p class="num" style="font-size:11.5px;margin-top:8px">Umbral 3.0 · formato UTP/1 · ${D.planes.length} plan${D.planes.length === 1 ? '' : 'es'} · ${Object.keys(D.reg).length} registros</p>
   </div>`;
 }
 
@@ -2052,6 +2202,7 @@ function ejerciciosDeSesion(s) {
   for (const g of s.segmentos || []) {
     if (g.rol === 'calentamiento' || esEstacion(g)) continue;
     for (const e of parseEjercicios(g.descripcion)) {
+      if (e.k && ['core', 'carrera', 'movilidad'].includes(EJ_POR_K[e.k].c)) continue;
       const id = e.k || normNombre(e.nombre);
       if (vistos.has(id)) continue;
       vistos.add(id); out.push(e);
@@ -2093,10 +2244,10 @@ function segmentoHTML(g, z, rec, claveRegActual) {
     cuerpo = `<b>${enlazar(g.descripcion || '')}</b>`;
     ritmo = g.duracion_min != null ? `≈ ${duracionTxt(g.duracion_min)}` : '';
   } else {
-    const ejs = g.rol !== 'calentamiento' ? parseEjercicios(g.descripcion) : [];
-    if (ejs.length) {
-      rol = ejs.length > 1 ? 'Superserie' : 'Ejercicio'; color = 'var(--fuerza)';
-      cuerpo = ejs.map(e => filaEjercicio(e, claveRegActual)).join('');
+    const bl = g.rol !== 'calentamiento' ? parseBloque(g.descripcion) : { items: [] };
+    if (bl.items.length) {
+      rol = 'Fuerza'; color = 'var(--fuerza)';
+      cuerpo = bloqueFuerzaHTML(bl, claveRegActual);
       ritmo = g.duracion_min != null ? `≈ ${duracionTxt(g.duracion_min)}` : '';
     } else {
       const medida = g.distancia_m != null ? (g.distancia_m >= 1000 ? +(g.distancia_m / 1000).toFixed(2) + ' km' : g.distancia_m + ' m') : duracionTxt(g.duracion_min);
@@ -2259,6 +2410,248 @@ function registroFuerzaCSV() {
   }
   return out.join('\n') + '\n';
 }
+
+/* ============================================================
+   3.0 — BLOQUES DE FUERZA CLAROS Y RESUMEN PRIMERO
+   ============================================================ */
+const MODALIDAD = {
+  ejercicio: { n: 'Ejercicio', como: '' },
+  superserie: { n: 'Superserie', como: 'Alterna los ejercicios sin pausa entre ellos; descansa al final de cada ronda.' },
+  circuito: { n: 'Circuito', como: 'Uno tras otro sin pausa; descansa al terminar cada vuelta.' },
+  secuencia: { n: 'En secuencia', como: 'Termina todas las series de un ejercicio antes de pasar al siguiente.' },
+};
+const cargaCorta = c => String(c || '').replace(/\s*\([^)]*\)/g, '').trim();
+/* Qué peso lleva: lo que dice el plan, el peso corporal, o la indicación de elegirlo por RIR. */
+function pesoDe(e) {
+  if (e.carga) return { txt: cargaCorta(e.carga), cls: 'kg' };
+  if (e.pesoDefecto) return { txt: e.pesoDefecto, cls: 'pc' };
+  if (e.rir) return { txt: `Elige carga · RIR ${e.rir}`, cls: 'libre' };
+  return { txt: 'Carga a elección', cls: 'libre' };
+}
+function itemFuerzaHTML(e, claveRegActual) {
+  const u = ultimaVez(e, claveRegActual);
+  const sug = cargaSugerida(e, u);
+  const peso = pesoDe(e);
+  const filas = [
+    e.rir ? ['Reserva', `RIR ${e.rir} (te quedan ${e.rir} reps en el tanque)`] : null,
+    e.pausa ? ['Pausa', e.pausa] : null,
+    e.carga && cargaCorta(e.carga) !== e.carga ? ['Carga', e.carga] : null,
+    u ? ['Última vez', txtUltima(u)] : null,
+    sug != null && u ? ['Sugerido hoy', `${String(sug).replace('.', ',')} kg`] : null,
+    e.nota ? ['Nota', e.nota] : null,
+  ].filter(Boolean);
+  return `<details class="ejd"><summary>
+      <span class="ejn">${esc(e.nombre)}</span>
+      <span class="ejsr num">${e.series} × ${esc(e.reps)}</span>
+      <span class="peso ${peso.cls}">${esc(peso.txt)}</span></summary>
+    <div class="ejdet">${filas.map(([k, v]) => `<div><span>${k}</span><b>${k === 'Nota' ? enlazar(v) : esc(v)}</b></div>`).join('')}
+      ${e.k ? `<button class="btn gh mini" data-ej="${e.k}">Cómo se hace</button>` : ''}</div></details>`;
+}
+function bloqueFuerzaHTML(bl, claveRegActual) {
+  const mod = MODALIDAD[bl.modalidad] || MODALIDAD.ejercicio;
+  const cab = bl.modalidad === 'ejercicio' && !bl.titulo ? '' :
+    `<div class="blq-cab"><b>${esc(bl.titulo || mod.n)}</b>${bl.titulo && bl.modalidad !== 'ejercicio' ? `<span class="mod">${mod.n}</span>` : ''}
+      ${bl.rondas ? `<span class="mod">${bl.rondas} vueltas</span>` : ''}${bl.pausa ? `<span class="mod">descanso ${esc(bl.pausa)}</span>` : ''}</div>
+      ${mod.como ? `<div class="blq-como">${mod.como}</div>` : ''}`;
+  return cab + bl.items.map(e => itemFuerzaHTML(e, claveRegActual)).join('');
+}
+
+/* Líneas cortas con lo esencial de la sesión (sin calentamiento ni vuelta a la calma). */
+function resumenSesion(s, z, rec) {
+  const out = [];
+  for (const g of s.segmentos || []) {
+    if (['calentamiento', 'vuelta_calma'].includes(g.rol)) continue;
+    if (g.rol === 'serie' && g.trabajo) {
+      const t = g.trabajo;
+      const q = t.distancia_m != null ? (t.distancia_m >= 1000 ? t.distancia_m / 1000 + ' km' : t.distancia_m + ' m') : duracionTxt(t.duracion_min);
+      out.push(`<b>${g.repeticiones || 1} × ${q}</b> ${esc(ritmoRango(t.zona, z, rec) || (t.zona ? 'en ' + t.zona : ''))}`);
+    } else if (g.rol === 'tecnica') {
+      out.push(`<span class="sub">${enlazar(g.descripcion || 'Técnica')}</span>`);
+    } else if (esEstacion(g)) {
+      const det = detectarEjercicios(g.descripcion)[0];
+      out.push(`<span class="peso pc">Estación</span> ${det ? esc(EJ_POR_K[det.k].n) : enlazar(g.descripcion)}`);
+    } else {
+      const bl = g.rol !== 'calentamiento' ? parseBloque(g.descripcion) : { items: [] };
+      if (bl.items.length) {
+        if (bl.modalidad === 'ejercicio') {
+          const e = bl.items[0];
+          out.push(`<b>${esc(e.nombre)}</b> <span class="num">${e.series} × ${esc(e.reps)}</span> <span class="peso ${pesoDe(e).cls}">${esc(pesoDe(e).txt)}</span>`);
+        } else {
+          out.push(`<b>${esc(bl.titulo || MODALIDAD[bl.modalidad].n)}${bl.rondas ? ' × ' + bl.rondas : ''}:</b> ${bl.items.map(e => esc(e.nombre)).join(', ')}`);
+        }
+      } else {
+        const medida = g.distancia_m != null ? (g.distancia_m >= 1000 ? +(g.distancia_m / 1000).toFixed(2) + ' km' : g.distancia_m + ' m') : duracionTxt(g.duracion_min);
+        out.push(`<b>${medida}</b> ${esc(g.ritmo || ritmoRango(g.zona, z, rec) || '')}${g.descripcion ? ` <span class="sub">${enlazar(g.descripcion)}</span>` : ''}`);
+      }
+    }
+  }
+  return out;
+}
+
+/* ============================================================
+   CALENDARIO: Mes · Semana · Día · Plan
+   ============================================================ */
+const CAL = ['mes', 'semana', 'dia', 'plan'];
+let calModo = 'semana';
+let mesSel = null;     // 'AAAA-MM'
+let diaSel = null;     // 'AAAA-MM-DD'
+function subnavCal(v) {
+  return `<div class="segctl" role="tablist">${CAL.map(m => `<button data-ir="${m}" class="${m === v ? 'on' : ''}">${{ mes: 'Mes', semana: 'Semana', dia: 'Día', plan: 'Plan' }[m]}</button>`).join('')}</div>`;
+}
+const CAT_SES = s => s.tipo === 'cruzado' ? 'clase' : s.tipo === 'fuerza' ? 'fuerza'
+  : ['intervalos', 'tempo', 'test', 'carrera', 'repeticiones', 'cuestas', 'fartlek', 'progresivo'].includes(s.tipo) ? 'calidad'
+  : ['suave', 'largo'].includes(s.tipo) ? 'aerobico' : 'otro';
+function vistaMes() {
+  const c = $('v-mes'), p = plan();
+  const base = mesSel ? parseYMD(mesSel + '-01') : new Date(hoy().getFullYear(), hoy().getMonth(), 1, 12);
+  const y = base.getFullYear(), mo = base.getMonth();
+  const primero = new Date(y, mo, 1, 12), dias = new Date(y, mo + 1, 0).getDate();
+  const off = (primero.getDay() + 6) % 7;
+  const porFecha = {};
+  if (p) todasSesiones(p).forEach(x => (porFecha[x.s.fecha] ||= []).push(x.s));
+  const hoyStr = ymd(hoy());
+  let celdas = '';
+  for (let i = 0; i < off; i++) celdas += '<span class="cm vacia"></span>';
+  let ses = 0, hechas = 0, km = 0;
+  const z = zonasActuales();
+  for (let d = 1; d <= dias; d++) {
+    const k = ymd(new Date(y, mo, d, 12));
+    const ss = (porFecha[k] || []).filter(s => s.tipo !== 'descanso');
+    const ok = ss.length && ss.every(s => { const r = regDe(s); return r && r.hecho; });
+    ses += ss.length; hechas += ss.filter(s => { const r = regDe(s); return r && r.hecho; }).length;
+    km += ss.reduce((a, s) => a + metricaSesion(s, z).km, 0);
+    celdas += `<button class="cm ${cargaDia(porFecha[k] || [])}${k === hoyStr ? ' hoy' : ''}" data-dia="${k}" aria-label="${fmtFecha(parseYMD(k))}: ${ss.length} sesiones">
+      <b>${d}</b><span class="pts">${ss.slice(0, 3).map(s => `<i class="c-${CAT_SES(s)}"></i>`).join('')}</span>${ok ? '<em>✓</em>' : ''}</button>`;
+  }
+  const prev = ymd(new Date(y, mo - 1, 1, 12)).slice(0, 7), next = ymd(new Date(y, mo + 1, 1, 12)).slice(0, 7);
+  c.innerHTML = subnavCal('mes') + `
+    <div class="semnav"><button data-mes="${prev}" aria-label="Mes anterior">‹</button>
+      <div><b style="text-transform:capitalize">${MESES[mo]} ${y}</b><span>${ses} sesiones · ${hechas} hechas · ${km.toFixed(0)} km</span></div>
+      <button data-mes="${next}" aria-label="Mes siguiente">›</button></div>
+    <div class="cal-sem">${DIAS_MIN.map(x => `<span>${x}</span>`).join('')}</div>
+    <div class="cal">${celdas}</div>
+    <p class="leyenda"><i class="c-calidad"></i>Calidad <i class="c-clase"></i>Clase <i class="c-fuerza"></i>Fuerza <i class="c-aerobico"></i>Suave · fondo <span>· fondo de color = carga del día · ✓ todo hecho</span></p>
+    <p style="font-size:12.5px;color:var(--ink-3);margin:2px">Toca un día para ver sus sesiones.</p>`;
+}
+function vistaDia() {
+  const c = $('v-dia'), p = plan();
+  const k = diaSel || ymd(hoy());
+  const d = parseYMD(k);
+  const z = zonasActuales(), rec = recargoActual();
+  const ss = p ? todasSesiones(p).filter(x => x.s.fecha === k) : [];
+  const w = p ? p.semanas.find(x => k >= x.inicio && k <= x.fin) : null;
+  const dt = DIAS_LBL[(d.getDay() + 6) % 7];
+  let html = subnavCal('dia') + `<div class="semnav">
+      <button data-dia="${ymd(addDays(d, -1))}" aria-label="Día anterior">‹</button>
+      <div><b>${dt[0].toUpperCase() + dt.slice(1)} ${fmtFecha(d)}</b><span>${w ? `semana ${w.numero} · ` : ''}${k === ymd(hoy()) ? 'hoy' : diffDays(hoy(), d) === 1 ? 'mañana' : ''}</span></div>
+      <button data-dia="${ymd(addDays(d, 1))}" aria-label="Día siguiente">›</button></div>`;
+  const activas = ss.filter(x => x.s.tipo !== 'descanso');
+  html += activas.length ? activas.map(x => tarjetaHoy(x.s, z, rec)).join('')
+    : `<div class="hoy-card" style="--z:var(--nulo)"><span class="tipo-chip">Libre</span><h2>Sin entrenamiento</h2>
+       <p style="color:var(--ink-2);font-size:14px;margin-top:8px">${p && k >= p.inicio && k <= p.fin ? 'Día de descanso: la adaptación pasa en el reposo.' : 'Fuera del plan activo.'}</p></div>`;
+  c.innerHTML = html;
+}
+
+/* ============================================================
+   PANEL: métricas de seguimiento
+   ============================================================ */
+const SERIE_HECHO = '#2a78d6', SERIE_PLAN = '#eb6834';
+function datosSemanas(p) {
+  const z = zonasActuales();
+  return p.semanas.map(w => {
+    const act = w.sesiones.filter(s => s.tipo !== 'descanso');
+    const regs = act.map(s => regDe(s)).filter(r => r && r.hecho);
+    const rpes = regs.map(r => r.rpe).filter(Boolean);
+    return { n: w.numero, inicio: w.inicio, plan: metricaSemana(w, z).km, hecho: Math.round(regs.reduce((a, r) => a + (+r.km || 0), 0) * 10) / 10,
+      ses: act.length, hechas: regs.length, rpe: rpes.length ? Math.round(rpes.reduce((a, b) => a + b, 0) / rpes.length * 10) / 10 : null };
+  });
+}
+const _ticks = max => { const paso = max > 60 ? 20 : max > 30 ? 10 : 5; const out = []; for (let v = 0; v <= max + 0.001; v += paso) out.push(v); return out; };
+/* Columnas agrupadas: plan y hecho por semana. Un solo eje, tooltip al tocar. */
+function graficoKm(ds, actual) {
+  const W = 340, H = 170, izq = 26, abajo = 20, arriba = 8;
+  const max = Math.max(10, ...ds.map(d => Math.max(d.plan, d.hecho)));
+  const ticks = _ticks(Math.ceil(max / 5) * 5), top = ticks[ticks.length - 1];
+  const banda = (W - izq) / ds.length, ancho = Math.min(12, (banda - 8) / 2);
+  const yy = v => arriba + (H - abajo - arriba) * (1 - v / top);
+  const col = (x, v, color, tip) => {
+    const h = Math.max(0, yy(0) - yy(v)), r = Math.min(4, h / 2);
+    const path = h ? `M${x},${yy(0)}V${yy(v) + r}Q${x},${yy(v)} ${x + r},${yy(v)}H${x + ancho - r}Q${x + ancho},${yy(v)} ${x + ancho},${yy(v) + r}V${yy(0)}Z` : '';
+    return `<path d="${path}" fill="${color}"/><rect x="${x - 2}" y="${arriba}" width="${ancho + 4}" height="${H - abajo - arriba}" fill="transparent" data-tip="${esc(tip)}"><title>${esc(tip)}</title></rect>`;
+  };
+  let svg = ticks.map(t => `<line x1="${izq}" x2="${W}" y1="${yy(t)}" y2="${yy(t)}" class="grid"/><text x="${izq - 4}" y="${yy(t) + 3}" class="ax" text-anchor="end">${t}</text>`).join('');
+  ds.forEach((d, i) => {
+    const x0 = izq + i * banda + (banda - (ancho * 2 + 2)) / 2;
+    svg += col(x0, d.plan, SERIE_PLAN, `Semana ${d.n}: plan ${d.plan} km`) + col(x0 + ancho + 2, d.hecho, SERIE_HECHO, `Semana ${d.n}: hecho ${d.hecho} km (${d.hechas}/${d.ses} sesiones)`);
+    svg += `<text x="${x0 + ancho + 1}" y="${H - 5}" class="ax${d.n === actual ? ' act' : ''}" text-anchor="middle">S${d.n}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" class="graf" role="img" aria-label="Kilómetros por semana, planificados y hechos">${svg}</svg>`;
+}
+/* Línea de una serie: 1RM estimado de un ejercicio a lo largo del tiempo. */
+function graficoLinea(puntos) {
+  const W = 150, H = 54, pad = 6;
+  if (puntos.length < 2) return '';
+  const vs = puntos.map(p => p.v), min = Math.min(...vs), max = Math.max(...vs), rango = max - min || 1;
+  const xs = i => pad + (W - 2 * pad) * i / (puntos.length - 1), ys = v => H - pad - (H - 2 * pad) * (v - min) / rango;
+  const d = puntos.map((p, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="spark"><path d="${d}" fill="none" stroke="${SERIE_HECHO}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${puntos.map((p, i) => `<circle cx="${xs(i)}" cy="${ys(p.v)}" r="4" fill="${SERIE_HECHO}" stroke="var(--surface)" stroke-width="2" data-tip="${esc(p.tip)}"><title>${esc(p.tip)}</title></circle>`).join('')}</svg>`;
+}
+function vistaPanel() {
+  const c = $('v-panel'), p = plan();
+  if (!p) { c.innerHTML = `<div class="vacio"><h3>Sin datos todavía</h3><p>Importá un plan y registrá tus sesiones para ver tu progreso.</p><button class="btn pri" data-ir="importar">Importar un plan</button></div>`; return; }
+  const ds = datosSemanas(p), w = semanaActual(p), dw = ds.find(d => d.n === w.numero);
+  const hoyStr = ymd(hoy());
+  const pasadas = ds.filter(d => p.semanas.find(x => x.numero === d.n).fin < hoyStr || d.n === w.numero);
+  const cumpl = pasadas.reduce((a, d) => a + d.hechas, 0), totalP = todasSesiones(p).filter(x => x.s.tipo !== 'descanso' && x.s.fecha <= hoyStr).length;
+  const regs7 = Object.entries(D.reg).filter(([k, r]) => k.startsWith(p.id + ':') && r.hecho && r.rpe && (r.fecha_sesion || r.fecha) > ymd(addDays(hoy(), -7)));
+  const rpe7 = regs7.length ? (regs7.reduce((a, [, r]) => a + r.rpe, 0) / regs7.length).toFixed(1) : '—';
+  const dObj = p.objetivo.fecha ? diffDays(hoy(), parseYMD(p.objetivo.fecha)) : null;
+  // fuerza: 1RM estimado por ejercicio
+  const porEj = {};
+  for (const h of historialFuerza().slice().reverse()) {
+    const reps = Math.max(0, ...String(h.reps || '').split(/[^\d]+/).filter(Boolean).map(Number));
+    const v = typeof h.carga_kg === 'number' ? e1rm(h.carga_kg, reps, h.rir) : null;
+    if (!v) continue;
+    const id = h.k || normNombre(h.nombre);
+    (porEj[id] ||= { nombre: h.k && EJ_POR_K[h.k] ? EJ_POR_K[h.k].n : h.nombre, pts: [] }).pts
+      .push({ v, tip: `${h.fecha ? fmtCorta(parseYMD(h.fecha)) : ''}: ${h.carga_kg} kg × ${h.reps}${h.rir != null ? ' @RIR ' + h.rir : ''} → 1RM ≈ ${v} kg` });
+  }
+  const fuerza = Object.values(porEj).sort((a, b) => b.pts.length - a.pts.length).slice(0, 6);
+  const tonelaje = historialFuerza().filter(h => h.fecha >= w.inicio && h.fecha <= w.fin && typeof h.carga_kg === 'number')
+    .reduce((a, h) => a + h.carga_kg * String(h.reps || '').split(/[^\d]+/).filter(Boolean).map(Number).reduce((x, y) => x + y, 0), 0);
+  const recientes = Object.entries(D.reg).filter(([k, r]) => k.startsWith(p.id + ':') && r.hecho)
+    .map(([k, r]) => ({ r, s: buscarSesion(k.split(':')[1]) })).filter(x => x.s).sort((a, b) => b.s.s.fecha.localeCompare(a.s.s.fecha)).slice(0, 5);
+  c.innerHTML = `
+    <div class="tiles">
+      <div><span>Esta semana</span><b>${dw.hechas}/${dw.ses}</b><em>sesiones hechas</em></div>
+      <div><span>Km esta semana</span><b>${dw.hecho}</b><em>de ${dw.plan} planificados</em></div>
+      <div><span>Cumplimiento</span><b>${totalP ? Math.round(cumpl / totalP * 100) : 0} %</b><em>${cumpl} de ${totalP} hasta hoy</em></div>
+      <div><span>Esfuerzo (7 días)</span><b>${rpe7}</b><em>RPE medio</em></div>
+      ${dObj != null && dObj >= 0 ? `<div><span>${esc(p.objetivo.nombre)}</span><b>${dObj}</b><em>días</em></div>` : ''}
+      ${tonelaje ? `<div><span>Fuerza esta semana</span><b>${Math.round(tonelaje).toLocaleString('es')}</b><em>kg levantados</em></div>` : ''}
+    </div>
+    <div class="card tight graf-card"><span class="eyebrow">Kilómetros por semana</span>
+      <div class="ley"><span><i style="background:${SERIE_PLAN}"></i>Plan</span><span><i style="background:${SERIE_HECHO}"></i>Hecho</span></div>
+      ${graficoKm(ds, w.numero)}
+      <p class="tip" aria-live="polite">Toca una columna para ver el detalle.</p>
+      <details><summary>Ver tabla</summary><table class="tabla"><tr><td>Sem</td><td>Plan</td><td>Hecho</td><td>Sesiones</td><td>RPE</td></tr>
+        ${ds.map(d => `<tr><td>S${d.n}</td><td>${d.plan} km</td><td>${d.hecho} km</td><td>${d.hechas}/${d.ses}</td><td>${d.rpe ?? '—'}</td></tr>`).join('')}</table></details>
+    </div>
+    <div class="card tight graf-card"><span class="eyebrow">Fuerza · 1RM estimado</span>
+      ${fuerza.length ? `<div class="multi">${fuerza.map(f => {
+        const ult = f.pts[f.pts.length - 1].v, pri = f.pts[0].v, dlt = ult - pri;
+        return `<div class="mini-g"><b>${esc(f.nombre)}</b><span class="num">${String(ult).replace('.', ',')} kg${f.pts.length > 1 ? ` <em class="${dlt >= 0 ? 'up' : 'dn'}">${dlt >= 0 ? '▲' : '▼'} ${Math.abs(dlt).toFixed(1).replace('.', ',')}</em>` : ''}</span>
+          ${graficoLinea(f.pts) || '<small>Un solo registro: aparece la tendencia con el segundo.</small>'}</div>`;
+      }).join('')}</div><p class="tip" aria-live="polite">1RM estimado = carga × (1 + (reps + RIR) / 30). Toca un punto para ver la serie.</p>`
+      : '<p>Registra tus cargas al marcar una sesión de fuerza como hecha y acá vas a ver cómo progresa cada ejercicio.</p>'}
+    </div>
+    <div class="card tight"><span class="eyebrow">Últimos registros</span>
+      ${recientes.length ? recientes.map(x => filaSesion(x.s.s, x.s.w)).join('') : '<p>Todavía no registraste sesiones.</p>'}
+    </div>`;
+}
+
+const TAB_DE = { mes: 'calendario', semana: 'calendario', dia: 'calendario', plan: 'calendario', ritmos: 'mas', importar: 'mas', ajustes: 'mas' };
 
 /* ============================================================
    DETALLE DE SESIÓN
@@ -2428,32 +2821,41 @@ function abrirRegistro(uid) {
   registrandoUid = uid;
   const r = regDe(f.s) || {};
   const m = metricaSesion(f.s, zonasActuales());
+  // precarga: lo planificado y lo que hiciste la última vez; solo revisás y ajustás
+  const sg = registroSugerido(f.s, zonasActuales());
+  const v = (real, sug) => real != null && real !== '' ? { val: real, cls: '' } : (sug != null && sug !== '' ? { val: sug, cls: ' sug' } : { val: '', cls: '' });
+  const kmV = v(r.km, sg.km), tV = v(r.tiempo, sg.tiempo);
+  const rpe = r.rpe ?? sg.rpe, sens = r.sensacion || sg.sensacion;
+  const corre = !NO_CORRER.includes(f.s.tipo);
   $('cuerpoRegistro').innerHTML = `
-    <h2 class="disp" style="font-size:20px;margin-bottom:12px">${esc(tituloAuto(f.s, zonasActuales()))}</h2>
-    <div class="g2">
-      <div class="f"><label>Distancia (km)</label><input class="in mono" type="number" step="0.1" id="rKm" value="${r.km ?? (m.km || '')}" placeholder="${m.km ? '' : 'sin carrera'}"></div>
-      <div class="f"><label>Tiempo</label><input class="in mono" id="rTiempo" placeholder="48:20" value="${esc(r.tiempo || '')}"></div>
-    </div>
-    <div class="f"><label>Esfuerzo percibido (1 a 10)</label>
-      <div class="seg-btns">${[1,2,3,4,5,6,7,8,9,10].map(n => `<button data-rpe="${n}" class="${r.rpe === n ? 'on' : ''}">${n}</button>`).join('')}</div></div>
+    <h2 class="disp" style="font-size:20px;margin-bottom:8px">${esc(tituloAuto(f.s, zonasActuales()))}</h2>
+    ${r.hecho ? '' : `<p class="reg-aviso">Ya viene cargado con lo planificado${ejerciciosDeSesion(f.s).length ? ' y lo sugerido para cada ejercicio' : ''}. Revisá y cambiá solo lo que fue distinto.</p>`}
+    ${corre || r.km ? `<div class="g2">
+      <div class="f"><label>Distancia (km)</label><input class="in mono${kmV.cls}" type="number" step="0.1" id="rKm" value="${esc(kmV.val)}"></div>
+      <div class="f"><label>Tiempo</label><input class="in mono${tV.cls}" id="rTiempo" placeholder="48:20" value="${esc(tV.val)}"></div>
+    </div>` : `<input type="hidden" id="rKm" value=""><div class="f"><label>Duración</label><input class="in mono" id="rTiempo" placeholder="${duracionTxt(m.min)}" value="${esc(r.tiempo || '')}"></div>`}
+    <div class="f"><label>Esfuerzo percibido (1 a 10)${r.rpe == null ? ' · sugerido ' + sg.rpe : ''}</label>
+      <div class="seg-btns">${[1,2,3,4,5,6,7,8,9,10].map(n => `<button data-rpe="${n}" class="${rpe === n ? 'on' : ''}">${n}</button>`).join('')}</div></div>
     <div class="f"><label>Cómo te sentiste</label>
-      <div class="seg-btns">${['muy bien','bien','normal','pesado','muy mal'].map(v => `<button data-sens="${v}" class="${r.sensacion === v ? 'on' : ''}">${v}</button>`).join('')}</div></div>
+      <div class="seg-btns">${['muy bien','bien','normal','pesado','muy mal'].map(x => `<button data-sens="${x}" class="${sens === x ? 'on' : ''}">${x}</button>`).join('')}</div></div>
     ${ejerciciosDeSesion(f.s).length ? `<span class="eyebrow" style="display:block;margin:4px 0 2px">Cargas de fuerza</span>
       <p style="font-size:12.5px;color:var(--ink-3);margin:0 0 4px">Kilos usados, repeticiones de cada serie (por ejemplo 5-5-5) y RIR de la última serie.</p>
       ${ejerciciosDeSesion(f.s).map((e, i) => {
         const prev = (r.ejercicios || []).find(x => (e.k && x.k === e.k) || normNombre(x.nombre) === normNombre(e.nombre)) || {};
         const u = ultimaVez(e, claveReg(f.p, f.s));
+        const pc = !e.carga && e.pesoDefecto;
+        const cg = v(prev.carga_kg, pc ? null : cargaSugerida(e, u)), rp = v(prev.reps, repsSugeridas(e)), ri = v(prev.rir, rirSugerido(e));
         return `<div class="ejreg" data-ejreg="${i}" data-k="${e.k || ''}" data-nombre="${esc(e.nombre)}">
           <b>${esc(e.nombre)}</b> <span class="num" style="color:var(--ink-3);font-size:12.5px">${e.series} × ${esc(e.reps)}${e.rir ? ' @ RIR ' + esc(e.rir) : ''}</span>
-          ${u ? `<small>Última vez: ${esc(txtUltima(u))}</small>` : ''}
-          <div class="g3"><input class="in mono" inputmode="decimal" data-r="carga_kg" placeholder="kg" value="${esc(prev.carga_kg ?? '')}">
-            <input class="in mono" data-r="reps" placeholder="${esc(Array(e.series).fill(String(e.reps).split(/\s/)[0]).join('-'))}" value="${esc(prev.reps ?? '')}">
-            <input class="in mono" inputmode="numeric" data-r="rir" placeholder="RIR" value="${esc(prev.rir ?? '')}"></div></div>`;
+          <small>${u ? `Última vez: ${esc(txtUltima(u))}` : 'Primera vez: sugerido desde el plan'}</small>
+          <div class="g3"><label><span>kg</span><input class="in mono${cg.cls}" inputmode="decimal" data-r="carga_kg" placeholder="${pc ? 'corporal' : 'kg'}" value="${esc(cg.val)}"></label>
+            <label><span>reps por serie</span><input class="in mono${rp.cls}" data-r="reps" value="${esc(rp.val)}"></label>
+            <label><span>RIR final</span><input class="in mono${ri.cls}" inputmode="numeric" data-r="rir" placeholder="RIR" value="${esc(ri.val)}"></label></div></div>`;
       }).join('')}` : ''}
     <div class="f" style="margin-top:12px"><label>Notas</label><textarea class="in" id="rNota" placeholder="Viento en la rambla, molestia en el gemelo…">${esc(r.nota || '')}</textarea></div>
     ${r.hecho ? '<button class="btn dg" id="btnBorrarReg">Borrar el registro</button>' : ''}`;
-  $('cuerpoRegistro').dataset.rpe = r.rpe || '';
-  $('cuerpoRegistro').dataset.sens = r.sensacion || '';
+  $('cuerpoRegistro').dataset.rpe = rpe || '';
+  $('cuerpoRegistro').dataset.sens = sens || '';
   abrirHoja('shRegistro');
 }
 
@@ -2558,7 +2960,7 @@ function planAUTP(p) {
    EVENTOS
    ============================================================ */
 document.addEventListener('click', async ev => {
-  const t = ev.target.closest('[data-ej],[data-term],[data-semnav],[data-ses],[data-tick],[data-registrar],[data-ir],[data-toggle],[data-acc],[data-clima],[data-flag],[data-rpe],[data-sens],[data-quitar-seg],[data-activar],[data-borrar-plan],[data-borrar-ses],[data-duplicar],[data-icsses]');
+  const t = ev.target.closest('[data-tip],[data-dia],[data-mes],[data-ej],[data-term],[data-semnav],[data-ses],[data-tick],[data-registrar],[data-ir],[data-toggle],[data-acc],[data-clima],[data-flag],[data-rpe],[data-sens],[data-quitar-seg],[data-activar],[data-borrar-plan],[data-borrar-ses],[data-duplicar],[data-icsses]');
   if (!t) return;
   const p = plan();
 
@@ -2572,9 +2974,12 @@ document.addEventListener('click', async ev => {
     D.reg[k] = r; await guardar(); pintar();
     return;
   }
-  if (t.dataset.ej) { ev.stopPropagation(); abrirGuia(t.dataset.ej); return; }
+  if (t.dataset.tip) { const tip = t.closest('.graf-card') && t.closest('.graf-card').querySelector('.tip'); if (tip) tip.textContent = t.dataset.tip; return; }
+  if (t.dataset.dia) { diaSel = t.dataset.dia; irA('dia'); return; }
+  if (t.dataset.mes) { mesSel = t.dataset.mes; vistaMes(); return; }
+  if (t.dataset.ej) { ev.preventDefault(); ev.stopPropagation(); abrirGuia(t.dataset.ej); return; }
   if (t.dataset.term) { abrirGuia(t.dataset.term, true); return; }
-  if (t.dataset.semnav != null) { const w = p && p.semanas[+t.dataset.semnav]; if (w) { semSel = w.numero; vistaSemana(); $('v-semana').scrollTop = 0; } return; }
+  if (t.dataset.semnav != null) { const w = p && p.semanas[+t.dataset.semnav]; if (w) { semSel = w.numero; pintar(); $('v-semana').scrollTop = 0; } return; }
   if (t.dataset.ses) { abrirDetalle(t.dataset.ses); return; }
   if (t.dataset.registrar) { cerrarHojas(); setTimeout(() => abrirRegistro(t.dataset.registrar), 240); return; }
   if (t.dataset.ir) { cerrarHojas(); irA(t.dataset.ir); return; }
@@ -2630,11 +3035,12 @@ $('scrim').onclick = cerrarHojas;
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => irA(b.dataset.v));
 
 function irA(v) {
+  if (v === 'calendario') v = calModo;
+  if (CAL.includes(v)) { if (v === 'semana') semSel = null; calModo = v; }
   vista = v;
-  if (v === 'semana') semSel = null;
-  const tab = SUBVISTA[v] || v;
+  const tab = TAB_DE[v] || v;
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === tab));
-  ['hoy', 'semana', 'plan', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'].forEach(k => $('v-' + k).classList.toggle('off', k !== v));
+  ['hoy', 'mes', 'semana', 'dia', 'plan', 'panel', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'].forEach(k => $('v-' + k).classList.toggle('off', k !== v));
   pintar();
   document.querySelector('.vista:not(.off)').scrollTop = 0;
 }
@@ -2737,7 +3143,10 @@ document.addEventListener('change', ev => {
   if (ev.target.id === 'climaH') { D.cfg.hum = +ev.target.value; guardar(); pintar(); }
 });
 
-document.addEventListener('input', ev => { if (ev.target.id === 'guiaBuscar') vistaGuia(); });
+document.addEventListener('input', ev => {
+  if (ev.target.id === 'guiaBuscar') vistaGuia();
+  if (ev.target.classList && ev.target.classList.contains('sug')) ev.target.classList.remove('sug');
+});
 
 $('fileJson').onchange = e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
@@ -2768,7 +3177,10 @@ $('fileCopia').onchange = e => {
 function pintar() {
   pintarCabecera();
   if (vista === 'hoy') vistaHoy();
+  if (vista === 'mes') vistaMes();
   if (vista === 'semana') vistaSemana();
+  if (vista === 'dia') vistaDia();
+  if (vista === 'panel') vistaPanel();
   if (vista === 'plan') vistaPlan();
   if (vista === 'guia') vistaGuia();
   if (vista === 'mas') vistaMas();
@@ -2777,6 +3189,8 @@ function pintar() {
   if (vista === 'ajustes') vistaAjustes();
   // las secciones de "Más" llevan un atajo para volver
   if (SUBVISTA[vista]) $('v-' + vista).insertAdjacentHTML('afterbegin', '<button class="volver" data-ir="mas">‹ Más</button>');
+  // semana y plan son modos del calendario
+  if (vista === 'semana' || vista === 'plan') $('v-' + vista).insertAdjacentHTML('afterbegin', subnavCal(vista));
 }
 async function arrancar() {
   const g = await Store.get(CLAVE);

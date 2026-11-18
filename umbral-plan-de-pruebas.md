@@ -1,6 +1,6 @@
 # Umbral — Plan de pruebas
 
-Versión 2.0 · automatizado en `tests/` (núcleo: `node --test tests/*.test.mjs` · recorridos: `node tests/app.e2e.mjs`)
+Versión 3.0 · automatizado en `tests/` (núcleo: `node --test tests/*.test.mjs` · recorridos: `node tests/app.e2e.mjs`)
 
 ## Alcance y estrategia
 
@@ -129,6 +129,25 @@ Tres niveles, de adentro hacia afuera:
 | N06 | Detalle con estaciones | "Estación" en lugar de "caminando" | Sí |
 | N07 | 390 px | Ninguna vista desborda en horizontal | Sí |
 | N08 | Más | Ritmos, Importar y Ajustes conservan todo y tienen "‹ Más" para volver | Sí |
+
+### Núcleo 3.0 — bloques de fuerza y precarga
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| U54 | `Título · A 2 × 12 + B 2 × 10 + C 2 × 20 s por lado` | Secuencia con título y 3 ejercicios; peso corporal por defecto donde corresponde | Sí |
+| U54b | `Circuito × 2 vueltas: A 12 por lado · B 40 s por lado` | Circuito de 2 vueltas; cada ejercicio con sus reps o tiempo | Sí |
+| U54c | Superserie con carga solo en uno | Carga en el primero, el segundo sin carga ("elige por RIR") | Sí |
+| U55 | Carga sugerida | Sin historial: lo más bajo del rango · sobró RIR (+2): +2,5 kg (+1 kg bajo 40 kg) · justo: igual · pasado: −5 % | Sí |
+| U55b | Reps, RIR y RPE sugeridos; 1RM estimado | `5-5-5`, RIR mínimo del rango, RPE por tipo; Epley con RIR, nulo con más de 12 reps | Sí |
+
+### Integración 3.0
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| N09 | Calendario | Pestaña con Mes · Semana · Día · Plan; mes con carga y tipo por día; tocar un día abre el Día; navegación entre meses y días | Sí |
+| N10 | Panel | Indicadores, km plan vs hecho por semana con detalle al tocar y tabla, 1RM estimado por ejercicio | Sí |
+| N11 | Registro precargado | Km, tiempo, RPE, sensación y cargas sugeridas, marcadas como sugeridas hasta editarlas; se guardan al confirmar | Sí |
+| N12 | Resumen primero | La sesión muestra lo esencial con el peso de cada ejercicio; el paso a paso y el detalle de cada ejercicio se despliegan al tocar | Sí |
 
 ### Entrega
 
