@@ -219,6 +219,11 @@ await caso('N10', 'Panel: indicadores, gráficos y tabla', async () => {
   ok(/Semana 1: hecho/.test(await texto('#v-panel .graf-card .tip')), 'el toque no muestra el detalle');
   ok((await texto('#v-panel')).includes('1RM estimado'));
   ok(await pg.locator('#v-panel .graf-card table').count() === 1, 'falta la vista de tabla');
+  ok(/Racha/.test(await texto('#v-panel .tiles')), 'falta la racha');
+  // un suave registrado demasiado rápido se marca
+  await ev(() => { const p = plan(); const x = todasSesiones(p).find(o => o.s.tipo === 'suave' && !(regDe(o.s) || {}).hecho);
+    D.reg[claveReg(p, x.s)] = { hecho: true, km: 10, tiempo: '45:00', rpe: 5, fecha_sesion: x.s.fecha }; pintar(); });
+  ok(/frente a la zona E/.test(await texto('#v-panel')) && /rápido/.test(await texto('#v-panel')), 'no marca el suave rápido');
   if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'panel.png'), fullPage: false });
 });
 await caso('I05/N06', 'detalle: estructura, explicaciones, ejercicios y estaciones', async () => {

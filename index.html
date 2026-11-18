@@ -2628,6 +2628,25 @@ function graficoLinea(puntos) {
   return `<svg viewBox="0 0 ${W} ${H}" class="spark"><path d="${d}" fill="none" stroke="${SERIE_HECHO}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     ${puntos.map((p, i) => `<circle cx="${xs(i)}" cy="${ys(p.v)}" r="4" fill="${SERIE_HECHO}" stroke="var(--surface)" stroke-width="2" data-tip="${esc(p.tip)}"><title>${esc(p.tip)}</title></circle>`).join('')}</svg>`;
 }
+/* Rodajes suaves registrados frente a la zona E: el error más común es correrlos rápido. */
+function suavesVsZona(p) {
+  const z = zonasActuales(); if (!z) return [];
+  return todasSesiones(p).filter(x => ['suave', 'largo'].includes(x.s.tipo)).map(x => ({ s: x.s, r: regDe(x.s) }))
+    .filter(o => o.r && o.r.hecho && o.r.km && segundos(o.r.tiempo))
+    .map(o => {
+      const ritmo = segundos(o.r.tiempo) / o.r.km;
+      const estado = ritmo < z.E.rapido - 3 ? 'rapido' : ritmo > z.E.lento + 15 ? 'lento' : 'ok';
+      return { fecha: o.s.fecha, titulo: tituloAuto(o.s, z), ritmo, estado };
+    }).sort((a, b) => b.fecha.localeCompare(a.fecha));
+}
+/* Sesiones planificadas seguidas cumplidas, contando hacia atrás desde la última pasada. */
+function racha(p) {
+  const h = ymd(hoy());
+  const pasadas = todasSesiones(p).filter(x => x.s.tipo !== 'descanso' && x.s.fecha <= h && !x.s.opcional).reverse();
+  let n = 0;
+  for (const x of pasadas) { const r = regDe(x.s); if (r && r.hecho) n++; else if (x.s.fecha < h) break; }
+  return n;
+}
 function vistaPanel() {
   const c = $('v-panel'), p = plan();
   if (!p) { c.innerHTML = `<div class="vacio"><h3>Sin datos todavía</h3><p>Importá un plan y registrá tus sesiones para ver tu progreso.</p><button class="btn pri" data-ir="importar">Importar un plan</button></div>`; return; }
@@ -2660,6 +2679,7 @@ function vistaPanel() {
       <div><span>Cumplimiento</span><b>${totalP ? Math.round(cumpl / totalP * 100) : 0} %</b><em>${cumpl} de ${totalP} hasta hoy</em></div>
       <div><span>Esfuerzo (7 días)</span><b>${rpe7}</b><em>RPE medio</em></div>
       ${dObj != null && dObj >= 0 ? `<div><span>${esc(p.objetivo.nombre)}</span><b>${dObj}</b><em>días</em></div>` : ''}
+      <div><span>Racha</span><b>${racha(p)}</b><em>sesiones seguidas cumplidas</em></div>
       ${tonelaje ? `<div><span>Fuerza esta semana</span><b>${Math.round(tonelaje).toLocaleString('es')}</b><em>kg levantados</em></div>` : ''}
     </div>
     <div class="card tight graf-card"><span class="eyebrow">Kilómetros por semana</span>
@@ -2677,6 +2697,16 @@ function vistaPanel() {
       }).join('')}</div><p class="tip" aria-live="polite">1RM estimado = carga × (1 + (reps + RIR) / 30). Toca un punto para ver la serie.</p>`
       : '<p>Registra tus cargas al marcar una sesión de fuerza como hecha y acá vas a ver cómo progresa cada ejercicio.</p>'}
     </div>
+    ${(() => {
+      const sv = suavesVsZona(p);
+      if (!sv.length) return '';
+      const rap = sv.filter(x => x.estado === 'rapido').length;
+      const EST = { ok: ['en zona', 'pc'], rapido: ['rápido', 'libre'], lento: ['lento', 'pc'] };
+      return `<div class="card tight"><span class="eyebrow">Tus rodajes suaves frente a la zona E</span>
+        <p style="margin-top:4px">${rap ? `<b style="color:var(--alerta)">${rap} de ${sv.length}</b> por encima de la zona E (${ritmoRango('E', zonasActuales(), 0)}). Correrlos más lento te deja fresco para la calidad.` : `Los ${sv.length} dentro de la zona E (${ritmoRango('E', zonasActuales(), 0)}). Bien.`}</p>
+        ${sv.slice(0, 5).map(x => `<div class="spread" style="padding:6px 0;border-top:1px solid var(--line)"><span style="font-size:13.5px">${fmtCorta(parseYMD(x.fecha))} · ${esc(x.titulo)}</span>
+          <span><span class="num" style="font-size:13px">${ritmoTxt(x.ritmo)}/km</span> <span class="peso ${EST[x.estado][1]}">${EST[x.estado][0]}</span></span></div>`).join('')}</div>`;
+    })()}
     <div class="card tight"><span class="eyebrow">Últimos registros</span>
       ${recientes.length ? recientes.map(x => filaSesion(x.s.s, x.s.w)).join('') : '<p>Todavía no registraste sesiones.</p>'}
     </div>`;
