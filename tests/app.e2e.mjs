@@ -385,6 +385,17 @@ await caso('E03/C8', 'service worker: funciona sin conexión y la página se pid
   ok(/esPagina/.test(sw) && /SHELL = \[[^\]]*index\.html/.test(sw), 'estrategia o precarga del service worker');
 });
 
+await caso('C9', 'rendimiento con años de historial (1000 registros de fuerza)', async () => {
+  const ms = await ev(() => {
+    for (let i = 0; i < 1000; i++) D.reg['viejo' + i + ':x'] = { hecho: true, fecha_sesion: ymd(addDays(hoy(), -400 + (i % 390))),
+      ejercicios: [{ nombre: 'Sentadilla trasera', k: 'sentadilla', carga_kg: 80, reps: '5-5-5', rir: 3 }, { nombre: 'Floor press', k: 'floor_press', carga_kg: 25, reps: '8-8-8', rir: 2 }] };
+    const out = {};
+    for (const v of ['hoy', 'dia', 'mes', 'semana', 'panel']) { irA(v); const t0 = performance.now(); pintar(); out[v] = performance.now() - t0; }
+    return out;
+  });
+  for (const [v, t] of Object.entries(ms)) ok(t < 50, `${v} tarda ${t.toFixed(0)} ms`);
+});
+
 await navegador.close(); srv.close();
 if (errores.length) fallos.push('Errores de JavaScript: ' + [...new Set(errores)].join(' | '));
 if (fallos.length) { console.error(`✗ ${fallos.length} de ${casos} casos fallan:\n  ` + fallos.join('\n  ')); process.exit(1); }

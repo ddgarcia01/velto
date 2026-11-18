@@ -2250,7 +2250,16 @@ function enlazar(texto) {
 }
 
 /* Registros de fuerza de todos los planes, del más nuevo al más viejo. */
+/* Se calcula una vez por pintado: la copia vive hasta que termina la tarea en curso
+   (cualquier cambio posterior de D.reg pasa por un await o un evento nuevo y la recalcula). */
+let _hist = null;
 function historialFuerza() {
+  if (_hist) return _hist;
+  _hist = _historialFuerza();
+  Promise.resolve().then(() => { _hist = null; });
+  return _hist;
+}
+function _historialFuerza() {
   const out = [];
   for (const [clave, r] of Object.entries(D.reg)) {
     for (const e of (r && r.ejercicios) || []) out.push({ ...e, fecha: r.fecha_sesion || r.fecha || '', clave });
