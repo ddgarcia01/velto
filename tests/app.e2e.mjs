@@ -201,6 +201,14 @@ await caso('C1', 'un toque registra la sesión como planificada, con deshacer y 
   const r2 = await ev(u => regDe(buscarSesion(u).s), uid);
   ok(!r2.hecho && r2.ejercicios, 'desmarcar no debe borrar lo registrado');
 });
+await caso('C2', 'el resumen muestra la carga sugerida de hoy cuando hay historial', async () => {
+  // con un registro previo de sentadilla a 80 kg y RIR 6 (sobró), la próxima sesión sugiere 82,5 kg
+  const [a, b] = await ev(() => todasSesiones(plan()).filter(x => x.s.segmentos.some(g => /Sentadilla trasera/.test(g.descripcion || ''))).map(x => x.s.uid));
+  await ev(([a]) => { const p = plan(), s = buscarSesion(a).s; D.reg[claveReg(p, s)] = { hecho: true, fecha_sesion: s.fecha,
+    ejercicios: [{ nombre: 'Sentadilla trasera', k: 'sentadilla', carga_kg: 80, reps: '5-5-5-5', rir: 6 }] }; }, [a]);
+  const html = await ev(([b]) => resumenSesion(buscarSesion(b).s, zonasActuales(), 0).join(' '), [b]);
+  ok(/Hoy 82,5 kg/.test(html), 'no sugiere la carga: ' + html.slice(0, 200));
+});
 await caso('N10', 'Panel: indicadores, gráficos y tabla', async () => {
   await pg.click('.tabs button[data-v="panel"]');
   ok(await pg.locator('#v-panel .tiles > div').count() >= 4, 'faltan indicadores');

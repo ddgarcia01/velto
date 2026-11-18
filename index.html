@@ -2448,16 +2448,23 @@ function pesoDe(e) {
   if (e.rir) return { txt: `Elige carga · RIR ${e.rir}`, cls: 'libre' };
   return { txt: 'Carga a elección', cls: 'libre' };
 }
+/* El peso a mostrar hoy: con historial, la carga sugerida; sin historial, lo que dice el plan. */
+function pesoHoy(e, claveRegActual) {
+  const u = ultimaVez(e, claveRegActual);
+  const sug = u && !(!e.carga && e.pesoDefecto) ? cargaSugerida(e, u) : null;
+  return sug != null ? { txt: `Hoy ${String(sug).replace('.', ',')} kg`, cls: 'kg' } : pesoDe(e);
+}
 function itemFuerzaHTML(e, claveRegActual) {
   const u = ultimaVez(e, claveRegActual);
   const sug = cargaSugerida(e, u);
-  const peso = pesoDe(e);
+  const peso = pesoHoy(e, claveRegActual);
   const filas = [
     e.rir ? ['Reserva', `RIR ${e.rir} (te quedan ${e.rir} reps en el tanque)`] : null,
     e.pausa ? ['Pausa', e.pausa] : null,
     e.carga && cargaCorta(e.carga) !== e.carga ? ['Carga', e.carga] : null,
     u ? ['Última vez', txtUltima(u)] : null,
-    sug != null && u ? ['Sugerido hoy', `${String(sug).replace('.', ',')} kg`] : null,
+    sug != null && u ? ['Sugerido hoy', `${String(sug).replace('.', ',')} kg (según tu última vez y el RIR que quedó)`] : null,
+    e.carga && u ? ['Plan', cargaCorta(e.carga)] : null,
     e.nota ? ['Nota', e.nota] : null,
   ].filter(Boolean);
   return `<details class="ejd"><summary>
@@ -2478,7 +2485,7 @@ function bloqueFuerzaHTML(bl, claveRegActual) {
 
 /* Líneas cortas con lo esencial de la sesión (sin calentamiento ni vuelta a la calma). */
 function resumenSesion(s, z, rec) {
-  const out = [];
+  const out = [], p = plan();
   for (const g of s.segmentos || []) {
     if (['calentamiento', 'vuelta_calma'].includes(g.rol)) continue;
     if (g.rol === 'serie' && g.trabajo) {
@@ -2495,7 +2502,8 @@ function resumenSesion(s, z, rec) {
       if (bl.items.length) {
         if (bl.modalidad === 'ejercicio') {
           const e = bl.items[0];
-          out.push(`<b>${esc(e.nombre)}</b> <span class="num">${e.series} × ${esc(e.reps)}</span> <span class="peso ${pesoDe(e).cls}">${esc(pesoDe(e).txt)}</span>`);
+          const ph = pesoHoy(e, p ? claveReg(p, s) : '');
+          out.push(`<b>${esc(e.nombre)}</b> <span class="num">${e.series} × ${esc(e.reps)}</span> <span class="peso ${ph.cls}">${esc(ph.txt)}</span>`);
         } else {
           out.push(`<b>${esc(bl.titulo || MODALIDAD[bl.modalidad].n)}${bl.rondas ? ' × ' + bl.rondas : ''}:</b> ${bl.items.map(e => esc(e.nombre)).join(', ')}`);
         }
