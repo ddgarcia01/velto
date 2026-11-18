@@ -128,3 +128,12 @@ test('U55 precarga del registro', () => {
   assert.equal(plano(N.registroSugerido({ tipo: 'fuerza', segmentos: [{ rol: 'bloque', duracion_min: 40 }] }, null)).tiempo, null);
   assert.equal(N.e1rm(100, 5, 2), 123.3); assert.equal(N.e1rm(50, 15, 0), null);
 });
+
+test('U56 la guía reconoce los ejercicios de calentamientos y rutinas habituales', () => {
+  const k = t => plano(N.detectarEjercicios(t)).map(x => x.k);
+  assert.deepEqual(k('2 × 10 band pull-apart + 5 burpees y 3 burpee broad jump'), ['band_pullapart', 'burpees', 'bbj']);
+  assert.deepEqual(k('Extensión cuádriceps, tríceps cuerda, curl de muñeca, crunch fitball, elevaciones rodillas'.replace('cuádriceps', 'de cuádriceps').replace('elevaciones rodillas', 'elevaciones de rodillas')),
+    ['extension_cuadriceps', 'triceps_polea', 'curl_muneca', 'crunch_fitball', 'elevacion_rodillas']);
+  assert.deepEqual(k('kettlebell swing + thruster + step-up + prensa'), ['kb_swing', 'thruster', 'step_up', 'prensa']);
+  assert.ok(plano(N.EJERCICIOS).length >= 50);
+});
