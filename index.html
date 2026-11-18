@@ -38,6 +38,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16p
 button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
 button{background:none;border:0;padding:0;cursor:pointer;text-align:left}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+summary:focus-visible,.tick:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .app{display:flex;flex-direction:column;height:100dvh;padding-top:var(--st)}
 .vista{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px calc(78px + var(--sb))}
 .vista.off{display:none}
@@ -119,9 +120,9 @@ h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:600;letter-spacing:.005
 .ses .viz{flex:0 0 62px}
 .ses.hecha .tit{color:var(--ink-3);text-decoration:line-through}
 .ses.hoy{background:var(--surface-2);border-radius:var(--r-s)}
-.tick{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--line-2);flex:0 0 17px;display:grid;place-items:center}
+.tick{width:28px;height:28px;border-radius:50%;border:2px solid var(--line-2);flex:0 0 28px;display:grid;place-items:center;cursor:pointer}
 .tick.on{background:var(--ok);border-color:var(--ok)}
-.tick.on::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg) translate(-1px,-1px)}
+.tick.on::after{content:"";width:7px;height:12px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg) translate(-1px,-1px)}
 
 /* ---------- semanas del plan ---------- */
 .sem{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);margin-bottom:9px;overflow:hidden}
@@ -371,7 +372,7 @@ a.btn{text-decoration:none;color:inherit}
   <div class="vista off" id="v-importar"></div>
   <div class="vista off" id="v-ajustes"></div>
 
-  <nav class="tabs">
+  <nav class="tabs" aria-label="Secciones">
     <button class="on" data-v="hoy">
       <svg viewBox="0 0 24 24"><path d="M12 3v3M5 8l2 2M19 8l-2 2M12 21a7 7 0 100-14 7 7 0 000 14zM12 13v-2"/></svg>Hoy</button>
     <button data-v="calendario">
@@ -1749,7 +1750,7 @@ function filaSesion(s, w, opts = {}) {
     ${opts.sinFecha ? '' : `<span class="fecha"><b>${d.getDate()}</b><span>${DIAS_MIN[(d.getDay() + 6) % 7]}</span></span>`}
     <span class="cuerpo"><span class="tit">${esc(tituloAuto(s, z))}</span><span class="bajo">${esc(bajo)}</span></span>
     ${s.tipo === 'descanso' ? '' : `<span class="viz">${perfilHTML(s, 'xs')}</span>`}
-    ${opts.sinRegistro ? '' : `<span class="tick${r && r.hecho ? ' on' : ''}" data-tick="${s.uid}"></span>`}
+    ${opts.sinRegistro ? '' : `<span class="tick${r && r.hecho ? ' on' : ''}" data-tick="${s.uid}" role="button" tabindex="0" aria-pressed="${r && r.hecho ? 'true' : 'false'}" aria-label="${r && r.hecho ? 'Hecha: tocar para desmarcar' : 'Marcar como hecha'}"></span>`}
   </button>`;
 }
 
@@ -2570,7 +2571,7 @@ let mesSel = null;     // 'AAAA-MM'
 let diaSel = null;     // 'AAAA-MM-DD'
 const volverHoy = modo => `<button class="hoy-btn" data-hoy="${modo}">Volver a hoy</button>`;
 function subnavCal(v) {
-  return `<div class="segctl" role="tablist">${CAL.map(m => `<button data-ir="${m}" class="${m === v ? 'on' : ''}">${{ mes: 'Mes', semana: 'Semana', dia: 'Día', plan: 'Plan' }[m]}</button>`).join('')}</div>`;
+  return `<div class="segctl" role="tablist" aria-label="Vista del calendario">${CAL.map(m => `<button role="tab" aria-selected="${m === v}" data-ir="${m}" class="${m === v ? 'on' : ''}">${{ mes: 'Mes', semana: 'Semana', dia: 'Día', plan: 'Plan' }[m]}</button>`).join('')}</div>`;
 }
 const CAT_SES = s => s.tipo === 'cruzado' ? 'clase' : s.tipo === 'fuerza' ? 'fuerza'
   : ['intervalos', 'tempo', 'test', 'carrera', 'repeticiones', 'cuestas', 'fartlek', 'progresivo'].includes(s.tipo) ? 'calidad'
@@ -3252,6 +3253,9 @@ document.addEventListener('change', ev => {
   if (ev.target.id === 'climaH') { D.cfg.hum = +ev.target.value; guardar(); pintar(); }
 });
 
+document.addEventListener('keydown', ev => {
+  if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('tick')) { ev.preventDefault(); ev.target.click(); }
+});
 document.addEventListener('input', ev => {
   if (ev.target.id === 'guiaBuscar') vistaGuia();
   if (ev.target.classList && ev.target.classList.contains('sug')) ev.target.classList.remove('sug');

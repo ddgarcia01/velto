@@ -341,6 +341,18 @@ await caso('I18', 'borrar un plan borra sus registros', async () => {
   await pg.click(`[data-borrar-plan="${id}"]`); await pg.waitForTimeout(250);
   ok(await ev(i => !D.planes.some(p => p.id === i) && !Object.keys(D.reg).some(k => k.startsWith(i + ':')), id));
 });
+await caso('C6', 'áreas de toque y accesibilidad', async () => {
+  await ev(() => irA('semana'));
+  const bb = await pg.locator('#v-semana .tick').first().boundingBox();
+  ok(bb.width >= 28 && bb.height >= 28, 'tilde pequeño: ' + bb.width);
+  ok(await pg.locator('#v-semana .tick[aria-label]').count() === await pg.locator('#v-semana .tick').count(), 'tilde sin etiqueta');
+  ok(await pg.locator('#v-semana .segctl [role="tab"][aria-selected="true"]').count() === 1);
+  const antes = await pg.locator('#v-semana .tick.on').count();
+  await pg.locator('#v-semana .tick:not(.on)').first().focus(); await pg.keyboard.press('Enter'); await pg.waitForTimeout(150);
+  ok(await pg.locator('#v-semana .tick.on').count() === antes + 1, 'el teclado no marca la sesión');
+  const sinNombre = await ev(() => [...document.querySelectorAll('button')].filter(b => b.offsetParent && !b.textContent.trim() && !b.getAttribute('aria-label')).length);
+  ok(sinNombre === 0, `${sinNombre} botones sin nombre accesible`);
+});
 await caso('E05', 'inputs de 16 px o más', async () => {
   await ev(() => irA('guia'));
   const chicos = await ev(() => [...document.querySelectorAll('input,select,textarea')].filter(e => e.offsetParent !== null && parseFloat(getComputedStyle(e).fontSize) < 16).length);
