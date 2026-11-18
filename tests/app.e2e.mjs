@@ -145,6 +145,8 @@ await caso('N09', 'Calendario: mes, día y modos', async () => {
   await pg.click('#v-dia .semnav [data-dia="2026-11-29"]');
   ok((await texto('#v-dia .semnav')).includes('29 de noviembre'));
   if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'cal-dia.png') });
+  await pg.click('#v-dia [data-hoy]');
+  ok((await texto('#v-dia .semnav')).includes('25 de noviembre') && !(await pg.isVisible('#v-dia [data-hoy]')), 'Volver a hoy no vuelve');
   await pg.click('#v-dia .segctl [data-ir="plan"]');
   ok(await ev(() => vista) === 'plan' && await pg.isVisible('#v-plan .segctl'));
 });
