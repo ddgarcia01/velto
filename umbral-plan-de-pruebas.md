@@ -1,6 +1,6 @@
 # Umbral — Plan de pruebas
 
-Versión 2.0 · automatizado en `tests/` (núcleo: `node --test tests/*.test.mjs` · recorridos: `node tests/app.e2e.mjs`)
+Versión 3.0 · automatizado en `tests/` (núcleo: `node --test tests/*.test.mjs` · recorridos: `node tests/app.e2e.mjs`)
 
 ## Alcance y estrategia
 
@@ -129,6 +129,40 @@ Tres niveles, de adentro hacia afuera:
 | N06 | Detalle con estaciones | "Estación" en lugar de "caminando" | Sí |
 | N07 | 390 px | Ninguna vista desborda en horizontal | Sí |
 | N08 | Más | Ritmos, Importar y Ajustes conservan todo y tienen "‹ Más" para volver | Sí |
+
+### Núcleo 3.0 — bloques de fuerza y precarga
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| U54 | `Título · A 2 × 12 + B 2 × 10 + C 2 × 20 s por lado` | Secuencia con título y 3 ejercicios; peso corporal por defecto donde corresponde | Sí |
+| U54b | `Circuito × 2 vueltas: A 12 por lado · B 40 s por lado` | Circuito de 2 vueltas; cada ejercicio con sus reps o tiempo | Sí |
+| U54c | Superserie con carga solo en uno | Carga en el primero, el segundo sin carga ("elige por RIR") | Sí |
+| U55 | Carga sugerida | Sin historial: lo más bajo del rango · sobró RIR (+2): +2,5 kg (+1 kg bajo 40 kg) · justo: igual · pasado: −5 % | Sí |
+| U55b | Reps, RIR y RPE sugeridos; 1RM estimado | `5-5-5`, RIR mínimo del rango, RPE por tipo; Epley con RIR, nulo con más de 12 reps | Sí |
+
+### Integración 3.0
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| N09 | Calendario | Pestaña con Mes · Semana · Día · Plan; mes con carga y tipo por día; tocar un día abre el Día; navegación entre meses y días | Sí |
+| N10 | Panel | Indicadores, km plan vs hecho por semana con detalle al tocar y tabla, 1RM estimado por ejercicio | Sí |
+| N11 | Registro precargado | Km, tiempo, RPE, sensación y cargas sugeridas, marcadas como sugeridas hasta editarlas; se guardan al confirmar | Sí |
+| N12 | Resumen primero | La sesión muestra lo esencial con el peso de cada ejercicio; el paso a paso y el detalle de cada ejercicio se despliegan al tocar | Sí |
+
+### Mejoras 3.0 (ciclos 1–10)
+
+| ID | Caso | Esperado | Blq |
+|---|---|---|---|
+| C1 | Un toque en "Hecha como el plan" o en el tilde | Registro completo sugerido (km, tiempo, RPE, cargas); aviso con "Editar"; desmarcar no borra datos | Sí |
+| C2 | Carga sugerida de hoy | Con historial, el resumen y la fila del ejercicio muestran "Hoy X kg" | Sí |
+| C3 | Volver a hoy | Botón en Mes, Semana y Día cuando se mira otro período | No |
+| C4 | Panel: racha y suaves frente a la zona E | Racha de sesiones cumplidas; suaves más rápidos que E marcados | Sí |
+| C5 | Guía | ≥ 50 ejercicios; reconoce calentamientos y rutinas habituales | No |
+| C6 | Accesibilidad | Tilde de 28 px con etiqueta y teclado; pestañas con estado; ningún botón sin nombre | Sí |
+| C7 | Modo oscuro | Fondos oscuros y texto claro en todas las vistas; colores de gráfico validados para fondo oscuro | Sí |
+| C8 | Service worker | La página se pide primero a la red (versión nueva al abrir); sin conexión abre la copia | Sí |
+| C9 | Rendimiento | Con 1000 registros de fuerza cada vista se pinta en menos de 50 ms | Sí |
+| C10 | Robustez | Tiempo inválido no se guarda; una sesión corrupta muestra un aviso, no una pantalla en blanco | Sí |
 
 ### Entrega
 

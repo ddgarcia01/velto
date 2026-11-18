@@ -54,7 +54,7 @@ async function importar(txt) {
   await pg.click('#btnConfirmar');
   await pg.waitForTimeout(350);
 }
-const VISTAS = ['hoy', 'semana', 'plan', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'];
+const VISTAS = ['hoy', 'mes', 'semana', 'dia', 'plan', 'panel', 'guia', 'mas', 'ritmos', 'importar', 'ajustes'];
 async function sinDesborde(v) {
   const w = await ev(() => document.querySelector('.vista:not(.off)').scrollWidth);
   ok(w <= 391, `desborde horizontal en ${v}: ${w}px`);
@@ -128,6 +128,104 @@ await caso('N03', 'Guía: búsqueda y explicación de un ejercicio', async () =>
   ok((await texto('#cuerpoGuia')).includes('reserva'));
   await pg.click('#btnCerrarGuia');
 });
+await caso('N09', 'Calendario: mes, día y modos', async () => {
+  await pg.click('.tabs button[data-v="calendario"]');
+  ok(await ev(() => vista) === 'semana', 'el calendario abre en la semana');
+  await pg.click('#v-semana .segctl [data-ir="mes"]');
+  ok(await pg.locator('#v-mes .cm:not(.vacia)').count() === 30, 'noviembre debe tener 30 días');
+  ok((await texto('#v-mes .semnav')).toLowerCase().includes('noviembre 2026'));
+  ok(await pg.locator('#v-mes .cm.hoy').count() === 1);
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'cal-mes.png') });
+  await pg.click('#v-mes [data-mes="2026-12"]');
+  ok((await texto('#v-mes .semnav')).toLowerCase().includes('diciembre'), 'no avanza de mes');
+  await pg.click('#v-mes [data-mes="2026-11"]');
+  await pg.click('#v-mes [data-dia="2026-11-28"]');
+  ok(await ev(() => vista) === 'dia');
+  ok((await texto('#v-dia')).includes('28 de noviembre') && await pg.locator('#v-dia .hoy-card').count() >= 1, 'el día no muestra sus sesiones');
+  await pg.click('#v-dia .semnav [data-dia="2026-11-29"]');
+  ok((await texto('#v-dia .semnav')).includes('29 de noviembre'));
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'cal-dia.png') });
+  await pg.click('#v-dia [data-hoy]');
+  ok((await texto('#v-dia .semnav')).includes('25 de noviembre') && !(await pg.isVisible('#v-dia [data-hoy]')), 'Volver a hoy no vuelve');
+  await pg.click('#v-dia .segctl [data-ir="plan"]');
+  ok(await ev(() => vista) === 'plan' && await pg.isVisible('#v-plan .segctl'));
+});
+await caso('N12', 'resumen primero; bloques con modalidad y peso al desplegar', async () => {
+  await ev(() => irA('hoy'));
+  ok(await pg.locator('#v-hoy .resumen li').count() > 0, 'falta el resumen');
+  ok(!(await pg.locator('#v-hoy .mas-det').first().evaluate(d => d.open)), 'el detalle debe arrancar cerrado');
+  ok(await pg.locator('#v-hoy .peso').count() > 0, 'el resumen no muestra el peso');
+  await pg.locator('#v-hoy .mas-det > summary').first().click();
+  ok(await pg.locator('#v-hoy .mas-det').first().evaluate(d => d.open), 'no despliega');
+  const ejd = pg.locator('#v-hoy .ejd').first();
+  await ejd.locator('summary').click();
+  ok((await ejd.innerText()).match(/Reserva|Pausa|Cómo se hace/), 'el ejercicio no muestra su detalle');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'hoy-detalle.png'), fullPage: false });
+  // un bloque de varios ejercicios muestra modalidad y peso de cada uno
+  const html = await ev(() => bloqueFuerzaHTML(parseBloque('Pie y cadera · elevación de talón a una pierna 2 × 12 + puente de glúteo a una pierna 2 × 10 + Copenhagen 2 × 20 s por lado'), ''));
+  ok(html.includes('En secuencia') && (html.match(/Peso corporal/g) || []).length === 3, 'bloque mixto poco claro');
+});
+await caso('N11', 'registro precargado: solo revisar y guardar', async () => {
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'suave' && !regDe(x.s)).s.uid);
+  await ev(u => abrirRegistro(u), uid);
+  ok(await pg.isVisible('#cuerpoRegistro .reg-aviso'), 'falta el aviso de precarga');
+  const km = await pg.inputValue('#rKm'), t = await pg.inputValue('#rTiempo');
+  ok(+km > 0 && /:\d\d$/.test(t), `sin precarga: ${km} / ${t}`);
+  ok(await pg.locator('#rKm.sug').count() === 1, 'la precarga no se distingue');
+  ok(await pg.locator('#cuerpoRegistro [data-rpe].on').count() === 1, 'sin RPE sugerido');
+  await pg.fill('#rKm', String(+km + 1));
+  ok(await pg.locator('#rKm.sug').count() === 0, 'al editar debe dejar de verse como sugerido');
+  await pg.click('#btnGuardarReg'); await pg.waitForTimeout(200);
+  const r = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(r.hecho && Math.abs(r.km - (+km + 1)) < 0.01 && r.tiempo === t && r.rpe === 3, 'no guardó lo precargado: ' + JSON.stringify(r));
+  // fuerza: kilos, reps y RIR sugeridos
+  const fu = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'fuerza' && /Sentadilla/.test(JSON.stringify(x.s.segmentos)) && !regDe(x.s)).s.uid);
+  await ev(u => abrirRegistro(u), fu);
+  const f1 = pg.locator('#cuerpoRegistro [data-ejreg]').first();
+  ok(await f1.locator('[data-r="reps"]').inputValue() !== '' && await f1.locator('[data-r="rir"]').inputValue() !== '', 'fuerza sin precarga');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'registro-precargado.png') });
+  await ev(() => cerrarHojas());
+});
+await caso('C1', 'un toque registra la sesión como planificada, con deshacer y editar', async () => {
+  await ev(() => irA('hoy'));
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.fecha === ymd(hoy()) && x.s.tipo === 'fuerza').s.uid);
+  await ev(u => { const p = plan(); delete D.reg[claveReg(p, buscarSesion(u).s)]; pintar(); }, uid);
+  await pg.click(`#v-hoy .btn[data-tick="${uid}"]`); await pg.waitForTimeout(150);
+  const r = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(r.hecho && r.segun_plan && r.rpe === 7 && r.ejercicios && r.ejercicios.length >= 2 && r.ejercicios.every(e => e.reps), 'registro incompleto: ' + JSON.stringify(r));
+  ok(await pg.isVisible('#toastAcc'), 'falta "Editar" en el aviso');
+  await pg.click('#toastAcc'); await pg.waitForSelector('#shRegistro.on');
+  ok(await pg.inputValue('#cuerpoRegistro [data-ejreg] [data-r="reps"]') !== '', 'el registro no trae lo guardado');
+  await ev(() => cerrarHojas());
+  // tocar de nuevo desmarca sin borrar los datos
+  await ev(u => { irA('semana'); }, uid);
+  await pg.click(`#v-semana .tick[data-tick="${uid}"]`); await pg.waitForTimeout(150);
+  const r2 = await ev(u => regDe(buscarSesion(u).s), uid);
+  ok(!r2.hecho && r2.ejercicios, 'desmarcar no debe borrar lo registrado');
+});
+await caso('C2', 'el resumen muestra la carga sugerida de hoy cuando hay historial', async () => {
+  // con un registro previo de sentadilla a 80 kg y RIR 6 (sobró), la próxima sesión sugiere 82,5 kg
+  const [a, b] = await ev(() => todasSesiones(plan()).filter(x => x.s.segmentos.some(g => /Sentadilla trasera/.test(g.descripcion || ''))).map(x => x.s.uid));
+  await ev(([a]) => { const p = plan(), s = buscarSesion(a).s; D.reg[claveReg(p, s)] = { hecho: true, fecha_sesion: s.fecha,
+    ejercicios: [{ nombre: 'Sentadilla trasera', k: 'sentadilla', carga_kg: 80, reps: '5-5-5-5', rir: 6 }] }; }, [a]);
+  const html = await ev(([b]) => resumenSesion(buscarSesion(b).s, zonasActuales(), 0).join(' '), [b]);
+  ok(/Hoy 82,5 kg/.test(html), 'no sugiere la carga: ' + html.slice(0, 200));
+});
+await caso('N10', 'Panel: indicadores, gráficos y tabla', async () => {
+  await pg.click('.tabs button[data-v="panel"]');
+  ok(await pg.locator('#v-panel .tiles > div').count() >= 4, 'faltan indicadores');
+  ok(await pg.locator('#v-panel .graf path').count() > 0, 'falta el gráfico de km');
+  await pg.locator('#v-panel .graf [data-tip]').nth(1).click();
+  ok(/Semana 1: hecho/.test(await texto('#v-panel .graf-card .tip')), 'el toque no muestra el detalle');
+  ok((await texto('#v-panel')).includes('1RM estimado'));
+  ok(await pg.locator('#v-panel .graf-card table').count() === 1, 'falta la vista de tabla');
+  ok(/Racha/.test(await texto('#v-panel .tiles')), 'falta la racha');
+  // un suave registrado demasiado rápido se marca
+  await ev(() => { const p = plan(); const x = todasSesiones(p).find(o => o.s.tipo === 'suave' && !(regDe(o.s) || {}).hecho);
+    D.reg[claveReg(p, x.s)] = { hecho: true, km: 10, tiempo: '45:00', rpe: 5, fecha_sesion: x.s.fecha }; pintar(); });
+  ok(/frente a la zona E/.test(await texto('#v-panel')) && /rápido/.test(await texto('#v-panel')), 'no marca el suave rápido');
+  if (CAPT) await pg.screenshot({ path: path.join(CAPT, 'panel.png'), fullPage: false });
+});
 await caso('I05/N06', 'detalle: estructura, explicaciones, ejercicios y estaciones', async () => {
   const uids = await ev(() => todasSesiones(plan()).map(x => x.s.uid));
   for (const uid of uids) {
@@ -184,14 +282,15 @@ await caso('I09/N04', 'registro con cargas de fuerza y "última vez"', async () 
   // la próxima sesión con sentadilla muestra la última carga
   const otra = await ev(u => todasSesiones(plan()).find(x => x.s.uid !== u && x.s.segmentos.some(g => /Sentadilla trasera/.test(g.descripcion || ''))).s.uid, uid);
   await ev(u => { cerrarHojas(); abrirDetalle(u); }, otra);
-  ok((await texto('#cuerpoDetalle')).includes('Última vez: 80 kg × 5-5-5-5'), 'no muestra la última vez');
+  const det = await texto('#cuerpoDetalle');
+  ok(det.includes('Última vez') && det.includes('80 kg × 5-5-5-5'), 'no muestra la última vez');
   await ev(() => cerrarHojas());
 });
 await caso('N05', 'exportar registro de fuerza en CSV', async () => {
   const csv = await ev(() => registroFuerzaCSV());
-  const [cab, l1] = csv.trim().split('\n');
+  const [cab, ...filas] = csv.trim().split('\n');
   ok(cab === 'fecha,ejercicio,series,reps,carga_kg,rir,notas');
-  ok(/^2026-11-23,Sentadilla trasera,4,5,80,3,reps 5-5-5-5$/.test(l1), 'fila inesperada: ' + l1);
+  ok(filas.some(l => /^2026-11-23,Sentadilla trasera,4,5,80,3,reps 5-5-5-5$/.test(l)), 'falta la sentadilla: ' + filas.join(' | '));
 });
 await caso('I10', 'marcar hecha desde la lista', async () => {
   await ev(() => irA('semana'));
@@ -242,10 +341,79 @@ await caso('I18', 'borrar un plan borra sus registros', async () => {
   await pg.click(`[data-borrar-plan="${id}"]`); await pg.waitForTimeout(250);
   ok(await ev(i => !D.planes.some(p => p.id === i) && !Object.keys(D.reg).some(k => k.startsWith(i + ':')), id));
 });
+await caso('C6', 'áreas de toque y accesibilidad', async () => {
+  await ev(() => irA('semana'));
+  const bb = await pg.locator('#v-semana .tick').first().boundingBox();
+  ok(bb.width >= 28 && bb.height >= 28, 'tilde pequeño: ' + bb.width);
+  ok(await pg.locator('#v-semana .tick[aria-label]').count() === await pg.locator('#v-semana .tick').count(), 'tilde sin etiqueta');
+  ok(await pg.locator('#v-semana .segctl [role="tab"][aria-selected="true"]').count() === 1);
+  const antes = await pg.locator('#v-semana .tick.on').count();
+  await pg.locator('#v-semana .tick:not(.on)').first().focus(); await pg.keyboard.press('Enter'); await pg.waitForTimeout(150);
+  ok(await pg.locator('#v-semana .tick.on').count() === antes + 1, 'el teclado no marca la sesión');
+  const sinNombre = await ev(() => [...document.querySelectorAll('button')].filter(b => b.offsetParent && !b.textContent.trim() && !b.getAttribute('aria-label')).length);
+  ok(sinNombre === 0, `${sinNombre} botones sin nombre accesible`);
+});
+await caso('C7', 'modo oscuro', async () => {
+  await pg.emulateMedia({ colorScheme: 'dark' });
+  for (const v of ['hoy', 'mes', 'panel', 'guia']) {
+    await ev(v => irA(v), v); await pg.waitForTimeout(80);
+    const [fondo, tarjeta, texto] = await ev(() => [getComputedStyle(document.body).backgroundColor,
+      getComputedStyle(document.querySelector('.vista:not(.off) .card, .vista:not(.off) .hoy-card, .vista:not(.off) .tiles div') || document.body).backgroundColor,
+      getComputedStyle(document.querySelector('.vista:not(.off) b, .vista:not(.off) h2') || document.body).color]);
+    const lum = c => { const [r, g, b] = c.match(/\d+/g).map(Number); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; };
+    ok(lum(fondo) < 0.15 && lum(tarjeta) < 0.2, `${v}: fondo claro en modo oscuro (${fondo} / ${tarjeta})`);
+    ok(lum(texto) > 0.6, `${v}: texto oscuro sobre fondo oscuro (${texto})`);
+    if (CAPT) await pg.screenshot({ path: path.join(CAPT, `oscuro-${v}.png`) });
+  }
+  await pg.emulateMedia({ colorScheme: 'light' });
+});
 await caso('E05', 'inputs de 16 px o más', async () => {
   await ev(() => irA('guia'));
   const chicos = await ev(() => [...document.querySelectorAll('input,select,textarea')].filter(e => e.offsetParent !== null && parseFloat(getComputedStyle(e).fontSize) < 16).length);
   ok(chicos === 0, `${chicos} inputs de menos de 16 px`);
+});
+
+await caso('C10', 'robustez: datos corruptos y tiempo inválido', async () => {
+  await ev(() => irA('hoy'));
+  const uid = await ev(() => todasSesiones(plan()).find(x => x.s.tipo === 'suave').s.uid);
+  await ev(u => abrirRegistro(u), uid);
+  await pg.fill('#rTiempo', 'cuarenta');
+  const antes = await ev(u => JSON.stringify(regDe(buscarSesion(u).s) || null), uid);
+  await pg.click('#btnGuardarReg'); await pg.waitForTimeout(150);
+  ok(await ev(u => JSON.stringify(regDe(buscarSesion(u).s) || null), uid) === antes, 'guardó un tiempo inválido');
+  ok(/Poné el tiempo/.test(await texto('#toast')), 'no avisa el formato');
+  await ev(() => cerrarHojas());
+  // una sesión corrupta no deja la vista en blanco
+  const errores0 = errores.length;
+  await ev(() => { irA('semana'); const s = semanaActual(plan()).sesiones.find(x => x.tipo !== 'descanso'); s.__copia = s.segmentos; s.segmentos = [null]; pintar(); });
+  ok(/No se pudo mostrar esta vista/.test(await texto('#v-semana')), 'la vista quedó en blanco');
+  ok(await pg.isVisible('#v-semana [data-ir="hoy"]'), 'sin salida desde el aviso');
+  await ev(() => { const s = semanaActual(plan()).sesiones.find(x => x.__copia); s.segmentos = s.__copia; delete s.__copia; pintar(); });
+  ok(await pg.locator('#v-semana .dia-blk').count() === 7, 'no se recupera');
+  errores.length = errores0;
+});
+
+await caso('E03/C8', 'service worker: funciona sin conexión y la página se pide primero a la red', async () => {
+  await pg.evaluate(() => navigator.serviceWorker.ready);
+  await pg.reload(); await pg.waitForTimeout(300);
+  ok(await ev(() => !!navigator.serviceWorker.controller), 'el service worker no controla la página');
+  await pg.context().setOffline(true);
+  await pg.reload(); await pg.waitForTimeout(300);
+  ok((await texto('#v-hoy')).length > 20, 'sin conexión la app no abre');
+  await pg.context().setOffline(false);
+  const sw = fs.readFileSync(path.join(RAIZ, 'sw.js'), 'utf8');
+  ok(/esPagina/.test(sw) && /SHELL = \[[^\]]*index\.html/.test(sw), 'estrategia o precarga del service worker');
+});
+
+await caso('C9', 'rendimiento con años de historial (1000 registros de fuerza)', async () => {
+  const ms = await ev(() => {
+    for (let i = 0; i < 1000; i++) D.reg['viejo' + i + ':x'] = { hecho: true, fecha_sesion: ymd(addDays(hoy(), -400 + (i % 390))),
+      ejercicios: [{ nombre: 'Sentadilla trasera', k: 'sentadilla', carga_kg: 80, reps: '5-5-5', rir: 3 }, { nombre: 'Floor press', k: 'floor_press', carga_kg: 25, reps: '8-8-8', rir: 2 }] };
+    const out = {};
+    for (const v of ['hoy', 'dia', 'mes', 'semana', 'panel']) { irA(v); const t0 = performance.now(); pintar(); out[v] = performance.now() - t0; }
+    return out;
+  });
+  for (const [v, t] of Object.entries(ms)) ok(t < 50, `${v} tarda ${t.toFixed(0)} ms`);
 });
 
 await navegador.close(); srv.close();
